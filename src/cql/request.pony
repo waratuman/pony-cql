@@ -50,6 +50,13 @@ class Request
 
     fun _encodeBody(data: None val): EncodedBody val => None
     fun _encodeBody(data: Array[U8 val] val): EncodedBody val => data
+    fun _encodeBody(data: String val): EncodedBody val =>
+        recover
+            let result = Array[U8 val](2 + data.size())
+            result.append(Bytes.from_u16(data.size().u16()))
+            result.append(data.array())
+            result
+        end
     fun _encodeBody(data: collection.Map[String val, String val] val): EncodedBody val =>
         recover
             let result = Array[U8 val]()
@@ -101,6 +108,6 @@ class Request
                 end
                 output.append("}")
             end
-            
+
             output
         end

@@ -1,3 +1,4 @@
+use "crypto"
 use "format"
 use "ponytest"
 use collection = "collections"
@@ -32,11 +33,7 @@ class iso _TestRequestEncode is UnitTest
             "040000000100000000",
             recover
                 let request = Request.create(Startup, 0, None)
-                let hexString = String()
-                for byte in request.encode().values() do
-                    hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
-                end
-                hexString
+                Bytes.to_hex_string(request.encode())
             end
         )
 
@@ -49,11 +46,7 @@ class iso _TestRequestEncode is UnitTest
                     b
                 end
                 let request = Request.create(Startup, 0, consume body)
-                let hexString = String()
-                for byte in request.encode().values() do
-                    hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
-                end
-                hexString
+                Bytes.to_hex_string(request.encode())
             end
         )
 

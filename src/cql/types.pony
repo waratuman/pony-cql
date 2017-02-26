@@ -65,11 +65,23 @@ type OpCode is (
     AuthResponse | AuthSuccess
 )
 
+// type StartupBody is collection.Map[String val, String val] val
+// // type AuthResponseBody is Array[U8 val] val
+// // type OptionsBody is None
+// // // type QueryBody is (String, )
+// // type PrepareBody is String
+// // type Execute
+// // type AuthenticateBody is None
+// type ErrorBody is (U32, String)
+
+
 type Body is (
-    Array[U8 val] val
+    String
+    | Array[U8 val] val
     | collection.Map[String val, String val] val
     | None val
 )
+
 
 type EncodedBody is ( Array[U8 val] val | None val )
 

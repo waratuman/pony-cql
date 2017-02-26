@@ -77,9 +77,14 @@ class ClientTCPConnectionNotify is TCPConnectionNotify
         else recover Array[U8 val]() end
         end
 
-        for byte in data.values() do
-            env.out.print(Format.int[U8](byte, FormatHex, PrefixDefault, 2))
+        let s = recover
+            let hexString = String()
+            for byte in data.values() do
+                hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
+            end
+            hexString
         end
+        env.out.print(consume s)
         data
 
     fun ref sentv(conn: TCPConnection ref, data: ByteSeqIter val): ByteSeqIter val =>
@@ -90,6 +95,14 @@ class ClientTCPConnectionNotify is TCPConnectionNotify
         env.out.print("received")
         try
             let response = Response.decode(data)
+            let s = recover
+                let hexString = String()
+                for byte in data.values() do
+                    hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
+                end
+                hexString
+            end
+            env.out.print(consume s)
             env.out.print("<- " + response.string())
         end
         false
