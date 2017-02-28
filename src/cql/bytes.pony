@@ -2,36 +2,46 @@ use "format"
 
 primitive Bytes
 
-    fun val from_u16(u16: U16, array: Array[U8] iso = recover Array[U8 val] end): Array[U8 val] val =>
-        let lsb: U8 = (u16 and 0xFF).u8()
-        let msb: U8 = ((u16 >> 8) and 0xFF).u8()
-        array.push(msb)
-        array.push(lsb)
-        consume array
+    fun val of[A: Integer[A] val](value: A): Array[U8 val] val =>
+        recover
+            let data = Array[U8 val]()
+            var width: A = value.bitwidth()// - A.from[U8](8)
+            let byte: A = A.from[U8](8)
+            while width.usize() > 0 do
+                width = width - byte
+                data.push((value >> width).u8())
+            end
+            data
+        end
+
+    fun val i8(data: Array[U8 val] val): I8 val ? =>
+        data(0).i8()
+
+    fun val u8(data: Array[U8 val] val): U8 val ? =>
+        data(0).u8()
+
+    fun val i16(data: Array[U8 val] val): I16 val ? =>
+        let a = data(0).i16()
+        let b = data(1).i16()
+        ((a << 8) or b)
     
-    fun val from_u32(u32: U32, array: Array[U8] iso = recover Array[U8 val] end): Array[U8 val] val =>
-        let a: U8 = (u32 and 0xFF).u8()
-        let b: U8 = ((u32 >> 8) and 0xFF).u8()
-        let c: U8 = ((u32 >> 16) and 0xFF).u8()
-        let d: U8 = ((u32 >> 24) and 0xFF).u8()
-        array.push(d)
-        array.push(c)
-        array.push(b)
-        array.push(a)
-        consume array
-    
-    fun val to_u16(data: Array[U8 val] val): U16 val ? =>
-        let msb: U16 val = data.apply(0).u16()
-        let lsb: U8 val = data.apply(1)
+    fun val u16(data: Array[U8 val] val): U16 val ? =>
+        let a = data(0).u16()
+        let b = data(1).u16()
+        ((a << 8) or b)
 
-        ((msb << 8) or lsb.u16())
+    fun val i32(data: Array[U8 val] val): I32 val ? =>
+        let a = data(0).i32()
+        let b = data(1).i32()
+        let c = data(2).i32()
+        let d = data(3).i32()
+        (a << 24) or (b << 16) or (c << 8) or d
 
-    fun val to_u32(data: Array[U8 val] val): U32 val ? =>
-        let a: U32 val = data.apply(0).u32()
-        let b: U32 val = data.apply(1).u32()
-        let c: U32 val = data.apply(2).u32()
-        let d: U32 val = data.apply(3).u32()
-
+    fun val u32(data: Array[U8 val] val): U32 val ? =>
+        let a = data(0).u32()
+        let b = data(1).u32()
+        let c = data(2).u32()
+        let d = data(3).u32()
         (a << 24) or (b << 16) or (c << 8) or d
 
     fun val from_hex_string(data: String val): Array[U8 val] val ? => 

@@ -25,23 +25,16 @@ actor Client is TCPConnectionNotify
 
     be connected(connection': TCPConnection) =>
         connection = connection'
-        try startup(connection') end
+        startup(connection')
     
     fun ref nextStream(): U16 =>
         _stream = _stream + 1
     
-    fun ref startup(connection': TCPConnection) ? =>
-        let request = startupRequest()
+    fun ref startup(connection': TCPConnection) =>
+        let request = StartupRequest.create(cqlVersion)
         env.out.print("-> " + request.string())
         connection'.write(request.encode())
-    
-    fun ref startupRequest(): Request =>
-        let body = recover
-            let b: collection.Map[String val, String val] ref = collection.Map[String val, String val]()
-            b.update("CQL_VERSION", cqlVersion)
-            b
-        end
-        Request.create(Startup, nextStream(), consume body)
+        
 
 
 
@@ -93,18 +86,18 @@ class ClientTCPConnectionNotify is TCPConnectionNotify
 
     fun ref received(conn: TCPConnection ref, data: Array[U8 val] val): Bool val =>
         env.out.print("received")
-        try
-            let response = Response.decode(data)
-            let s = recover
-                let hexString = String()
-                for byte in data.values() do
-                    hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
-                end
-                hexString
-            end
-            env.out.print(consume s)
-            env.out.print("<- " + response.string())
-        end
+        // try
+        //     let response = Response.decode(data)
+        //     let s = recover
+        //         let hexString = String()
+        //         for byte in data.values() do
+        //             hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
+        //         end
+        //         hexString
+        //     end
+        //     env.out.print(consume s)
+        //     env.out.print("<- " + response.string())
+        // end
         false
 
     // fun ref expect(conn: TCPConnection ref, qty: USize val): USize val =>

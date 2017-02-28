@@ -1,113 +1,156 @@
 use "format"
 use collection = "collections" 
 
-class Request
+trait Request is MessageBody
 
-    let version: U8 val = 4
-    let opcode: OpCode
-    let flags: U8 = 0
-    let stream: U16 val
-    let body: Body
-    
-    new create(opcode': OpCode, id': U16, body': Body = None) =>
-        opcode = opcode'
-        stream = id'
-        body = body'
+class StartupRequest is Request
 
-    fun encode(): Array[U8 val] val ? =>
-        recover
-            let encodedBody = _encodeBody(body)
-            let encodedBodyLength = _encodedBodyLength(encodedBody)
-            let encodedHeader = _encodeHeader(encodedBodyLength)
+    let cqlVersion: String val
+    let compression: (String val | None val)
 
-            let result = Array[U8 val](encodedBodyLength.usize() + encodedHeader.size())
-            result.append(encodedHeader)
-            match encodedBody
-            | let b: Array[U8 val] val => result.append(b)
+    new create(cqlVersion': String, compression': (String val | None val) = None) =>
+        cqlVersion = cqlVersion'
+        compression = compression'
+
+    new decode(data: Array[U8 val] val) ? =>
+        let pairs: U16 = Bytes.u16(recover data.slice(0, 2) end)
+
+        var foundCqlVersion: String = ""
+        var foundCompression: (String | None) = None
+        var dataIndex: U16 = 2
+        var processedPairs: U16 = 0
+        while processedPairs < pairs do
+            let keyLength = Bytes.u16(recover data.slice((dataIndex = dataIndex + 2).usize(), dataIndex.usize()) end)
+            let key: String = String.from_array(recover data.slice((dataIndex = dataIndex + keyLength).usize(), dataIndex.usize()) end)
+            let valueLength = Bytes.u16(recover data.slice((dataIndex = dataIndex + 2).usize(), dataIndex.usize()) end)
+            let value: String = String.from_array(recover data.slice((dataIndex = dataIndex + valueLength).usize(), dataIndex.usize()) end)
+
+            if key == "CQL_VERSION" then
+                foundCqlVersion = value
+            elseif key == "COMPRESSION" then
+                foundCompression = value
             end
-            result
-        end
-
-    fun _encodeHeader(length: U32): Array[U8 val] val =>
-        recover
-            let header = Array[U8 val](9)
             
-            header.push(version)
-            header.push(flags)
-
-            for byte in Bytes.from_u16(stream).values() do
-                header.push(byte)
-            end
-
-            header.push(opcode.value())
-
-            for byte in Bytes.from_u32(length).values() do
-                header.push(byte)
-            end
-            header
+            processedPairs = processedPairs + 1
         end
 
+        cqlVersion = foundCqlVersion
+        compression = foundCompression
 
-    fun _encodeBody(data: None val): EncodedBody val => None
-    fun _encodeBody(data: Array[U8 val] val): EncodedBody val => data
-    fun _encodeBody(data: String val): EncodedBody val =>
+    fun encode(): Array[U8 val] val =>
         recover
-            let result = Array[U8 val](2 + data.size())
-            result.append(Bytes.from_u16(data.size().u16()))
-            result.append(data.array())
-            result
-        end
-    fun _encodeBody(data: collection.Map[String val, String val] val): EncodedBody val =>
-        recover
-            let result = Array[U8 val]()
+            let data = Array[U8 val]()
+            var pairs: U16 = 1
 
-            for byte in Bytes.from_u16(data.size().u16()).values() do
-                result.push(byte)
+            match compression
+            | let c: String => 
+                pairs = pairs + 1
+                let compressionLength: U16 = 11
+                for byte in Bytes.of[U16](compressionLength).values() do
+                    data.push(byte)
+                end
+                for byte in "COMPRESSION".array().values() do
+                    data.push(byte)
+                end
+        
+                for byte in Bytes.of[U16](c.array().size().u16()).values() do
+                    data.push(byte)
+                end
+                for byte in c.array().values() do
+                    data.push(byte)
+                end
             end
 
-            for (k, v) in data.pairs() do
-                for byte in Bytes.from_u16(k.size().u16()).values() do
-                    result.push(byte)
-                end
-                for byte in k.values() do
-                    result.push(byte)
-                end
-                for byte in Bytes.from_u16(v.size().u16()).values() do
-                    result.push(byte)
-                end
-                for byte in v.values() do
-                    result.push(byte)
-                end
+            let cqlVersionLength: U16 = 11
+            for byte in Bytes.of[U16](cqlVersionLength).values() do
+                data.push(byte)
             end
-        end
+            for byte in "CQL_VERSION".array().values() do
+                data.push(byte)
+            end
 
-    fun tag _encodedBodyLength(data: (None | Array[U8 val] val)): U32 ? =>
-        match data
-        | let d: Array[U8 val] val =>
-            if (d.size() > U32.max_value().usize()) then
-                error
-            else
-                d.size().u32()
+            for byte in Bytes.of[U16](cqlVersion.array().size().u16()).values() do
+                data.push(byte)
             end
-        else
-            0
+            for byte in cqlVersion.array().values() do
+                data.push(byte)
+            end
+
+            for byte in Bytes.of[U16](pairs).reverse().values() do
+                data.unshift(byte)
+            end
+
+            data
         end
         
     
     fun string(): String val =>
         recover
             let output: String ref = String()
-            
-            output.append("[" + stream.string() + "] " + opcode.string().upper())
+            output.append("STARTUP {")
 
-            match body
-            | let b: collection.Map[String val, String val] val =>
-                output.append(" { ")
-                for (k, v) in b.pairs() do
-                    output.append("\"" + k + "\"" + ": \"" + v + "\" ")
-                end
-                output.append("}")
+            match compression
+            | let c: String => output.append(" \"COMPRESSION\": \"" + c + "\",")
             end
+            
+            output.append(" \"CQL_VERSION\": \"" + cqlVersion + "\"")
 
+            output.append(" }")
             output
         end
+
+class AuthResponseRequest is Request
+    
+    let token: (Array[U8 val] val | None)
+
+    new create(token': (Array[U8 val] val | None) = None) =>
+        token = token'
+    
+    new decode(data: Array[U8 val] val) ? =>
+        let length: I32 = Bytes.i32(recover data.slice(0, 4) end)
+
+        if (length < 0) then
+            token = None
+        else
+            token = recover data.slice(4, 4 + length.usize()) end
+        end
+    
+    fun encode(): Array[U8 val] val =>
+        recover
+            let data = Array[U8 val]()
+
+            match token
+            | None =>
+                let x: I32 = -1
+                for byte in Bytes.of[I32](x).values() do
+                    data.push(byte)
+                end
+            | let t: Array[U8 val] val =>
+                for byte in Bytes.of[I32](t.size().i32()).values() do
+                    data.push(byte)
+                end
+                for byte in t.values() do
+                    data.push(byte)
+                end
+            end
+            
+            data
+        end
+    
+    fun string(): String val =>
+        "AUTH_RESPONSE"
+
+class OptionsRequest is Request
+
+    new create() =>
+        None
+    
+    new decode(data: Array[U8 val] val) => 
+        None
+
+    fun encode(): Array[U8 val] val =>
+        recover Array[U8 val]() end
+    
+    fun string(): String val =>
+        "OPTIONS"
+
