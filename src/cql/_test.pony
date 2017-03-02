@@ -11,3 +11,5 @@ actor Main is TestList
         BytesTestList.make().tests(test)
         RequestTestList.make().tests(test)
         ResponseTestList.make().tests(test)
+        VisitorTestList.make().tests(test)
+        ParserTestList.make().tests(test)

@@ -65,23 +65,68 @@ type OpCode is (
     AuthResponse | AuthSuccess
 )
 
+type Body is ( Array[U8 val] val )
+
+type EncodedBody is ( Array[U8 val] val | None val )
+
 // Consistency 
+// primitive CAny
+//     fun value(): U8 => 0x0000
 primitive One
+    // fun value(): U8 => 0x0001
 primitive Two
+    // fun value(): U8 => 0x0002
 primitive Three
+    // fun value(): U8 => 0x0003
 primitive Quorum
+    // fun value(): U8 => 0x0004
 primitive All
+    // fun value(): U8 => 0x0005
 primitive LocalQuorum
+    // fun value(): U8 => 0x0006
 primitive EachQuorum
+    // fun value(): U8 => 0x0007
 primitive Serial
+    // fun value(): U8 => 0x0008
 primitive LocalSerial
+    // fun value(): U8 => 0x0009
 primitive LocalOne
+    // fun value(): U8 => 0x000A
 
 type Consistency is (
     Any | One | Two | Three | Quorum | All | LocalQuorum | EachQuorum | Serial
     | LocalSerial | LocalOne
 )
 
-type Body is ( Array[U8 val] val )
+primitive Values is collection.Flag[U8]
+    fun value(): U8 => 0x01
+    fun string(): String => "Values"
 
-type EncodedBody is ( Array[U8 val] val | None val )
+primitive SkipMetadata is collection.Flag[U8]
+    fun value(): U8 => 0x02
+    fun string(): String => "SkipMetadata"
+
+primitive PageSize is collection.Flag[U8]
+    fun value(): U8 => 0x04
+    fun string(): String => "PageSize"
+
+primitive WithPagingState is collection.Flag[U8]
+    fun value(): U8 => 0x08
+    fun string(): String => "WithPagingState"
+
+primitive WithSerialConsistency is collection.Flag[U8]
+    fun value(): U8 => 0x10
+    fun string(): String => "WithSerialConsistency"
+
+primitive WithDefaultTimestamp is collection.Flag[U8]
+    fun value(): U8 => 0x20
+    fun string(): String => "WithDefaultTimestamp"
+
+primitive WithNamesForValues is collection.Flag[U8]
+    fun value(): U8 => 0x40
+    fun string(): String => "WithNamesForValues"
+
+type QueryFlags is (
+    Values | SkipMetadata | PageSize | WithPagingState | WithSerialConsistency
+    | WithDefaultTimestamp | WithNamesForValues
+)

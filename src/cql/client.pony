@@ -33,9 +33,7 @@ actor Client is TCPConnectionNotify
     fun ref startup(connection': TCPConnection) =>
         let request = StartupRequest.create(cqlVersion)
         env.out.print("-> " + request.string())
-        connection'.write(request.encode())
-        
-
+        connection'.write(Visitor(request))
 
 
 class ClientTCPConnectionNotify is TCPConnectionNotify
