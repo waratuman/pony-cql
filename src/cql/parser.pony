@@ -25,10 +25,10 @@ primitive Parser
 
         Message(version, opcode, flags, stream, length, body)
 
-    fun parseRequest(data: Array[U8 val] val): Request ? =>
+    fun parseRequest(data: Array[U8 val] val): Request val ? =>
         parseStartupRequest(data)
     
-    fun parseStartupRequest(data: Array[U8 val] val): StartupRequest ? =>
+    fun parseStartupRequest(data: Array[U8 val] val): StartupRequest val ? =>
         let pairs: U16 = Bytes.u16(recover data.slice(0, 2) end)
 
         var cqlVersion: String = ""
@@ -50,9 +50,9 @@ primitive Parser
             processedPairs = processedPairs + 1
         end
 
-        StartupRequest(cqlVersion, compression)
+        recover StartupRequest(cqlVersion, compression) end
 
-    fun parseAuthResponseRequest(data: Array[U8 val] val): AuthResponseRequest ? =>
+    fun parseAuthResponseRequest(data: Array[U8 val] val): AuthResponseRequest val ? =>
         let length: I32 = Bytes.i32(recover data.slice(0, 4) end)
 
         let token: (None | Array[U8 val] val) = if (length < 0) then
@@ -61,8 +61,8 @@ primitive Parser
             recover data.slice(4, 4 + length.usize()) end
         end
 
-        AuthResponseRequest(token)
+        recover AuthResponseRequest(token) end
     
-    fun parseOptionsRequest(data: Array[U8 val] val): OptionsRequest =>
-        OptionsRequest()
+    fun parseOptionsRequest(data: Array[U8 val] val): OptionsRequest val =>
+        recover OptionsRequest() end
     

@@ -6,7 +6,7 @@ type Request is (
     | OptionsRequest
 )
 
-class StartupRequest
+class val StartupRequest
 
     let cqlVersion: String val
     let compression: (String val | None val)
@@ -30,7 +30,7 @@ class StartupRequest
             output
         end
 
-class AuthResponseRequest
+class val AuthResponseRequest
     
     let token: (Array[U8 val] val | None)
 
@@ -40,7 +40,7 @@ class AuthResponseRequest
     fun string(): String val =>
         "AUTH_RESPONSE"
 
-class OptionsRequest
+class val OptionsRequest
 
     new apply() =>
         None
@@ -51,14 +51,21 @@ class OptionsRequest
     fun string(): String val =>
         "OPTIONS"
 
-// class QueryRequest is Request
+class val QueryRequest
 
-//     let query: String val
-//     let consistency: Consistency val
-//     let metadata: Bool val = true
-//     let pageSize: None val | U32 val = None
-//     let pagingState None val | Array[U8 val] val
-//     let serialConsistency: None val | Serial val | LocalSerial val = None
-//     let timestamp: None val | U64 val
+    let query: String val
+    let consistency: Consistency val
+    let metadata: Bool val
+    let pageSize: (None val | U32 val)
+    let pagingState: (None val | Array[U8 val] val)
+    let serialConsistency: (None val | Serial val | LocalSerial val)
+    let timestamp: (None val | U64 val)
 
-//     new create(query: String val) =>
+    new create(query': String val, consistency': Consistency val, metadata': Bool val = true, pageSize': (None val | U32 val) = None, pagingState': (None val | Array[U8 val] val) = None, serialConsistency': (None val | Serial val | LocalSerial val) = None, timestamp': (None val | U64 val) = None) =>
+        query = query'
+        consistency = consistency'
+        metadata = metadata'
+        pageSize = pageSize'
+        pagingState = pagingState'
+        serialConsistency = serialConsistency'
+        timestamp = timestamp'

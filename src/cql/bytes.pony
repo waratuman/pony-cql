@@ -5,7 +5,7 @@ primitive Bytes
     fun val of[A: Integer[A] val](value: A): Array[U8 val] val =>
         recover
             let data = Array[U8 val]()
-            var width: A = value.bitwidth()// - A.from[U8](8)
+            var width: A = value.bitwidth()
             let byte: A = A.from[U8](8)
             while width.usize() > 0 do
                 width = width - byte

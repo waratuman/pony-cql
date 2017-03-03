@@ -14,8 +14,3 @@ class Message
         stream = stream'
         length = length'
         body = body'
-
-trait MessageBody
-    fun encode(): Array[U8 val] val
-    new decode(data: Array[U8 val] val) ?
-    fun string(): String val

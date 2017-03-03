@@ -31,7 +31,7 @@ actor Client is TCPConnectionNotify
         _stream = _stream + 1
     
     fun ref startup(connection': TCPConnection) =>
-        let request = StartupRequest.create(cqlVersion)
+        let request: StartupRequest val = recover StartupRequest.create(cqlVersion) end
         env.out.print("-> " + request.string())
         connection'.write(Visitor(request))
 
