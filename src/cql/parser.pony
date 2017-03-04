@@ -1,29 +1,27 @@
 primitive Parser
 
-    fun apply(data: Array[U8 val] val): Message ? =>
+    fun apply(data: Array[U8 val] val): Message val ? =>
+        parseMessage(data)
+
+    fun parseMessage(data: Array[U8 val] val): Message val ? =>
         let version: U8 val = data(0) and 0b0111
         let flags: U8 val = data(1)
         let stream: U16 val = Bytes.u16(recover data.slice(2,4) end)
 
-        let opcode' = data(4)
+        let opcode = data(4)
         let length: U32 val = Bytes.u32(recover data.slice(5,9) end)
         let body' = recover data.slice(9, 9 + length.usize()) end
-        
-        var opcode: OpCode
-        var body: Request
-
-        match opcode'
+    
+        let body: Request = match opcode
         // | 0x00 =>
-        //     opcode = Error
         //     body = ErrorRequest.decode(consume body')
-        | 0x01 =>
-            opcode = Startup
-            body = Parser.parseStartupRequest(consume body')
-        else
-            error
+        | 0x01 => parseStartupRequest(consume body')
+        | 0x05 => parseOptionsRequest(consume body')
+        | 0x0F => parseAuthResponseRequest(consume body')
+        else error
         end
 
-        Message(version, opcode, flags, stream, length, body)
+        recover Message(version, flags, stream, body) end
 
     fun parseRequest(data: Array[U8 val] val): Request val ? =>
         parseStartupRequest(data)

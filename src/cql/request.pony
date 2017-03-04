@@ -4,6 +4,7 @@ type Request is (
     StartupRequest
     | AuthResponseRequest
     | OptionsRequest
+    | QueryRequest
 )
 
 class val StartupRequest
@@ -69,3 +70,6 @@ class val QueryRequest
         pagingState = pagingState'
         serialConsistency = serialConsistency'
         timestamp = timestamp'
+
+    fun string(): String val =>
+        "QUERY"

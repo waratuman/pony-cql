@@ -1,80 +1,108 @@
 primitive Visitor
     
-    fun apply(message: Request val): Array[U8 val] val =>
-        recover visitRequest(Array[U8 val](), message) end
+    fun apply(message: Message val): Array[U8 val] val =>
+        recover visitMessage(message) end
     
-    fun visit(collector: Array[U8 val] ref, message: Request val): Array[U8 val] ref => 
-        visitRequest(collector, consume message)
+    fun visitMessage(message: Message val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        let version: U8 = match message.body
+        | let b: Request => 0x7F and message.version
+        // | Response => 0xFF or message.version
+        else message.version
+        end
+        c.push(version)
 
-    fun visitRequest(c: Array[U8 val] ref, request: Request val): Array[U8 val] ref =>
+        c.push(message.flags)
+
+        visitShort(message.stream, c)
+
+        let opcode: U8 = match message.body
+        | let b: StartupRequest => 0x01
+        | let b: OptionsRequest => 0x05
+        | let b: QueryRequest => 0x07
+        | let b: AuthResponseRequest => 0x0F
+        else 0
+        end
+    
+        c.push(opcode)
+
+        let body = Array[U8 val]()
+        match message.body
+        | let r: Request => visitRequest(r, body)
+        end
+        
+        visitInt(body.size().i32(), c)
+
+        c.append(body)
+        
+        c
+
+    fun visitRequest(request: Request val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         match consume request
-        | let r: StartupRequest val => visitStartupRequest(c, r)
-        | let r: AuthResponseRequest val => visitAuthResponseRequest(c, r)
+        | let r: StartupRequest val => visitStartupRequest(r, c)
+        | let r: AuthResponseRequest val => visitAuthResponseRequest(r, c)
         else
-            Array[U8 val]()
+            c
         end
         c
 
-    fun visitStartupRequest(collector: Array[U8 val] ref, request: StartupRequest val): Array[U8 val] ref =>
+    fun visitStartupRequest(request: StartupRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         let compression = request.compression
         let cqlVersion = request.cqlVersion
     
-        let c = Array[U8 val]()
-        var pairs: U16 = 1
+        let pairs: U16 = if compression is None then 1 else 2 end
+
+        visitShort(pairs, c)
 
         match compression
         | let compression': String => 
-            pairs = pairs + 1
-            visitString(c, "COMPRESSION")
-            visitString(c, compression')
+            visitString("COMPRESSION", c)
+            visitString(compression', c)
         end
 
-        visitString(c, "CQL_VERSION")
-        visitString(c, cqlVersion)
+        visitString("CQL_VERSION", c)
+        visitString(cqlVersion, c)
 
-        for byte in Bytes.of[U16](pairs).reverse().values() do
-            c.unshift(byte)
-        end
+        c
 
-        collector.append(c)
-        collector
+    fun visitOptionsRequest(request: OptionsRequest, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        c
 
-    fun visitAuthResponseRequest(c: Array[U8 val] ref, request: AuthResponseRequest val): Array[U8 val] ref =>
+    fun visitAuthResponseRequest(request: AuthResponseRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         let token = request.token
 
         match token
-        | None => visitInt(c, -1)
-        | let t: Array[U8 val] val => visitBytes(c, t)
+        | None => visitInt(-1, c)
+        | let t: Array[U8 val] val => visitBytes(t, c)
         end
         
         c
 
     // fun visitQueryRequest(request: QueryRequest iso): Array[U8 val] val =>
 
-    fun visitNone(c: Array[U8 val] ref, data: None val): Array[U8 val] ref =>
+    fun visitNone(data: None val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
 
-    fun visitInt(c: Array[U8 val] ref, value: I32 val): Array[U8 val] ref =>
+    fun visitInt(value: I32 val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c.push((value >> 24).u8())
         c.push((value >> 16).u8())
         c.push((value >> 8).u8())
         c.push(value.u8())
         c
 
-    fun visitShort(c: Array[U8 val] ref, value: U16 val): Array[U8 val] ref =>
+    fun visitShort(value: U16 val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c.push((value >> 8).u8())
         c.push(value.u8())
         c
 
-    fun visitBytes(c: Array[U8 val] ref, data: Array[U8 val] val): Array[U8 val] ref =>
-        visitInt(c, data.size().i32())
+    fun visitBytes(data: Array[U8 val] val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        visitInt(data.size().i32(), c)
         for byte in data.values() do
             c.push(byte)
         end
         c
 
-    fun visitString(c: Array[U8 val] ref, data: String val): Array[U8 val] ref =>
-        visitShort(c, data.size().u16())
+    fun visitString(data: String val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        visitShort(data.size().u16(), c)
         for byte in data.array().values() do
             c.push(byte)
         end

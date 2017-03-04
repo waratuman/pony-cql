@@ -1,16 +1,25 @@
+use collection = "collections" 
+
+primitive Compression   fun value(): U8 => 0x01
+primitive Tracing       fun value(): U8 => 0x02
+primitive CustomPayload fun value(): U8 => 0x04
+primitive Warning       fun value(): U8 => 0x08
+primitive Beta          fun value(): U8 => 0x10
+
+type Flag is collection.Flags[(Compression | Tracing | CustomPayload | Warning | Beta), U8]
+
 class Message
 
     let version: U8 val
-    let opcode: OpCode val
     let flags: U8 val
     let stream: U16 val
-    let length: U32 val
-    let body: Request // (Request | Response)
+    let body: Request
 
-    new create(version': U8 val, opcode': OpCode val, flags': U8 val, stream': U16 val, length': U32 val, body': Request) =>
+    new create(version': U8 val, flags': U8 val, stream': U16 val, body': Request) =>
         version = version'
-        opcode = opcode'
         flags = flags'
         stream = stream'
-        length = length'
         body = body'
+
+    fun string(): String val =>
+        body.string()

@@ -10,6 +10,7 @@ actor VisitorTestList is TestList
     new make() => None
 
     fun tag tests(test: PonyTest) =>
+        test(_TestVisitMesssage)
         test(_TestVisitStartupRequest)
         test(_TestVisitAuthResponseRequest)
         test(_TestVisitOptionsRequest)
@@ -20,20 +21,44 @@ actor VisitorTestList is TestList
         test(_TestVisitBytes)
         test(_TestVisitString)
 
+class iso _TestVisitMesssage is UnitTest
+    fun name(): String => "Visitor.visitMessage"
+
+    fun tag apply(h: TestHelper) =>
+        var request: Request val = recover StartupRequest("3.0.0") end
+        var message: Message val = recover Message(4, 0, 0, request) end
+        var result: Array[U8 val] val = recover Visitor.visitMessage(message) end
+        
+        h.assert_eq[String val](
+            "0400000001000000160001000B43514C5F56455253494F4E0005332E302E30",
+            Bytes.to_hex_string(result)
+        )
+
+        request = recover AuthResponseRequest(recover [as U8: 0xAB, 0xCD] end) end
+        message = recover Message(4, 0, 0, request) end
+        result = recover Visitor.visitMessage(message) end
+        h.assert_eq[String val](
+            "040000000F0000000600000002ABCD",
+            Bytes.to_hex_string(result)
+        )
+
 class iso _TestVisitStartupRequest is UnitTest
     fun name(): String => "Visitor.visitStartupRequest"
 
     fun tag apply(h: TestHelper) =>
         var request: StartupRequest val = recover StartupRequest("3.0.0") end
+        var result: Array[U8 val] val = recover Visitor.visitStartupRequest(request) end
+        
         h.assert_eq[String val](
             "0001000B43514C5F56455253494F4E0005332E302E30",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
 
         request = recover StartupRequest("3.0.0", "snappy") end
+        result = recover Visitor.visitStartupRequest(request) end
         h.assert_eq[String val](
             "0002000B434F4D5052455353494F4E0006736E61707079000B43514C5F56455253494F4E0005332E302E30",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
 
 class iso _TestVisitAuthResponseRequest is UnitTest
@@ -41,15 +66,17 @@ class iso _TestVisitAuthResponseRequest is UnitTest
 
     fun tag apply(h: TestHelper) =>
         var request: AuthResponseRequest val = recover AuthResponseRequest() end
+        var result: Array[U8 val] val = recover Visitor.visitAuthResponseRequest(request) end
         h.assert_eq[String val](
             "FFFFFFFF",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
 
         request = recover AuthResponseRequest(recover [as U8: 0xAB, 0xCD] end) end
+        result = recover Visitor.visitAuthResponseRequest(request) end
         h.assert_eq[String val](
             "00000002ABCD",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
 
 class iso _TestVisitOptionsRequest is UnitTest
@@ -57,9 +84,10 @@ class iso _TestVisitOptionsRequest is UnitTest
 
     fun tag apply(h: TestHelper) =>
         let request: OptionsRequest val = recover OptionsRequest() end
+        let result: Array[U8 val] val = recover Visitor.visitOptionsRequest(request) end
         h.assert_eq[String val](
             "",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
 
 class iso _TestVisitNone is UnitTest
@@ -67,7 +95,7 @@ class iso _TestVisitNone is UnitTest
 
     fun tag apply(h: TestHelper) =>
         let collector = Array[U8 val]()
-        Visitor.visitNone(collector, None)
+        Visitor.visitNone(None, collector)
         h.assert_eq[USize](0, collector.size())
 
 class iso _TestVisitInt is UnitTest
@@ -75,14 +103,14 @@ class iso _TestVisitInt is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var collector = Array[U8 val]()
-        Visitor.visitInt(collector, I32.min_value())
+        Visitor.visitInt(I32.min_value(), collector)
         h.assert_eq[U8](0x80, collector(0))
         h.assert_eq[U8](0x00, collector(1))
         h.assert_eq[U8](0x00, collector(2))
         h.assert_eq[U8](0x00, collector(3))
         
         collector = Array[U8 val]()
-        Visitor.visitInt(collector, I32.max_value())
+        Visitor.visitInt(I32.max_value(), collector)
         h.assert_eq[U8](0x7F, collector(0))
         h.assert_eq[U8](0xFF, collector(1))
         h.assert_eq[U8](0xFF, collector(2))
@@ -93,12 +121,12 @@ class iso _TestVisitShort is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var collector = Array[U8 val]()
-        Visitor.visitShort(collector, U16.min_value())
+        Visitor.visitShort(U16.min_value(), collector)
         h.assert_eq[U8](0x00, collector(0))
         h.assert_eq[U8](0x00, collector(1))
         
         collector = Array[U8 val]()
-        Visitor.visitShort(collector, U16.max_value())
+        Visitor.visitShort(U16.max_value(), collector)
         h.assert_eq[U8](0xFF, collector(0))
         h.assert_eq[U8](0xFF, collector(1))
 
@@ -107,7 +135,7 @@ class iso _TestVisitBytes is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var collector = Array[U8 val]()
-        Visitor.visitBytes(collector, recover [as U8: 0xAB, 0xCD] end)
+        Visitor.visitBytes(recover [as U8: 0xAB, 0xCD] end, collector)
         h.assert_eq[U8](0x00, collector(0))
         h.assert_eq[U8](0x00, collector(1))
         h.assert_eq[U8](0x00, collector(2))
@@ -120,7 +148,7 @@ class iso _TestVisitString is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var collector = Array[U8 val]()
-        Visitor.visitString(collector, "CQL_VERSION")
+        Visitor.visitString("CQL_VERSION", collector)
         h.assert_eq[U8](0x00, collector(0))
         h.assert_eq[U8](0x0B, collector(1))
         h.assert_eq[U8](0x43, collector(2))
@@ -134,3 +162,5 @@ class iso _TestVisitString is UnitTest
         h.assert_eq[U8](0x49, collector(10))
         h.assert_eq[U8](0x4F, collector(11))
         h.assert_eq[U8](0x4E, collector(12))
+
+// class iso _TestVisitOpCode is UnitTest

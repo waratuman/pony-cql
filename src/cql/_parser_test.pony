@@ -10,9 +10,37 @@ actor ParserTestList is TestList
     new make() => None
 
     fun tag tests(test: PonyTest) =>
+        test(_TestParseMessage)
         test(_TestParseStartupRequest)
         test(_TestParseAuthResponseRequest)
         test(_TestParseOptionsRequest)
+
+class iso _TestParseMessage is UnitTest
+    fun name(): String => "Parser.parseMessage"
+
+    fun tag apply(h: TestHelper) ? => 
+        var data: Array[U8 val] val = Bytes.from_hex_string("0400000001000000160001000B43514C5F56455253494F4E0005332E302E30")
+        var message = Parser.parseMessage(data)
+
+        h.assert_eq[U8](4, message.version)
+        h.assert_eq[U8](0, message.flags)
+        h.assert_eq[U16](0, message.stream)
+        
+        match message.body
+        | let b: StartupRequest => h.assert_eq[String]("3.0.0", b.cqlVersion)
+        else h.fail()
+        end
+
+        data = Bytes.from_hex_string("040000010F0000000600000002ABCD")
+        message = Parser.parseMessage(data)
+        
+        h.assert_eq[U8](4, message.version)
+        h.assert_eq[U8](0, message.flags)
+        h.assert_eq[U16](1, message.stream)
+        match message.body
+        | let b: AuthResponseRequest => None
+        else h.fail()
+        end
 
 class iso _TestParseStartupRequest is UnitTest
     fun name(): String => "Parser.parseStartupRequest"
@@ -63,16 +91,17 @@ class iso _TestParseOptionsRequest is UnitTest
     fun tag apply(h: TestHelper) ? =>
         var data: Array[U8 val] val = recover Array[U8 val]() end
         var request = Parser.parseOptionsRequest(data)
+        var result: Array[U8 val] val = recover Visitor.visitOptionsRequest(request) end
         h.assert_eq[String val](
             "",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
 
         // Extra data should be ignored
         data = Bytes.from_hex_string("FFFFFFFF")
         request = Parser.parseOptionsRequest(data)
+        result = recover Visitor.visitOptionsRequest(request) end
         h.assert_eq[String val](
             "",
-            Bytes.to_hex_string(Visitor(request))
+            Bytes.to_hex_string(result)
         )
-

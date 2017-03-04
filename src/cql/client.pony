@@ -6,12 +6,15 @@ actor Client is TCPConnectionNotify
 
     let env: Env
     let cqlVersion: String = "3.0.0"
-    var _stream: U16 = 0
+    let compression: (String val | None) = None
+    let _flags: U8 = 0x00
+    var _stream: U16 = 0x0000
 
     var connection: (TCPConnection | None) = None
 
     new create(env': Env) =>
         env = env'
+
     
     be connect() =>
         try
@@ -32,8 +35,12 @@ actor Client is TCPConnectionNotify
     
     fun ref startup(connection': TCPConnection) =>
         let request: StartupRequest val = recover StartupRequest.create(cqlVersion) end
+        let message: Message val = _createMessage(request)  
         env.out.print("-> " + request.string())
-        connection'.write(Visitor(request))
+        connection'.write(Visitor(message))
+    
+    fun ref _createMessage(body: Request val): Message val =>
+        recover Message(4, _flags, _stream + 1, body) end
 
 
 class ClientTCPConnectionNotify is TCPConnectionNotify
