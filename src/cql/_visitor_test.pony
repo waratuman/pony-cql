@@ -14,6 +14,8 @@ actor VisitorTestList is TestList
         test(_TestVisitStartupRequest)
         test(_TestVisitAuthResponseRequest)
         test(_TestVisitOptionsRequest)
+        
+        test(_TestVistReadyResponse)
 
         test(_TestVisitNone)
         test(_TestVisitInt)
@@ -90,6 +92,14 @@ class iso _TestVisitOptionsRequest is UnitTest
             Bytes.to_hex_string(result)
         )
 
+class iso _TestVistReadyResponse is UnitTest
+    fun name(): String => "Visitor.visitReady"
+
+    fun tag apply(h: TestHelper) =>
+        let collector = Array[U8 val]()
+        Visitor.visitReadyResponse(ReadyResponse(), collector)
+        h.assert_eq[USize](0, collector.size())
+
 class iso _TestVisitNone is UnitTest
     fun name(): String => "Visitor.visitNone"
 
@@ -162,5 +172,3 @@ class iso _TestVisitString is UnitTest
         h.assert_eq[U8](0x49, collector(10))
         h.assert_eq[U8](0x4F, collector(11))
         h.assert_eq[U8](0x4E, collector(12))
-
-// class iso _TestVisitOpCode is UnitTest

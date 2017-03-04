@@ -15,6 +15,8 @@ actor ParserTestList is TestList
         test(_TestParseAuthResponseRequest)
         test(_TestParseOptionsRequest)
 
+        test(_TestParseReadyResponse)
+
 class iso _TestParseMessage is UnitTest
     fun name(): String => "Parser.parseMessage"
 
@@ -105,3 +107,26 @@ class iso _TestParseOptionsRequest is UnitTest
             "",
             Bytes.to_hex_string(result)
         )
+
+class iso _TestParseReadyResponse is UnitTest
+    fun name(): String => "Parser.parseReadyResponse"
+
+    fun tag apply(h: TestHelper) ? =>
+        var data: Array[U8 val] val = recover Array[U8 val]() end
+        var request = Parser.parseReadyResponse(data)
+        var result: Array[U8 val] val = recover Visitor.visitReadyResponse(request) end
+        h.assert_eq[String val](
+            "",
+            Bytes.to_hex_string(result)
+        )
+
+        // Extra data should be ignored
+        data = Bytes.from_hex_string("FFFFFFFF")
+        request = Parser.parseReadyResponse(data)
+        result = recover Visitor.visitReadyResponse(request) end
+        h.assert_eq[String val](
+            "",
+            Bytes.to_hex_string(result)
+        )
+
+// class iso _TestParseBytes is UnitTest

@@ -12,7 +12,7 @@ class val StartupRequest
     let cqlVersion: String val
     let compression: (String val | None val)
 
-    new create(cqlVersion': String, compression': (String val | None val) = None) =>
+    new val create(cqlVersion': String, compression': (String val | None val) = None) =>
         cqlVersion = cqlVersion'
         compression = compression'
 
@@ -35,7 +35,7 @@ class val AuthResponseRequest
     
     let token: (Array[U8 val] val | None)
 
-    new create(token': (Array[U8 val] val | None) = None) =>
+    new val create(token': (Array[U8 val] val | None) = None) =>
         token = token'
     
     fun string(): String val =>
@@ -43,10 +43,10 @@ class val AuthResponseRequest
 
 class val OptionsRequest
 
-    new apply() =>
+    new val apply() =>
         None
 
-    new create() =>
+    new val create() =>
         None
 
     fun string(): String val =>
@@ -62,7 +62,7 @@ class val QueryRequest
     let serialConsistency: (None val | Serial val | LocalSerial val)
     let timestamp: (None val | U64 val)
 
-    new create(query': String val, consistency': Consistency val, metadata': Bool val = true, pageSize': (None val | U32 val) = None, pagingState': (None val | Array[U8 val] val) = None, serialConsistency': (None val | Serial val | LocalSerial val) = None, timestamp': (None val | U64 val) = None) =>
+    new val create(query': String val, consistency': Consistency val, metadata': Bool val = true, pageSize': (None val | U32 val) = None, pagingState': (None val | Array[U8 val] val) = None, serialConsistency': (None val | Serial val | LocalSerial val) = None, timestamp': (None val | U64 val) = None) =>
         query = query'
         consistency = consistency'
         metadata = metadata'

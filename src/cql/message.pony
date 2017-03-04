@@ -13,9 +13,9 @@ class Message
     let version: U8 val
     let flags: U8 val
     let stream: U16 val
-    let body: Request
+    let body: (Request val | Response val)
 
-    new create(version': U8 val, flags': U8 val, stream': U16 val, body': Request) =>
+    new val create(version': U8 val, flags': U8 val, stream': U16 val, body': (Request val | Response val)) =>
         version = version'
         flags = flags'
         stream = stream'

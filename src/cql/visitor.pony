@@ -17,6 +17,7 @@ primitive Visitor
 
         let opcode: U8 = match message.body
         | let b: StartupRequest => 0x01
+        | let b: ReadyResponse => 0x02
         | let b: OptionsRequest => 0x05
         | let b: QueryRequest => 0x07
         | let b: AuthResponseRequest => 0x0F
@@ -26,9 +27,7 @@ primitive Visitor
         c.push(opcode)
 
         let body = Array[U8 val]()
-        match message.body
-        | let r: Request => visitRequest(r, body)
-        end
+        visitBody(message.body, body)
         
         visitInt(body.size().i32(), c)
 
@@ -36,14 +35,13 @@ primitive Visitor
         
         c
 
-    fun visitRequest(request: Request val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
-        match consume request
+    fun visitBody(body: (Request val | Response val), c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        match consume body
         | let r: StartupRequest val => visitStartupRequest(r, c)
+        | let r: ReadyResponse val => visitReadyResponse(r, c)
         | let r: AuthResponseRequest val => visitAuthResponseRequest(r, c)
-        else
-            c
+        else c
         end
-        c
 
     fun visitStartupRequest(request: StartupRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         let compression = request.compression
@@ -78,6 +76,9 @@ primitive Visitor
         c
 
     // fun visitQueryRequest(request: QueryRequest iso): Array[U8 val] val =>
+
+    fun visitReadyResponse(response: ReadyResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        c
 
     fun visitNone(data: None val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
