@@ -16,12 +16,14 @@ actor VisitorTestList is TestList
         test(_TestVisitOptionsRequest)
         
         test(_TestVistReadyResponse)
+        test(_TestVisitAuthenticateResponse)
 
         test(_TestVisitNone)
         test(_TestVisitInt)
         test(_TestVisitShort)
         test(_TestVisitBytes)
         test(_TestVisitString)
+        test(_TestVisitStringMap)
 
 class iso _TestVisitMesssage is UnitTest
     fun name(): String => "Visitor.visitMessage"
@@ -100,6 +102,17 @@ class iso _TestVistReadyResponse is UnitTest
         Visitor.visitReadyResponse(ReadyResponse(), collector)
         h.assert_eq[USize](0, collector.size())
 
+class iso _TestVisitAuthenticateResponse is UnitTest
+    fun name(): String => "Visitor.visitAuthenticateResponse"
+
+    fun tag apply(h: TestHelper) =>
+        let request: AuthenticateResponse val = recover AuthenticateResponse("org.apache.cassandra.auth.PasswordAuthenticator") end
+        let result: Array[U8 val] val = recover Visitor.visitAuthenticateResponse(request) end
+        h.assert_eq[String val](
+            "002F6F72672E6170616368652E63617373616E6472612E617574682E50617373776F726441757468656E74696361746F72",
+            Bytes.to_hex_string(result)
+        )
+
 class iso _TestVisitNone is UnitTest
     fun name(): String => "Visitor.visitNone"
 
@@ -172,3 +185,25 @@ class iso _TestVisitString is UnitTest
         h.assert_eq[U8](0x49, collector(10))
         h.assert_eq[U8](0x4F, collector(11))
         h.assert_eq[U8](0x4E, collector(12))
+
+class iso _TestVisitStringMap is UnitTest
+    fun name(): String => "Visitor.visitStringMap"
+
+    fun tag apply(h: TestHelper) ? =>
+        let data: collection.Map[String val, String val] val = recover
+            let d = collection.Map[String val, String val]()
+            d.insert("username", "cassandra")
+            d.insert("password", "cassandra")
+            d
+        end
+        
+        let collector: Array[U8 val] val = recover
+            let c = Array[U8 val]()
+            Visitor.visitStringMap(data, c)
+            c
+        end
+
+        h.assert_eq[String val](
+            "0002000870617373776F7264000963617373616E6472610008757365726E616D65000963617373616E647261",
+            Bytes.to_hex_string(collector)
+        )

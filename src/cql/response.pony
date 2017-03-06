@@ -1,5 +1,6 @@
 type Response is (
     ReadyResponse
+    | AuthenticateResponse
 )
 
 class val ReadyResponse
@@ -12,3 +13,13 @@ class val ReadyResponse
 
     fun string(): String val =>
         "READY"
+
+class val AuthenticateResponse
+
+    let authenticator: String val
+
+    new val create(authenticator': String) =>
+        authenticator = authenticator'
+
+    fun string(): String val =>
+        "AUTHENTICATE " + authenticator

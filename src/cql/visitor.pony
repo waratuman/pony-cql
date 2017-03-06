@@ -1,3 +1,5 @@
+use collection = "collections"
+
 primitive Visitor
     
     fun apply(message: Message val): Array[U8 val] val =>
@@ -80,6 +82,10 @@ primitive Visitor
     fun visitReadyResponse(response: ReadyResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
 
+    fun visitAuthenticateResponse(response: AuthenticateResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        visitString(response.authenticator, c)
+        c
+
     fun visitNone(data: None val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
 
@@ -109,7 +115,13 @@ primitive Visitor
         end
         c
 
-    // fun visitStringMap(c: Array[U8 val] ref, data: collection.Map[String val, String val] iso): Array[U8 val] ref =>
+    fun visitStringMap(data: collection.Map[String val, String val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitShort(data.size().u16(), c)
+        for pairs in data.pairs() do
+            visitString(pairs._1, c)
+            visitString(pairs._2, c)
+        end
+        c
 
     // fun visitLongString(collector: Array[U8 val] ref, data: String iso): Array[U8 val] ref =>
 

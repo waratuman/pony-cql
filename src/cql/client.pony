@@ -2,7 +2,7 @@ use "net"
 use "format"
 use collection = "collections" 
 
-actor Client // is TCPConnectionNotify
+actor Client
 
     let env: Env
     let cqlVersion: String = "3.0.0"
@@ -25,27 +25,40 @@ actor Client // is TCPConnectionNotify
             )
         end
 
-    be connected(connection': TCPConnection) =>
+    be send(request: Request) =>
+        env.out.print("-> " + request.string())
+        let message = _createMessage(request)
+        let data = Visitor(message)
+        match connection
+        | let c: TCPConnection => c.write(data)
+        end
+
+    be tcpConnected(connection': TCPConnection) =>
         connection = connection'
         startup(connection')
     
-    be received(conn: TCPConnection, data: Array[U8 val] val) =>
+    be tcpReceived(conn: TCPConnection, data: Array[U8 val] val) =>
         try
-            let response = Parser(data)
+            let response = Parser(data)()
             env.out.print("<- " + response.string())
+
+            // match response
+            // | AuthenticateResponse => 
+            // end
         end
 
-    fun ref nextStream(): U16 =>
-        _stream = _stream + 1
-    
     fun ref startup(connection': TCPConnection) =>
         let request: StartupRequest val = StartupRequest.create(cqlVersion)
-        let message: Message val = _createMessage(request)  
-        env.out.print("-> " + request.string())
-        connection'.write(Visitor(message))
+        send(request)
+
+    // fun ref authenticate() =>
+    //     let request: AuthResponseRequest
+
+    fun ref _nextStream(): U16 =>
+        _stream = _stream + 1
     
     fun ref _createMessage(body: Request val): Message val =>
-        recover Message(4, _flags, _stream + 1, body) end
+        recover Message(4, _flags, _nextStream(), body) end
 
 
 class ClientTCPConnectionNotify is TCPConnectionNotify
@@ -59,7 +72,7 @@ class ClientTCPConnectionNotify is TCPConnectionNotify
     
     fun connected(connection: TCPConnection ref): None val =>
         env.out.print("connected")
-        client.connected(connection)
+        client.tcpConnected(connection)
     
     fun connecting(connection: TCPConnection ref, count: U32 val): None val =>
         env.out.print("connecting")
@@ -76,7 +89,7 @@ class ClientTCPConnectionNotify is TCPConnectionNotify
         data
 
     fun ref received(conn: TCPConnection ref, data: Array[U8 val] val): Bool val =>
-        client.received(conn, data)
+        client.tcpReceived(conn, data)
         // env.out.print("received")
         // let s = recover
         //     let hexString = String()

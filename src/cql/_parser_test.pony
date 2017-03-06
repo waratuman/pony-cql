@@ -14,15 +14,16 @@ actor ParserTestList is TestList
         test(_TestParseStartupRequest)
         test(_TestParseAuthResponseRequest)
         test(_TestParseOptionsRequest)
-
+        
         test(_TestParseReadyResponse)
+        test(_TestParseAuthenticateResponse)
 
 class iso _TestParseMessage is UnitTest
     fun name(): String => "Parser.parseMessage"
 
     fun tag apply(h: TestHelper) ? => 
         var data: Array[U8 val] val = Bytes.from_hex_string("0400000001000000160001000B43514C5F56455253494F4E0005332E302E30")
-        var message = Parser.parseMessage(data)
+        var message = Parser(data).parseMessage()
 
         h.assert_eq[U8](4, message.version)
         h.assert_eq[U8](0, message.flags)
@@ -34,7 +35,7 @@ class iso _TestParseMessage is UnitTest
         end
 
         data = Bytes.from_hex_string("040000010F0000000600000002ABCD")
-        message = Parser.parseMessage(data)
+        message = Parser(data).parseMessage()
         
         h.assert_eq[U8](4, message.version)
         h.assert_eq[U8](0, message.flags)
@@ -49,7 +50,7 @@ class iso _TestParseStartupRequest is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var data: Array[U8 val] val = Bytes.from_hex_string("0001000B43514C5F56455253494F4E0005332E302E30")
-        var request = Parser.parseStartupRequest(data)
+        var request = Parser(data).parseStartupRequest()
 
         h.assert_eq[String val]("3.0.0", request.cqlVersion)
         match request.compression
@@ -58,7 +59,7 @@ class iso _TestParseStartupRequest is UnitTest
         end
 
         data = Bytes.from_hex_string("0002000B434F4D5052455353494F4E0006736E61707079000B43514C5F56455253494F4E0005332E302E30")
-        request = Parser.parseStartupRequest(data)
+        request = Parser(data).parseStartupRequest()
         h.assert_eq[String val]("3.0.0", request.cqlVersion)
         match request.compression
         | let c: String => h.assert_eq[String val]("snappy", c)
@@ -70,7 +71,7 @@ class iso _TestParseAuthResponseRequest is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var data = Bytes.from_hex_string("FFFFFFFF")
-        var request = Parser.parseAuthResponseRequest(data)
+        var request = Parser(data).parseAuthResponseRequest()
 
         match request.token
         | let t: None => h.assert_eq[None val](None, t)
@@ -78,7 +79,7 @@ class iso _TestParseAuthResponseRequest is UnitTest
         end
 
         data = Bytes.from_hex_string("00000002ABCD")
-        request = Parser.parseAuthResponseRequest(data)
+        request = Parser(data).parseAuthResponseRequest()
 
         match request.token
         | let t: Array[U8 val] val =>
@@ -90,19 +91,10 @@ class iso _TestParseAuthResponseRequest is UnitTest
 class iso _TestParseOptionsRequest is UnitTest
     fun name(): String => "Parser.parseOptionsRequest"
 
-    fun tag apply(h: TestHelper) ? =>
+    fun tag apply(h: TestHelper) =>
         var data: Array[U8 val] val = recover Array[U8 val]() end
-        var request = Parser.parseOptionsRequest(data)
+        var request = Parser(data).parseOptionsRequest()
         var result: Array[U8 val] val = recover Visitor.visitOptionsRequest(request) end
-        h.assert_eq[String val](
-            "",
-            Bytes.to_hex_string(result)
-        )
-
-        // Extra data should be ignored
-        data = Bytes.from_hex_string("FFFFFFFF")
-        request = Parser.parseOptionsRequest(data)
-        result = recover Visitor.visitOptionsRequest(request) end
         h.assert_eq[String val](
             "",
             Bytes.to_hex_string(result)
@@ -112,21 +104,19 @@ class iso _TestParseReadyResponse is UnitTest
     fun name(): String => "Parser.parseReadyResponse"
 
     fun tag apply(h: TestHelper) ? =>
-        var data: Array[U8 val] val = recover Array[U8 val]() end
-        var request = Parser.parseReadyResponse(data)
-        var result: Array[U8 val] val = recover Visitor.visitReadyResponse(request) end
-        h.assert_eq[String val](
-            "",
-            Bytes.to_hex_string(result)
-        )
+        let data = Bytes.from_hex_string("FFFFFFFF") // Extra data should be ignored
+        Parser(data).parseReadyResponse()
 
-        // Extra data should be ignored
-        data = Bytes.from_hex_string("FFFFFFFF")
-        request = Parser.parseReadyResponse(data)
-        result = recover Visitor.visitReadyResponse(request) end
+
+class iso _TestParseAuthenticateResponse is UnitTest
+    fun name(): String => "Parser.parseAuthenticateResponse"
+
+    fun tag apply(h: TestHelper) ? =>
+        var data: Array[U8 val] val = Bytes.from_hex_string("002F6F72672E6170616368652E63617373616E6472612E617574682E50617373776F726441757468656E74696361746F72")
+        var response = Parser(data).parseAuthenticateResponse()
         h.assert_eq[String val](
-            "",
-            Bytes.to_hex_string(result)
+            "org.apache.cassandra.auth.PasswordAuthenticator",
+            response.authenticator
         )
 
 // class iso _TestParseBytes is UnitTest
