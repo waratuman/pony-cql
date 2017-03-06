@@ -2,22 +2,22 @@ use collection = "collections"
 
 primitive Visitor
     
-    fun apply(message: Message val): Array[U8 val] val =>
-        recover visitMessage(message) end
+    fun apply(frame: Frame val): Array[U8 val] val =>
+        recover visitFrame(frame) end
     
-    fun visitMessage(message: Message val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
-        let version: U8 = match message.body
-        | let b: Request => 0x7F and message.version
-        // | Response => 0xFF or message.version
-        else message.version
+    fun visitFrame(frame: Frame val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        let version: U8 = match frame.body
+        | let b: Request => 0x7F and frame.version
+        // | Response => 0xFF or frame.version
+        else frame.version
         end
         c.push(version)
 
-        c.push(message.flags)
+        c.push(frame.flags)
 
-        visitShort(message.stream, c)
+        visitShort(frame.stream, c)
 
-        let opcode: U8 = match message.body
+        let opcode: U8 = match frame.body
         | let b: StartupRequest => 0x01
         | let b: ReadyResponse => 0x02
         | let b: OptionsRequest => 0x05
@@ -29,7 +29,7 @@ primitive Visitor
         c.push(opcode)
 
         let body = Array[U8 val]()
-        visitBody(message.body, body)
+        visitBody(frame.body, body)
         
         visitInt(body.size().i32(), c)
 
@@ -37,7 +37,7 @@ primitive Visitor
         
         c
 
-    fun visitBody(body: (Request val | Response val), c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+    fun visitBody(body: Message val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         match consume body
         | let r: StartupRequest val => visitStartupRequest(r, c)
         | let r: ReadyResponse val => visitReadyResponse(r, c)

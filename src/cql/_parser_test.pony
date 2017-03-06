@@ -10,7 +10,7 @@ actor ParserTestList is TestList
     new make() => None
 
     fun tag tests(test: PonyTest) =>
-        test(_TestParseMessage)
+        test(_TestParseFrame)
         test(_TestParseStartupRequest)
         test(_TestParseAuthResponseRequest)
         test(_TestParseOptionsRequest)
@@ -18,29 +18,29 @@ actor ParserTestList is TestList
         test(_TestParseReadyResponse)
         test(_TestParseAuthenticateResponse)
 
-class iso _TestParseMessage is UnitTest
-    fun name(): String => "Parser.parseMessage"
+class iso _TestParseFrame is UnitTest
+    fun name(): String => "Parser.parseFrame"
 
     fun tag apply(h: TestHelper) ? => 
         var data: Array[U8 val] val = Bytes.from_hex_string("0400000001000000160001000B43514C5F56455253494F4E0005332E302E30")
-        var message = Parser(data).parseMessage()
+        var frame = Parser(data).parseFrame()
 
-        h.assert_eq[U8](4, message.version)
-        h.assert_eq[U8](0, message.flags)
-        h.assert_eq[U16](0, message.stream)
+        h.assert_eq[U8](4, frame.version)
+        h.assert_eq[U8](0, frame.flags)
+        h.assert_eq[U16](0, frame.stream)
         
-        match message.body
+        match frame.body
         | let b: StartupRequest => h.assert_eq[String]("3.0.0", b.cqlVersion)
         else h.fail()
         end
 
         data = Bytes.from_hex_string("040000010F0000000600000002ABCD")
-        message = Parser(data).parseMessage()
+        frame = Parser(data).parseFrame()
         
-        h.assert_eq[U8](4, message.version)
-        h.assert_eq[U8](0, message.flags)
-        h.assert_eq[U16](1, message.stream)
-        match message.body
+        h.assert_eq[U8](4, frame.version)
+        h.assert_eq[U8](0, frame.flags)
+        h.assert_eq[U16](1, frame.stream)
+        match frame.body
         | let b: AuthResponseRequest => None
         else h.fail()
         end

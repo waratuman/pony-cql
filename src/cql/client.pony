@@ -27,8 +27,8 @@ actor Client
 
     be send(request: Request) =>
         env.out.print("-> " + request.string())
-        let message = _createMessage(request)
-        let data = Visitor(message)
+        let frame = _createFrame(request)
+        let data = Visitor(frame)
         match connection
         | let c: TCPConnection => c.write(data)
         end
@@ -57,8 +57,8 @@ actor Client
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
     
-    fun ref _createMessage(body: Request val): Message val =>
-        recover Message(4, _flags, _nextStream(), body) end
+    fun ref _createFrame(body: Request val): Frame val =>
+        recover Frame(4, _flags, _nextStream(), body) end
 
 
 class ClientTCPConnectionNotify is TCPConnectionNotify

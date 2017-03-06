@@ -26,12 +26,12 @@ actor VisitorTestList is TestList
         test(_TestVisitStringMap)
 
 class iso _TestVisitMesssage is UnitTest
-    fun name(): String => "Visitor.visitMessage"
+    fun name(): String => "Visitor.visitFrame"
 
     fun tag apply(h: TestHelper) =>
         var request: Request val = recover StartupRequest("3.0.0") end
-        var message: Message val = recover Message(4, 0, 0, request) end
-        var result: Array[U8 val] val = recover Visitor.visitMessage(message) end
+        var frame: Frame val = recover Frame(4, 0, 0, request) end
+        var result: Array[U8 val] val = recover Visitor.visitFrame(frame) end
         
         h.assert_eq[String val](
             "0400000001000000160001000B43514C5F56455253494F4E0005332E302E30",
@@ -39,8 +39,8 @@ class iso _TestVisitMesssage is UnitTest
         )
 
         request = recover AuthResponseRequest(recover [as U8: 0xAB, 0xCD] end) end
-        message = recover Message(4, 0, 0, request) end
-        result = recover Visitor.visitMessage(message) end
+        frame = recover Frame(4, 0, 0, request) end
+        result = recover Visitor.visitFrame(frame) end
         h.assert_eq[String val](
             "040000000F0000000600000002ABCD",
             Bytes.to_hex_string(result)

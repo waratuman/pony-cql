@@ -13,6 +13,6 @@ actor Main is TestList
         VisitorTestList.make().tests(test)
         ParserTestList.make().tests(test)
 
-        MessageTestList.make().tests(test)
+        FrameTestList.make().tests(test)
         RequestTestList.make().tests(test)
         ResponseTestList.make().tests(test)

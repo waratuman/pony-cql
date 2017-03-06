@@ -2,7 +2,7 @@ use "format"
 use "ponytest"
 use collection = "collections"
 
-actor MessageTestList is TestList
+actor FrameTestList is TestList
     
     new create(env: Env) => PonyTest(env, this)
     

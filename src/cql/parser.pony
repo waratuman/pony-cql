@@ -20,10 +20,10 @@ class Parser
         _offset = _offset + length
         recover data.slice(start, _offset) end
 
-    fun ref apply(): Message val ? =>
-        parseMessage()
+    fun ref apply(): Frame val ? =>
+        parseFrame()
 
-    fun ref parseMessage(): Message val ? =>
+    fun ref parseFrame(): Frame val ? =>
         let version: U8 val = shift() and 0b0111
         let flags: U8 val = shift()
         let stream: U16 val = parseShort()
@@ -42,7 +42,7 @@ class Parser
         else error
         end
 
-        Message(version, flags, stream, body)
+        Frame(version, flags, stream, body)
 
     fun ref parseStartupRequest(): StartupRequest val ? =>
         let pairs: U16 = parseShort()
