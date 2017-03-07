@@ -73,6 +73,11 @@ primitive Visitor
 
     // fun visitQueryRequest(request: QueryRequest iso): Array[U8 val] val =>
 
+    fun visitErrorResponse(response: ErrorResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        visitInt(response.code, c)
+        visitString(response.message, c)
+        c
+
     fun visitReadyResponse(response: ReadyResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
 

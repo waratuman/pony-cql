@@ -10,7 +10,7 @@ actor VisitorTestList is TestList
     new make() => None
 
     fun tag tests(test: PonyTest) =>
-        test(_TestVisitMesssage)
+        test(_TestVisitFrame)
         test(_TestVisitStartupRequest)
         test(_TestVisitAuthResponseRequest)
         test(_TestVisitOptionsRequest)
@@ -26,7 +26,7 @@ actor VisitorTestList is TestList
         test(_TestVisitString)
         test(_TestVisitStringMap)
 
-class iso _TestVisitMesssage is UnitTest
+class iso _TestVisitFrame is UnitTest
     fun name(): String => "Visitor.visitFrame"
 
     fun tag apply(h: TestHelper) =>
@@ -99,7 +99,12 @@ class iso _TestVisitErrorResponse is UnitTest
     fun name(): String => "Visitor.visitErrorResponse"
 
     fun tag apply(h: TestHelper) =>
-        h.fail()
+        let request: ErrorResponse val = ErrorResponse(0x0000, "Server error")
+        let result: Array[U8 val] val = recover Visitor.visitErrorResponse(request) end
+        h.assert_eq[String val](
+            "00000000000C536572766572206572726F72",
+            Bytes.to_hex_string(result)
+        )
 
 class iso _TestVistReadyResponse is UnitTest
     fun name(): String => "Visitor.visitReady"

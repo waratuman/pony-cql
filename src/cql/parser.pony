@@ -32,7 +32,7 @@ class Parser
         let length: I32 val = parseInt()
 
         let body: (Request | Response) = match opcode
-        | 0x00 => parserErrorResponse()
+        | 0x00 => parseErrorResponse()
         | 0x01 => parseStartupRequest()
         | 0x02 => parseReadyResponse()
         | 0x03 => parseAuthenticateResponse()
@@ -43,7 +43,7 @@ class Parser
 
         Frame(version, flags, stream, body)
 
-    fun ref parserErrorResponse(): ErrorResponse val ? =>
+    fun ref parseErrorResponse(): ErrorResponse val ? =>
         ErrorResponse(parseInt(), parseString())
 
     fun ref parseStartupRequest(): StartupRequest val ? =>

@@ -107,11 +107,16 @@ class iso _TestParseOptionsRequest is UnitTest
             Bytes.to_hex_string(result)
         )
 
+
 class iso _TestParseErrorResponse is UnitTest
     fun name(): String => "Parser.parseErrorResponse"
 
-    fun tag apply(h: TestHelper) =>
-        h.fail()
+    fun tag apply(h: TestHelper) ? =>
+        let data = Bytes.from_hex_string("00000000000C536572766572206572726F72")
+        let response = Parser(data).parseErrorResponse()
+        h.assert_eq[I32 val](0, response.code)
+        h.assert_eq[String val]("Server error", response.message)
+
 
 class iso _TestParseReadyResponse is UnitTest
     fun name(): String => "Parser.parseReadyResponse"
@@ -135,26 +140,41 @@ class iso _TestParseAuthenticateResponse is UnitTest
 class iso _TestParseString is UnitTest
     fun name(): String => "Parser.parseString"
 
-    fun tag apply(h: TestHelper) =>
-        h.fail()
+    fun tag apply(h: TestHelper) ? =>
+        let data: Array[U8 val] val = recover [as U8: 0x00, 0x09, 0x63, 0x61, 0x73, 0x73, 0x61, 0x6E, 0x64, 0x72, 0x61] end
+        h.assert_eq[String val](
+            "cassandra",
+            Parser(data).parseString()
+        )
 
 class iso _TestParseShort is UnitTest
     fun name(): String => "Parser.parseShort"
 
-    fun tag apply(h: TestHelper) =>
-        h.fail()
+    fun tag apply(h: TestHelper) ? =>
+        let data: Array[U8 val] val = recover [as U8: 0x00, 0x09] end
+        h.assert_eq[U16 val](
+            9,
+            Parser(data).parseShort()
+        )
 
 class iso _TestParseInt is UnitTest
     fun name(): String => "Parser.parseInt"
 
-    fun tag apply(h: TestHelper) =>
-        h.fail()
+    fun tag apply(h: TestHelper) ? =>
+        let data: Array[U8 val] val = recover [as U8: 0xFF, 0xFF, 0xFF, 0xFF] end
+        h.assert_eq[I32 val](
+            -1,
+            Parser(data).parseInt()
+        )
 
 class iso _TestParseStringMap is UnitTest
     fun name(): String => "Parser.parseStringMap"
 
-    fun tag apply(h: TestHelper) =>
-        h.fail()
+    fun tag apply(h: TestHelper) ? =>
+        let data = Bytes.from_hex_string("0002000B434F4D5052455353494F4E0006736E61707079000B43514C5F56455253494F4E0005332E302E30")
+        let map = Parser(data).parseStringMap()
+        h.assert_eq[String val]("snappy", map("COMPRESSION"))
+        h.assert_eq[String val]("3.0.0", map("CQL_VERSION"))
 
 class iso _TestParseBytes is UnitTest
     fun name(): String => "Parser.parseBytes"
