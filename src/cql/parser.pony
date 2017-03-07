@@ -45,36 +45,16 @@ class Parser
         Frame(version, flags, stream, body)
 
     fun ref parseStartupRequest(): StartupRequest val ? =>
-        let pairs: U16 = parseShort()
+        let map = parseStringMap()
 
-        var cqlVersion: String = ""
-        var compression: (String | None) = None
-        var processedPairs: U16 = 0
-        while processedPairs < pairs do
-            let key: String = parseString()
-            let value: String = parseString()
-
-            if key == "CQL_VERSION" then
-                cqlVersion = value
-            elseif key == "COMPRESSION" then
-                compression = value
-            end
-            
-            processedPairs = processedPairs + 1
+        if map.contains("COMPRESSION") then
+            StartupRequest(map("CQL_VERSION"), map("COMPRESSION"))
+        else
+            StartupRequest(map("CQL_VERSION"))
         end
-
-        StartupRequest(cqlVersion, compression)
 
     fun ref parseAuthResponseRequest(): AuthResponseRequest val ? =>
-        let length: I32 = parseInt()
-
-        let token: (None | Array[U8 val] val) = if (length < 0) then
-            None
-        else
-            parseBytes(length)
-        end
-
-        AuthResponseRequest(token)
+        AuthResponseRequest(parseBytes())
     
     fun ref parseOptionsRequest(): OptionsRequest val =>
         OptionsRequest()
@@ -106,16 +86,20 @@ class Parser
         recover
             let pairs = parseShort()
             let result = collections.Map[String val, String val](pairs.usize())
-            var i = U16(0)
+            var i: U16 = 0
             while i < pairs do
                 let key = parseString()
                 let value = parseString()
-                result.update(key, value)
+                result.insert(key, value)
                 i = i + 1
             end
             result
         end
 
-    fun ref parseBytes(length: I32): Array[U8 val] val ? =>
-        shiftN(length.usize())
-
+    fun ref parseBytes(): (Array[U8 val] val | None) ? =>
+        let length = parseInt()
+        if (length < 0) then
+            None
+        else
+            shiftN(length.usize())
+        end

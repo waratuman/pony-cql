@@ -34,7 +34,7 @@ class iso _TestParseFrame is UnitTest
         else h.fail()
         end
 
-        data = Bytes.from_hex_string("040000010F0000000600000002ABCD")
+        data = Bytes.from_hex_string("040000010F00000004FFFFFFFF")
         frame = Parser(data).parseFrame()
         
         h.assert_eq[U8](4, frame.version)

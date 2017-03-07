@@ -68,13 +68,7 @@ primitive Visitor
         c
 
     fun visitAuthResponseRequest(request: AuthResponseRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
-        let token = request.token
-
-        match token
-        | None => visitInt(-1, c)
-        | let t: Array[U8 val] val => visitBytes(t, c)
-        end
-        
+        visitBytes(request.token, c)
         c
 
     // fun visitQueryRequest(request: QueryRequest iso): Array[U8 val] val =>
@@ -101,10 +95,14 @@ primitive Visitor
         c.push(value.u8())
         c
 
-    fun visitBytes(data: Array[U8 val] val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
-        visitInt(data.size().i32(), c)
-        for byte in data.values() do
-            c.push(byte)
+    fun visitBytes(data: (None | Array[U8 val] val), c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        match data
+        | None => visitInt(-1, c)
+        | let d: Array[U8 val] val =>
+            visitInt(d.size().i32(), c)
+            for byte in d.values() do
+                c.push(byte)
+            end
         end
         c
 

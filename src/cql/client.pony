@@ -5,6 +5,7 @@ use collection = "collections"
 actor Client
 
     let env: Env
+    let authenticator: (Authenticator | None)
     let cqlVersion: String = "3.0.0"
     let compression: (String val | None val) = None
     let _flags: U8 = 0x00
@@ -12,8 +13,9 @@ actor Client
 
     var connection: (TCPConnection | None) = None
 
-    new create(env': Env) =>
+    new create(env': Env, authenticator': (Authenticator iso | None) = None) =>
         env = env'
+        authenticator = consume authenticator'
 
     be connect() =>
         try
@@ -29,6 +31,7 @@ actor Client
         env.out.print("-> " + request.string())
         let frame = _createFrame(request)
         let data = Visitor(frame)
+        env.out.print(Bytes.to_hex_string(data))
         match connection
         | let c: TCPConnection => c.write(data)
         end
@@ -39,20 +42,21 @@ actor Client
     
     be tcpReceived(conn: TCPConnection, data: Array[U8 val] val) =>
         try
+            env.out.print(Bytes.to_hex_string(data))
             let response = Parser(data)()
             env.out.print("<- " + response.string())
 
-            // match response
-            // | AuthenticateResponse => 
-            // end
+            match response.body
+            | let m: AuthenticateResponse => authenticate()
+            end
         end
 
-    fun ref startup(connection': TCPConnection) =>
-        let request: StartupRequest val = StartupRequest.create(cqlVersion)
-        send(request)
+    fun ref startup(connection': TCPConnection) => send(StartupRequest.create(cqlVersion))
 
-    // fun ref authenticate() =>
-    //     let request: AuthResponseRequest
+    fun ref authenticate() =>
+        match authenticator
+        | let a: PasswordAuthenticator => send(AuthResponseRequest(a.token()))
+        end
 
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
