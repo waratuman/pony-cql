@@ -1,7 +1,22 @@
+use "format"
+
 type Response is (
-    ReadyResponse
+    ErrorResponse
+    | ReadyResponse
     | AuthenticateResponse
 )
+
+class val ErrorResponse
+
+    let code: I32 val
+    let message: String val
+
+    new val create(code': I32 val, message': String val) =>
+        code = code'
+        message = message'
+    
+    fun string(): String val =>
+        "ERROR " + Format.int[I32](code, FormatHex, PrefixDefault, 8) + " " + message
 
 class val ReadyResponse
 

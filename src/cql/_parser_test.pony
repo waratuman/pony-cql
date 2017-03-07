@@ -15,8 +15,15 @@ actor ParserTestList is TestList
         test(_TestParseAuthResponseRequest)
         test(_TestParseOptionsRequest)
         
+        test(_TestParseErrorResponse)
         test(_TestParseReadyResponse)
         test(_TestParseAuthenticateResponse)
+
+        test(_TestParseString)
+        test(_TestParseShort)
+        test(_TestParseInt)
+        test(_TestParseStringMap)
+        test(_TestParseBytes)
 
 class iso _TestParseFrame is UnitTest
     fun name(): String => "Parser.parseFrame"
@@ -100,6 +107,12 @@ class iso _TestParseOptionsRequest is UnitTest
             Bytes.to_hex_string(result)
         )
 
+class iso _TestParseErrorResponse is UnitTest
+    fun name(): String => "Parser.parseErrorResponse"
+
+    fun tag apply(h: TestHelper) =>
+        h.fail()
+
 class iso _TestParseReadyResponse is UnitTest
     fun name(): String => "Parser.parseReadyResponse"
 
@@ -119,4 +132,47 @@ class iso _TestParseAuthenticateResponse is UnitTest
             response.authenticator
         )
 
-// class iso _TestParseBytes is UnitTest
+class iso _TestParseString is UnitTest
+    fun name(): String => "Parser.parseString"
+
+    fun tag apply(h: TestHelper) =>
+        h.fail()
+
+class iso _TestParseShort is UnitTest
+    fun name(): String => "Parser.parseShort"
+
+    fun tag apply(h: TestHelper) =>
+        h.fail()
+
+class iso _TestParseInt is UnitTest
+    fun name(): String => "Parser.parseInt"
+
+    fun tag apply(h: TestHelper) =>
+        h.fail()
+
+class iso _TestParseStringMap is UnitTest
+    fun name(): String => "Parser.parseStringMap"
+
+    fun tag apply(h: TestHelper) =>
+        h.fail()
+
+class iso _TestParseBytes is UnitTest
+    fun name(): String => "Parser.parseBytes"
+
+    fun tag apply(h: TestHelper) ? =>
+        var data: Array[U8 val] val = recover [as U8: 0x00, 0x00, 0x00, 0x02, 0xAB, 0xCD] end
+        var result = Parser(data).parseBytes()
+        match result
+        | let r: Array[U8 val] val =>
+            h.assert_eq[U8](0xAB, r(0))
+            h.assert_eq[U8](0xCD, r(1))
+        else h.fail()
+        end
+        
+
+        data = recover [as U8: 0xFF, 0xFF, 0xFF, 0xFF] end
+        result = Parser(data).parseBytes()
+        match result
+        | let r: None => h.assert_eq[None val](None, r)
+        else h.fail()
+        end
