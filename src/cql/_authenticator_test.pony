@@ -7,11 +7,11 @@ actor AuthenticatorTestList is TestList
     new make() => None
 
     fun tag tests(test: PonyTest) =>
-        test(_TestCreate)
-        test(_TestToken)
-        test(_TestName)
+        test(_TestAuthenticatorCreate)
+        test(_TestAuthenticatorToken)
+        test(_TestAuthenticatorName)
 
-class iso _TestCreate is UnitTest
+class iso _TestAuthenticatorCreate is UnitTest
     fun name(): String => "Authenticator.create"
 
     fun tag apply(h: TestHelper) =>
@@ -19,7 +19,7 @@ class iso _TestCreate is UnitTest
         h.assert_eq[String val]("username", authenticator.username)
         h.assert_eq[String val]("password", authenticator.password)
 
-class iso _TestToken is UnitTest
+class iso _TestAuthenticatorToken is UnitTest
     fun name(): String => "Authenticator.token"
 
     fun tag apply(h: TestHelper) =>
@@ -29,7 +29,7 @@ class iso _TestToken is UnitTest
             Bytes.to_hex_string(authenticator.token())
         )
 
-class iso _TestName is UnitTest
+class iso _TestAuthenticatorName is UnitTest
     fun name(): String => "Authenticator.name"
 
     fun tag apply(h: TestHelper) =>

@@ -8,7 +8,6 @@ primitive Visitor
     fun visitFrame(frame: Frame val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         let version: U8 = match frame.body
         | let b: Request => 0x7F and frame.version
-        // | Response => 0xFF or frame.version
         else frame.version
         end
         c.push(version)

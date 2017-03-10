@@ -23,3 +23,6 @@ class Frame
 
     fun string(): String val =>
         body.string()
+
+
+type Message is (Request | Response)

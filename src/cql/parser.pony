@@ -3,9 +3,9 @@ use collections = "collections"
 class Parser
 
     var _offset: USize = 0
-    let data: Array[U8 val] val
+    let data: Array[U8 val] box
 
-    new create(data': Array[U8 val] val) =>
+    new create(data': Array[U8 val] box) =>
         data = data'
 
     fun ref shift(): U8 val ? =>
@@ -17,8 +17,15 @@ class Parser
         end
 
         let start = _offset
-        _offset = _offset + length
-        recover data.slice(start, _offset) end
+        let finish = _offset + length
+        
+        recover
+            let result = Array[U8 val]()
+            while _offset < finish do
+                result.push(shift())
+            end
+            result
+         end
 
     fun ref apply(): Frame val ? =>
         parseFrame()

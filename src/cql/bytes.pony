@@ -14,30 +14,30 @@ primitive Bytes
             data
         end
 
-    fun val i8(data: Array[U8 val] val): I8 val ? =>
+    fun val i8(data: Array[U8 val] box): I8 val ? =>
         data(0).i8()
 
-    fun val u8(data: Array[U8 val] val): U8 val ? =>
+    fun val u8(data: Array[U8 val] box): U8 val ? =>
         data(0).u8()
 
-    fun val i16(data: Array[U8 val] val): I16 val ? =>
+    fun val i16(data: Array[U8 val] box): I16 val ? =>
         let a = data(0).i16()
         let b = data(1).i16()
         ((a << 8) or b)
     
-    fun val u16(data: Array[U8 val] val): U16 val ? =>
+    fun val u16(data: Array[U8 val] box): U16 val ? =>
         let a = data(0).u16()
         let b = data(1).u16()
         ((a << 8) or b)
 
-    fun val i32(data: Array[U8 val] val): I32 val ? =>
+    fun val i32(data: Array[U8 val] box): I32 val ? =>
         let a = data(0).i32()
         let b = data(1).i32()
         let c = data(2).i32()
         let d = data(3).i32()
         (a << 24) or (b << 16) or (c << 8) or d
 
-    fun val u32(data: Array[U8 val] val): U32 val ? =>
+    fun val u32(data: Array[U8 val] box): U32 val ? =>
         let a = data(0).u32()
         let b = data(1).u32()
         let c = data(2).u32()
