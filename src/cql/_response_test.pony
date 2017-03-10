@@ -13,6 +13,7 @@ actor ResponseTestList is TestList
         test(_TestErrorResponseString)
         test(_TestReadyResponseString)
         test(_TestAuthenticateResponseString)
+        test(_TestAuthSuccessResponseString)
         
 class iso _TestErrorResponseCreate is UnitTest
 
@@ -53,5 +54,21 @@ class iso _TestAuthenticateResponseString is UnitTest
         let response = AuthenticateResponse("org.apache.cassandra.auth.PasswordAuthenticator")
         h.assert_eq[String val](
             "AUTHENTICATE org.apache.cassandra.auth.PasswordAuthenticator",
+            response.string()
+        )
+
+class iso _TestAuthSuccessResponseString is UnitTest
+    fun name(): String => "AuthSuccessResponse.string"
+
+    fun tag apply(h: TestHelper) => 
+        var response = AuthSuccessResponse()
+        h.assert_eq[String val](
+            "AUTH_SUCCESS",
+            response.string()
+        )
+
+        response = AuthSuccessResponse(recover [as U8: 0xAB, 0xCD] end)
+        h.assert_eq[String val](
+            "AUTH_SUCCESS",
             response.string()
         )

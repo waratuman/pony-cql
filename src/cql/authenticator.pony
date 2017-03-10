@@ -1,21 +1,20 @@
 interface Authenticator
-    fun ref token(): (Array[U8 val] val | None)
-    fun ref name(): String val
+    new iso create()
+    fun box name(): String box
+    fun box token(): (Array[U8 val] val | None val)
 
-class PasswordAuthenticator is Authenticator
+class iso PasswordAuthenticator is Authenticator
 
-    let username: String val
-    let password: String val
+    var _token: (Array[U8 val] val | None val)
 
-    new create(username': String val, password': String val) =>
-        username = username'
-        password = password'
+    new iso create() =>
+        _token = None
 
-    fun ref name(): String val =>
+    fun box name(): String val =>
         "org.apache.cassandra.auth.PasswordAuthenticator"
 
-    fun ref token(): Array[U8 val] val =>
-        recover
+    fun ref apply(username: String val, password: String val) =>
+        _token = recover
             let t = Array[U8 val](2 + username.size() + password.size())
             t.push(0x00)
             t.append(username.array())
@@ -23,3 +22,6 @@ class PasswordAuthenticator is Authenticator
             t.append(password.array())
             t
         end
+
+    fun box token(): (Array[U8 val] val | None val) =>
+        _token

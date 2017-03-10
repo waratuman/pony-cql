@@ -63,7 +63,8 @@ class Parser
         end
 
     fun ref parseAuthResponseRequest(): AuthResponseRequest val ? =>
-        AuthResponseRequest(parseBytes())
+        let token = parseBytes()
+        AuthResponseRequest(token)
     
     fun ref parseOptionsRequest(): OptionsRequest val =>
         OptionsRequest()
@@ -72,8 +73,12 @@ class Parser
         ReadyResponse()
 
     fun ref parseAuthenticateResponse(): AuthenticateResponse val ? =>
-        let authenticator: String = parseString()
-        AuthenticateResponse(authenticator)
+        let authenticator_name: String = parseString()
+        AuthenticateResponse(authenticator_name)
+
+    fun ref parseAuthSuccessResponse(): AuthSuccessResponse val ? =>
+        let token = parseBytes()
+        AuthSuccessResponse(token)
 
     fun ref parseString(): String val ? =>
         let length = parseShort().usize()

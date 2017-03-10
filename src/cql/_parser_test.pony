@@ -18,6 +18,7 @@ actor ParserTestList is TestList
         test(_TestParseErrorResponse)
         test(_TestParseReadyResponse)
         test(_TestParseAuthenticateResponse)
+        test(_TestParseAuthSuccessResponse)
 
         test(_TestParseString)
         test(_TestParseShort)
@@ -107,7 +108,6 @@ class iso _TestParseOptionsRequest is UnitTest
             Bytes.to_hex_string(result)
         )
 
-
 class iso _TestParseErrorResponse is UnitTest
     fun name(): String => "Parser.parseErrorResponse"
 
@@ -134,8 +134,30 @@ class iso _TestParseAuthenticateResponse is UnitTest
         var response = Parser(data).parseAuthenticateResponse()
         h.assert_eq[String val](
             "org.apache.cassandra.auth.PasswordAuthenticator",
-            response.authenticator
+            response.authenticator_name
         )
+
+class iso _TestParseAuthSuccessResponse is UnitTest
+    fun name(): String => "Parser.parseAuthSuccessResponse"
+
+    fun tag apply(h: TestHelper) ? =>
+        var data = Bytes.from_hex_string("FFFFFFFF")
+        var response = Parser(data).parseAuthSuccessResponse()
+
+        match response.token
+        | let t: None => h.assert_eq[None val](None, t)
+        else h.fail()
+        end
+
+        data = Bytes.from_hex_string("00000002ABCD")
+        response = Parser(data).parseAuthSuccessResponse()
+
+        match response.token
+        | let t: Array[U8 val] val =>
+            h.assert_eq[U8](0xAB, t(0))
+            h.assert_eq[U8](0xCD, t(1))
+        else h.fail()
+        end
 
 class iso _TestParseString is UnitTest
     fun name(): String => "Parser.parseString"

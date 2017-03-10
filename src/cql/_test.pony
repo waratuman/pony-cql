@@ -2,9 +2,9 @@ use "ponytest"
 
 actor Main is TestList
     new create(env: Env) =>
-        // PonyTest(env, this)
-        let authenticator: PasswordAuthenticator iso  = recover PasswordAuthenticator("cassandra", "cassandr") end
-        Client(env, consume authenticator).connect()
+        PonyTest(env, this)
+        // let authenticator: PasswordAuthenticator iso  = recover PasswordAuthenticator("cassandra", "cassandr") end
+        // Client(env, consume authenticator).connect()
 
     new make() => None
 
@@ -20,3 +20,4 @@ actor Main is TestList
         AuthenticatorTestList.make().tests(test)
 
         ClientTestList.make().tests(test)
+        ClientNotifyTestList.make().tests(test)

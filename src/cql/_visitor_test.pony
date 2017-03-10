@@ -18,6 +18,7 @@ actor VisitorTestList is TestList
         test(_TestVisitErrorResponse)        
         test(_TestVistReadyResponse)
         test(_TestVisitAuthenticateResponse)
+        test(_TestVisitAuthSuccessResponse)
 
         test(_TestVisitNone)
         test(_TestVisitInt)
@@ -118,10 +119,28 @@ class iso _TestVisitAuthenticateResponse is UnitTest
     fun name(): String => "Visitor.visitAuthenticateResponse"
 
     fun tag apply(h: TestHelper) =>
-        let request: AuthenticateResponse val = recover AuthenticateResponse("org.apache.cassandra.auth.PasswordAuthenticator") end
-        let result: Array[U8 val] val = recover Visitor.visitAuthenticateResponse(request) end
+        let response: AuthenticateResponse val = recover AuthenticateResponse("org.apache.cassandra.auth.PasswordAuthenticator") end
+        let result: Array[U8 val] val = recover Visitor.visitAuthenticateResponse(response) end
         h.assert_eq[String val](
             "002F6F72672E6170616368652E63617373616E6472612E617574682E50617373776F726441757468656E74696361746F72",
+            Bytes.to_hex_string(result)
+        )
+
+class iso _TestVisitAuthSuccessResponse is UnitTest
+    fun name(): String => "Visitor.visitAuthSuccessResponse"
+
+    fun tag apply(h: TestHelper) =>
+        var response: AuthSuccessResponse val = recover AuthSuccessResponse() end
+        var result: Array[U8 val] val = recover Visitor.visitAuthSuccessResponse(response) end
+        h.assert_eq[String val](
+            "FFFFFFFF",
+            Bytes.to_hex_string(result)
+        )
+
+        response = recover AuthSuccessResponse(recover [as U8: 0xAB, 0xCD] end) end
+        result = recover Visitor.visitAuthSuccessResponse(response) end
+        h.assert_eq[String val](
+            "00000002ABCD",
             Bytes.to_hex_string(result)
         )
 

@@ -81,7 +81,11 @@ primitive Visitor
         c
 
     fun visitAuthenticateResponse(response: AuthenticateResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
-        visitString(response.authenticator, c)
+        visitString(response.authenticator_name, c)
+        c
+
+    fun visitAuthSuccessResponse(response: AuthSuccessResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        visitBytes(response.token, c)
         c
 
     fun visitNone(data: None val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>

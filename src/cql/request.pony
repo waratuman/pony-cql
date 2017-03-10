@@ -33,9 +33,9 @@ class val StartupRequest
 
 class val AuthResponseRequest
     
-    let token: (Array[U8 val] val | None)
+    let token: (Array[U8 val] val | None val)
 
-    new val create(token': (Array[U8 val] val | None) = None) =>
+    new val create(token': (Array[U8 val] val | None val) = None) =>
         token = token'
     
     fun string(): String val =>

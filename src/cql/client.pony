@@ -3,8 +3,8 @@ use "net"
 actor Client
 
     let _env: Env
+    let _notify: ClientNotify
 
-    let authenticator: (Authenticator | None)
     let cqlVersion: String = "3.0.0"
     let compression: (String val | None val) = None
     let _flags: U8 = 0x00
@@ -12,9 +12,9 @@ actor Client
 
     var conn: (TCPConnection | None) = None
 
-    new create(env': Env, authenticator': (Authenticator iso | None) = None) =>
-        _env = env'
-        authenticator = consume authenticator'
+    new create(env: Env, notify: ClientNotify iso) =>
+        _env = env
+        _notify = consume notify
 
     fun ref _createFrame(body: Request val): Frame val =>
         recover Frame(4, _flags, _nextStream(), body) end
@@ -22,20 +22,27 @@ actor Client
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
 
-    be authenticate() =>
-        match authenticator
-        | let a: PasswordAuthenticator => send(AuthResponseRequest(a.token()))
+    fun ref _authenticate(response: AuthenticateResponse val) ? =>
+        var authenticator: Authenticator iso = match response.authenticator_name
+        | "org.apache.cassandra.auth.PasswordAuthenticator" =>
+            PasswordAuthenticator.create()
+        else error
         end
+        
+        let returnedAuthenticator: Authenticator box = _notify.authenticate(this, consume authenticator)
+        let token = returnedAuthenticator.token()
+        _send(AuthResponseRequest(token))
 
-    be closed(conn': TCPConnection tag) =>
-        _env.out.print("- Connection closed")
+    fun ref _authenticated(response: AuthSuccessResponse val) =>
+        _notify.connected(this)
 
-    be connect() =>
-        match _env.root
-        | let a: AmbientAuth => TCPConnection(a, TCPConnectionNotifyClient(_env, this), "", "9042", "", 64, 268435456)
-        end
-    
-    be send(request: Request val) =>
+    fun ref _ready(response: ReadyResponse val) =>
+        _notify.connected(this)
+
+    fun ref _startup(conn': TCPConnection) =>
+        _send(StartupRequest.create(cqlVersion))
+
+    fun ref _send(request: Request val) =>
         let frame = _createFrame(request)
         let data = Visitor(frame)
         match conn
@@ -45,25 +52,41 @@ actor Client
         else
             _env.out.print("-| " + request.string())
         end
+    
+    be closed(conn': TCPConnection tag) =>
+        _env.out.print("__ Connection closed")
+        _notify.closed(this)
+
+    be connect() =>
+        match _env.root
+        | let a: AmbientAuth => TCPConnection(a, TCPConnectionNotifyClient(_env, this), "", "9042", "", 64, 268435456)
+        end
+
+    be connecting(conn': TCPConnection, count: U32 val) =>
+        _notify.connecting(this, count)
 
     be connect_failed(conn': TCPConnection tag) =>
-        _env.out.print("- connection failed")
-        None
+        _notify.connect_failed(this)
+        _env.out.print("!! connection failed")
     
     be connected(conn': TCPConnection tag) =>
-        _env.out.print("- connection established")
+        _env.out.print("-- connection established")
         conn = conn'
-        startup(conn')
+        _startup(conn')
 
     be received(conn': TCPConnection tag, response: Response val) =>
         _env.out.print("<- " + response.string())
 
         match response
-        | let m: AuthenticateResponse => authenticate()
+        | let m: ReadyResponse => _ready(m)
+        | let m: AuthenticateResponse =>
+            try
+                _authenticate(m)
+            else
+                _notify.authenticate_failed(this)
+            end
+        | let m: AuthSuccessResponse => _authenticated(m)
         end
-
-    be startup(conn': TCPConnection) =>
-        send(StartupRequest.create(cqlVersion))
 
     be throttled(conn': TCPConnection tag) =>
         None
@@ -87,6 +110,9 @@ class TCPConnectionNotifyClient is TCPConnectionNotify
     new iso create(env: Env, client': Client tag) => 
         _stderr = env.err
         client = client'
+
+    fun ref connecting(conn: TCPConnection ref, count: U32 val) =>
+        client.connecting(conn, count)
 
     fun ref connected(conn: TCPConnection ref) =>
         conn.expect(9)

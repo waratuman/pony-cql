@@ -4,6 +4,7 @@ type Response is (
     ErrorResponse
     | ReadyResponse
     | AuthenticateResponse
+    | AuthSuccessResponse
 )
 
 class val ErrorResponse
@@ -31,10 +32,20 @@ class val ReadyResponse
 
 class val AuthenticateResponse
 
-    let authenticator: String val
+    let authenticator_name: String val
 
-    new val create(authenticator': String) =>
-        authenticator = authenticator'
+    new val create(authenticator_name': String) =>
+        authenticator_name = authenticator_name'
 
     fun string(): String val =>
-        "AUTHENTICATE " + authenticator
+        "AUTHENTICATE " + authenticator_name
+
+class val AuthSuccessResponse
+
+    let token: (Array[U8 val] val | None)
+
+    new val create(token': (Array[U8 val] val | None) = None) =>
+        token = token'
+    
+    fun string(): String val =>
+        "AUTH_SUCCESS"
