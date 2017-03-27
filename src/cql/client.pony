@@ -4,7 +4,7 @@ use "logger"
 actor Client is FrameNotifiee
 
     let _auth: TCPConnectionAuth
-    var _notify: ClientNotify
+    let _notify: ClientNotify
     let _logger: (Logger[String] | None)
 
     let cqlVersion: String = "3.0.0"

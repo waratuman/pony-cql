@@ -45,7 +45,16 @@ class Parser
         | 0x03 => parseAuthenticateResponse()
         | 0x05 => parseOptionsRequest()
         | 0x06 => parseSupportedResponse()
+        // | 0x07 => parseQueryRequest()
+        // | 0x08 => parseResultResponse()
+        // | 0x09 => parsePrepareRequest()
+        // | 0x0A => parseExecuteRequest()
+        // | 0x0B => parseRegisterRequest()
+        // | 0x0C => parseEventResponse()
+        // | 0x0D => parseBatchRequest()
+        // | 0x0E => parseAuthChallengeResponse()
         | 0x0F => parseAuthResponseRequest()
+        // | 0x10 => parseAuthSuccessResponse()
         else error
         end
 

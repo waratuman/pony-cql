@@ -4,7 +4,7 @@ use "logger"
 actor Server
 
     let _tcp_listener: TCPListener
-    var _notify: ServerNotify ref
+    let _notify: ServerNotify ref
     let _logger: (Logger[String] | None)
 
     var local_address: NetAddress val = recover NetAddress end
