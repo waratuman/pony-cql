@@ -44,6 +44,7 @@ class Parser
         | 0x02 => parseReadyResponse()
         | 0x03 => parseAuthenticateResponse()
         | 0x05 => parseOptionsRequest()
+        | 0x06 => parseSupportedResponse()
         | 0x0F => parseAuthResponseRequest()
         else error
         end
@@ -76,6 +77,23 @@ class Parser
         let authenticator_name: String = parseString()
         AuthenticateResponse(authenticator_name)
 
+    fun ref parseSupportedResponse(): SupportedResponse val ? =>
+        let map = parseStringMultiMap()
+
+        let compression: Array[String val] val = if map.contains("COMPRESSION") then
+            map("COMPRESSION")
+        else
+             recover Array[String val] end
+        end
+
+        let cql_version: Array[String val] val = if map.contains("CQL_VERSION") then
+            map("CQL_VERSION")
+        else
+             recover Array[String val] end
+        end
+
+        SupportedResponse(cql_version, compression)
+    
     fun ref parseAuthSuccessResponse(): AuthSuccessResponse val ? =>
         let token = parseBytes()
         AuthSuccessResponse(token)
@@ -83,6 +101,18 @@ class Parser
     fun ref parseString(): String val ? =>
         let length = parseShort().usize()
         String.from_array(shiftN(length))
+
+    fun ref parseStringList(): Array[String val] val ? =>
+        recover
+            let result = Array[String val]()
+            let n: U16 val = parseShort()
+            var i: U16 = 0
+            while i < n do
+                result.push(parseString())
+                i = i + 1
+            end
+            result
+        end
 
     fun ref parseShort(): U16 val ? =>
         let a = shift().u16()
@@ -104,6 +134,20 @@ class Parser
             while i < pairs do
                 let key = parseString()
                 let value = parseString()
+                result.insert(key, value)
+                i = i + 1
+            end
+            result
+        end
+
+    fun ref parseStringMultiMap(): collections.Map[String val, Array[String val] val] ? =>
+        recover
+            let pairs = parseShort()
+            let result = collections.Map[String val, Array[String val] val](pairs.usize())
+            var i: U16 = 0
+            while i < pairs do
+                let key = parseString()
+                let value = parseStringList()
                 result.insert(key, value)
                 i = i + 1
             end

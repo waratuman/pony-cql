@@ -25,7 +25,7 @@ class iso _TestBytesOfI8 is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var number: I8 = I8.max_value()
-        var bytes = Bytes.of[I8](number)
+        var bytes = Bytes.of(number)
         h.assert_eq[U8](0x7F, bytes.apply(0))
 
 class iso _TestBytesOfU8 is UnitTest
@@ -33,7 +33,7 @@ class iso _TestBytesOfU8 is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var number: U8 = 0xFA
-        var bytes = Bytes.of[U8](number)
+        var bytes = Bytes.of(number)
         h.assert_eq[U8](0xFA, bytes.apply(0))
 
 class iso _TestBytesOfI16 is UnitTest
@@ -41,12 +41,12 @@ class iso _TestBytesOfI16 is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var number: I16 = I16.max_value()
-        var bytes = Bytes.of[I16](number)
+        var bytes = Bytes.of(number)
         h.assert_eq[U8](0x7F, bytes.apply(0))
         h.assert_eq[U8](0xFF, bytes.apply(1))
 
         number = 0x00FF
-        bytes = Bytes.of[I16](number)
+        bytes = Bytes.of(number)
         h.assert_eq[U8](0x00, bytes.apply(0))
         h.assert_eq[U8](0xFF, bytes.apply(1))
 
@@ -55,12 +55,12 @@ class iso _TestBytesOfU16 is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var number: U16 = 0xFF00
-        var bytes = Bytes.of[U16](number)
+        var bytes = Bytes.of(number)
         h.assert_eq[U8](0xFF, bytes.apply(0))
         h.assert_eq[U8](0x00, bytes.apply(1))
 
         number = 0x00FF
-        bytes = Bytes.of[U16](number)
+        bytes = Bytes.of(number)
         h.assert_eq[U8](0x00, bytes.apply(0))
         h.assert_eq[U8](0xFF, bytes.apply(1))
 
@@ -69,14 +69,14 @@ class iso _TestBytesOfI32 is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var number: I32 = 0x11223344
-        var bytes = Bytes.of[I32](number)
+        var bytes = Bytes.of(number)
         h.assert_eq[U8](0x11, bytes.apply(0))
         h.assert_eq[U8](0x22, bytes.apply(1))
         h.assert_eq[U8](0x33, bytes.apply(2))
         h.assert_eq[U8](0x44, bytes.apply(3))
 
         number = 0x44332211
-        bytes = Bytes.of[I32](number)
+        bytes = Bytes.of(number)
         h.assert_eq[U8](0x11, bytes.apply(3))
         h.assert_eq[U8](0x22, bytes.apply(2))
         h.assert_eq[U8](0x33, bytes.apply(1))
@@ -87,14 +87,14 @@ class iso _TestBytesOfU32 is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var number: U32 = 0x11223344
-        var bytes = Bytes.of[U32](number)
+        var bytes = Bytes.of(number)
         h.assert_eq[U8](0x11, bytes.apply(0))
         h.assert_eq[U8](0x22, bytes.apply(1))
         h.assert_eq[U8](0x33, bytes.apply(2))
         h.assert_eq[U8](0x44, bytes.apply(3))
 
         number = 0x44332211
-        bytes = Bytes.of[U32](number)
+        bytes = Bytes.of(number)
         h.assert_eq[U8](0x11, bytes.apply(3))
         h.assert_eq[U8](0x22, bytes.apply(2))
         h.assert_eq[U8](0x33, bytes.apply(1))
@@ -106,8 +106,8 @@ class iso _TestBytesI8 is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let a: I8 = I8.min_value()
         let b: I8 = I8.max_value()
-        h.assert_eq[I8](a, Bytes.i8(Bytes.of[I8](a)))
-        h.assert_eq[I8](b, Bytes.i8(Bytes.of[I8](b)))
+        h.assert_eq[I8](a, Bytes.i8(Bytes.of(a)))
+        h.assert_eq[I8](b, Bytes.i8(Bytes.of(b)))
 
 class iso _TestBytesU8 is UnitTest
     fun name(): String => "Bytes.u8"
@@ -115,8 +115,8 @@ class iso _TestBytesU8 is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let a: U8 = 0x00
         let b: U8 = 0xFF
-        h.assert_eq[U8](a, Bytes.u8(Bytes.of[U8](a)))
-        h.assert_eq[U8](b, Bytes.u8(Bytes.of[U8](b)))
+        h.assert_eq[U8](a, Bytes.u8(Bytes.of(a)))
+        h.assert_eq[U8](b, Bytes.u8(Bytes.of(b)))
 
 class iso _TestBytesI16 is UnitTest
     fun name(): String => "Bytes.u16"
@@ -124,8 +124,8 @@ class iso _TestBytesI16 is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let a: I16 = I16.min_value()
         let b: I16 = I16.max_value()
-        h.assert_eq[I16](a, Bytes.i16(Bytes.of[I16](a)))
-        h.assert_eq[I16](b, Bytes.i16(Bytes.of[I16](b)))
+        h.assert_eq[I16](a, Bytes.i16(Bytes.of(a)))
+        h.assert_eq[I16](b, Bytes.i16(Bytes.of(b)))
 
 class iso _TestBytesU16 is UnitTest
     fun name(): String => "Bytes.u16"
@@ -133,8 +133,8 @@ class iso _TestBytesU16 is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let a: U16 = 0x00FF
         let b: U16 = 0xFF00
-        h.assert_eq[U16](a, Bytes.u16(Bytes.of[U16](a)))
-        h.assert_eq[U16](b, Bytes.u16(Bytes.of[U16](b)))
+        h.assert_eq[U16](a, Bytes.u16(Bytes.of(a)))
+        h.assert_eq[U16](b, Bytes.u16(Bytes.of(b)))
 
 class iso _TestBytesI32 is UnitTest
     fun name(): String => "Bytes.i32"
@@ -142,8 +142,8 @@ class iso _TestBytesI32 is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let a: I32 = I32.min_value()
         let b: I32 = I32.max_value()
-        h.assert_eq[I32](a, Bytes.i32(Bytes.of[I32](a)))
-        h.assert_eq[I32](b, Bytes.i32(Bytes.of[I32](b)))
+        h.assert_eq[I32](a, Bytes.i32(Bytes.of(a)))
+        h.assert_eq[I32](b, Bytes.i32(Bytes.of(b)))
 
 class iso _TestBytesU32 is UnitTest
     fun name(): String => "Bytes.u32"
@@ -151,5 +151,5 @@ class iso _TestBytesU32 is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let a: U32 = 0x00FF00FF
         let b: U32 = 0xFF00FF00
-        h.assert_eq[U32](a, Bytes.u32(Bytes.of[U32](a)))
-        h.assert_eq[U32](b, Bytes.u32(Bytes.of[U32](b)))
+        h.assert_eq[U32](a, Bytes.u32(Bytes.of(a)))
+        h.assert_eq[U32](b, Bytes.u32(Bytes.of(b)))

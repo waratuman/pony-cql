@@ -1,20 +1,25 @@
 use "net"
+use "logger"
 
-actor Client
+actor Client is FrameNotifiee
 
-    let _env: Env
-    let _notify: ClientNotify
+    let _auth: TCPConnectionAuth
+    var _notify: ClientNotify
+    let _logger: (Logger[String] | None)
 
     let cqlVersion: String = "3.0.0"
     let compression: (String val | None val) = None
     let _flags: U8 = 0x00
     var _stream: U16 = 0x0000
 
-    var conn: (TCPConnection | None) = None
-
-    new create(env: Env, notify: ClientNotify iso) =>
-        _env = env
+    var _closed: Bool val = false
+    let _conn: TCPConnection
+    
+    new create(auth: TCPConnectionAuth, notify: ClientNotify iso, host: String, service: String = "9042", logger: (Logger[String] | None) = None) =>
+        _auth = auth
         _notify = consume notify
+        _logger = logger
+        _conn = TCPConnection(_auth, FrameNotify(this, logger), host, service, "", 64, 268435456)
 
     fun ref _createFrame(body: Request val): Frame val =>
         recover Frame(4, _flags, _nextStream(), body) end
@@ -36,48 +41,65 @@ actor Client
     fun ref _authenticated(response: AuthSuccessResponse val) =>
         _notify.connected(this)
 
+    fun ref _log(level: LogLevel, message: String val, loc: SourceLoc = __loc) =>
+        match _logger
+        | let l: Logger[String] => l(level) and l.log(message, loc)
+        end
+    
     fun ref _ready(response: ReadyResponse val) =>
         _notify.connected(this)
 
-    fun ref _startup(conn': TCPConnection) =>
+    fun ref _startup() =>
         _send(StartupRequest.create(cqlVersion))
 
     fun ref _send(request: Request val) =>
         let frame = _createFrame(request)
         let data = Visitor(frame)
-        match conn
-        | let c: TCPConnection =>
-            c.write(data)
-            _env.out.print("-> " + request.string())
+        
+        if not _closed then
+            _conn.write(data)
+            _log(Info, "-> " + request.string())
         else
-            _env.out.print("-| " + request.string())
+            _log(Info, "-| " + request.string())
         end
+
+    fun ref close() =>
+        _closed = true
+        _conn.dispose()
+
+    be options() =>
+        _send(OptionsRequest)
     
-    be closed(conn': TCPConnection tag) =>
-        _env.out.print("__ Connection closed")
+    be accepted(conn: TCPConnection tag) =>
+        None
+
+    be closed(conn: TCPConnection tag) =>
+        _log(Info, "__ Connection closed")
         _notify.closed(this)
-
-    be connect() =>
-        match _env.root
-        | let a: AmbientAuth => TCPConnection(a, TCPConnectionNotifyClient(_env, this), "", "9042", "", 64, 268435456)
-        end
-
+    
     be connecting(conn': TCPConnection, count: U32 val) =>
+        _log(Info, ".. connecting")
         _notify.connecting(this, count)
 
     be connect_failed(conn': TCPConnection tag) =>
         _notify.connect_failed(this)
-        _env.out.print("!! connection failed")
+        _log(Warn, "!! connection failed")
     
-    be connected(conn': TCPConnection tag) =>
-        _env.out.print("-- connection established")
-        conn = conn'
-        _startup(conn')
+    be connected(conn: TCPConnection tag) =>
+        _log(Info, "-- connection established")
+        _startup()
 
-    be received(conn': TCPConnection tag, response: Response val) =>
-        _env.out.print("<- " + response.string())
+    be dispose() =>
+        close()
 
-        match response
+    be received(conn: TCPConnection tag, frame: Frame val) =>
+        _log(Info, "<- " + frame.body.string())
+
+        match frame.body
+        | let m: Response => _notify.received(this, m)
+        end
+
+        match frame.body
         | let m: ReadyResponse => _ready(m)
         | let m: AuthenticateResponse =>
             try
@@ -88,87 +110,8 @@ actor Client
         | let m: AuthSuccessResponse => _authenticated(m)
         end
 
-    be throttled(conn': TCPConnection tag) =>
+    be throttled(conn: TCPConnection tag) =>
         None
 
-    be unthrottled(conn': TCPConnection tag) =>
+    be unthrottled(conn: TCPConnection tag) =>
         None
-
-
-class TCPConnectionNotifyClient is TCPConnectionNotify
-
-    let _stderr: StdStream tag
-    let client: Client tag
-    
-    var _header: (Array[U8 val] val | None) = None
-    var _version: U8 val = 4
-    var _flags: U8 val = 0
-    var _stream: U16 val = 0
-    var _opcode: U8 val = 0
-    var _length: I32 val = 0
-    
-    new iso create(env: Env, client': Client tag) => 
-        _stderr = env.err
-        client = client'
-
-    fun ref connecting(conn: TCPConnection ref, count: U32 val) =>
-        client.connecting(conn, count)
-
-    fun ref connected(conn: TCPConnection ref) =>
-        conn.expect(9)
-        client.connected(conn)
-
-    fun ref connect_failed(conn: TCPConnection ref) =>
-        client.connect_failed(conn)
-
-    fun ref received(conn: TCPConnection ref, data: Array[U8 val] val): Bool val =>
-        try
-            match _header
-            | None =>
-                _header = data
-                
-                _version = data(0) and 0b0111
-                _flags = data(1)
-                _stream = ((data(2).u16() << 8) or data(3).u16())
-                _opcode = data(4)
-                _length = (data(5).i32() << 24)
-                    or (data(6).i32() << 16)
-                    or (data(7).i32() << 8)
-                    or data(8).i32()
-
-                conn.expect(_length.usize())
-
-                true
-            | let h: Array[U8 val] val =>
-                let parser = Parser(data)
-                let response: Response = match _opcode
-                | 0x00 => parser.parseErrorResponse()
-                | 0x02 => parser.parseReadyResponse()
-                | 0x03 => parser.parseAuthenticateResponse()
-                else error
-                end
-                client.received(conn, response)
-
-                _header = None
-                conn.expect(9)
-                false
-            else error
-            end
-        else
-            match _header
-            | None =>
-                _stderr.print("Error parsing frame header: " + Bytes.to_hex_string(data))
-            | let h: Array[U8 val] val => 
-                _stderr.print("Error parsing frame body: " + Bytes.to_hex_string(h) + Bytes.to_hex_string(data))
-            end
-            false
-        end
-
-    fun ref closed(conn: TCPConnection ref) =>
-        client.closed(conn)
-
-    fun ref throttled(conn: TCPConnection ref) =>
-        client.throttled(conn)
-
-    fun ref unthrottled(conn: TCPConnection ref) =>
-        client.unthrottled(conn)

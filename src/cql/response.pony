@@ -4,6 +4,7 @@ type Response is (
     ErrorResponse
     | ReadyResponse
     | AuthenticateResponse
+    | SupportedResponse
     | AuthSuccessResponse
 )
 
@@ -39,6 +40,38 @@ class val AuthenticateResponse
 
     fun string(): String val =>
         "AUTHENTICATE " + authenticator_name
+
+
+class val SupportedResponse
+
+    let cql_version: Array[String val] val
+    let compression: Array[String val] val
+
+    new val create(cql_version': Array[String val] val, compression': Array[String val] val) =>
+        cql_version = cql_version'
+        compression = compression'
+
+    fun string(): String val =>
+        recover
+            let output: String ref = String()
+            output.append("SUPPORTED {")
+
+            if compression.size() > 0 then
+                output.append(" \"COMPRESSION\": [\"" + "\", \"".join(compression) + "\"],")
+            else
+                output.append(" \"COMPRESSION\": [" + "\", \"".join(compression) + "],")
+            end
+            
+            if cql_version.size() > 0 then
+                output.append(" \"CQL_VERSION\": [\"" + "\", \"".join(cql_version) + "\"]")
+            else
+                output.append(" \"CQL_VERSION\": [" + "\", \"".join(cql_version) + "]")
+            end
+            
+            
+            output.append(" }")
+            output
+        end
 
 class val AuthSuccessResponse
 

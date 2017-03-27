@@ -20,6 +20,7 @@ primitive Visitor
         | let b: StartupRequest => 0x01
         | let b: ReadyResponse => 0x02
         | let b: OptionsRequest => 0x05
+        | let b: SupportedResponse => 0x06
         | let b: QueryRequest => 0x07
         | let b: AuthResponseRequest => 0x0F
         else 0
@@ -38,9 +39,22 @@ primitive Visitor
 
     fun visitBody(body: Message val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         match consume body
+        | let r: ErrorResponse val => visitErrorResponse(r, c)      
         | let r: StartupRequest val => visitStartupRequest(r, c)
         | let r: ReadyResponse val => visitReadyResponse(r, c)
+        | let r: AuthenticateResponse val => visitAuthenticateResponse(r, c)
+        | let r: OptionsRequest val => visitOptionsRequest(r, c)
+        | let r: SupportedResponse val => visitSupportedResponse(r, c)
+        // | let r: QueryRequest val => visitQueryRequest(r, c)
+        // | let r: ResultResponse val => visitResultResponse(r, c)
+        // | let r: PrepareRequest val => visitPrepareRequest(r, c)
+        // | let r: ExecuteRequest val => visitExecuteRequest(r, c)
+        // | let r: RegisterRequest val => visitRegisterRequest(r, c)
+        // | let r: EventResponse val => visitEventResponse(r, c)
+        // | let r: BatchRequest val => visitBatchRequest(r, c)
+        // | let r: AuthChallengeResponse val => visitAuthChallengeResponse(r, c)
         | let r: AuthResponseRequest val => visitAuthResponseRequest(r, c)
+        | let r: AuthSuccessResponse val => visitAuthSuccessResponse(r, c)
         else c
         end
 
@@ -84,6 +98,14 @@ primitive Visitor
         visitString(response.authenticator_name, c)
         c
 
+    fun visitSupportedResponse(response: SupportedResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+        visitShort(2, c)
+        visitString("COMPRESSION", c)
+        visitStringList(response.compression, c)
+        visitString("CQL_VERSION", c)
+        visitStringList(response.cql_version, c)
+        c       
+
     fun visitAuthSuccessResponse(response: AuthSuccessResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         visitBytes(response.token, c)
         c
@@ -121,6 +143,13 @@ primitive Visitor
         end
         c
 
+    fun visitStringList(data: Array[String val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitShort(data.size().u16(), c)
+        for value in data.values() do
+            visitString(value, c)
+        end
+        c
+        
     fun visitStringMap(data: collection.Map[String val, String val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
         visitShort(data.size().u16(), c)
         for pairs in data.pairs() do

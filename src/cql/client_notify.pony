@@ -8,9 +8,9 @@ interface ClientNotify
 
         fun ref authenticate(client: Client ref, authenticator: Authenticator iso): Authenticator iso =>
             match authenticator
-            | let a: PasswordAuthenticator => a.token("username", "password")
+            | let a: PasswordAuthenticator => a("username", "password")
             end
-            a
+            consume a
         """
         consume authenticator
 
@@ -33,4 +33,7 @@ interface ClientNotify
         None
     
     fun ref connected(client: Client ref): None val =>
+        None
+
+    fun ref received(client: Client ref, response: Response val): None val =>
         None

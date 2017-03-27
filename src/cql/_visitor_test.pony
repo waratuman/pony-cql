@@ -18,6 +18,7 @@ actor VisitorTestList is TestList
         test(_TestVisitErrorResponse)        
         test(_TestVistReadyResponse)
         test(_TestVisitAuthenticateResponse)
+        test(_TestVisitSupportedResponse)
         test(_TestVisitAuthSuccessResponse)
 
         test(_TestVisitNone)
@@ -25,6 +26,7 @@ actor VisitorTestList is TestList
         test(_TestVisitShort)
         test(_TestVisitBytes)
         test(_TestVisitString)
+        test(_TestVisitStringList)
         test(_TestVisitStringMap)
 
 class iso _TestVisitFrame is UnitTest
@@ -126,6 +128,17 @@ class iso _TestVisitAuthenticateResponse is UnitTest
             Bytes.to_hex_string(result)
         )
 
+class iso _TestVisitSupportedResponse is UnitTest
+    fun name(): String => "Visitor.visitSupportedResponse"
+
+    fun tag apply(h: TestHelper) =>
+        let response = SupportedResponse(recover ["3.0.0"] end, recover ["snappy", "lzo"] end)
+        let result: Array[U8 val] val = recover Visitor.visitSupportedResponse(response) end
+        h.assert_eq[String val](
+            "0002000B434F4D5052455353494F4E00020006736E6170707900036C7A6F000B43514C5F56455253494F4E00010005332E302E30",
+            Bytes.to_hex_string(result)
+        )
+
 class iso _TestVisitAuthSuccessResponse is UnitTest
     fun name(): String => "Visitor.visitAuthSuccessResponse"
 
@@ -224,6 +237,22 @@ class iso _TestVisitString is UnitTest
         h.assert_eq[U8](0x4F, collector(11))
         h.assert_eq[U8](0x4E, collector(12))
 
+class iso _TestVisitStringList is UnitTest
+    fun name(): String => "Visitor.visitStringList"
+
+    fun tag apply(h: TestHelper) ? =>
+        var collector = Array[U8 val]()
+        var data: Array[String val] val = recover ["1", "2"] end
+        Visitor.visitStringList(data, collector)
+        h.assert_eq[U8](0x00, collector(0))
+        h.assert_eq[U8](0x02, collector(1))
+        h.assert_eq[U8](0x00, collector(2))
+        h.assert_eq[U8](0x01, collector(3))
+        h.assert_eq[U8](49, collector(4))
+        h.assert_eq[U8](0x00, collector(5))
+        h.assert_eq[U8](0x01, collector(6))
+        h.assert_eq[U8](50, collector(7))
+        
 class iso _TestVisitStringMap is UnitTest
     fun name(): String => "Visitor.visitStringMap"
 

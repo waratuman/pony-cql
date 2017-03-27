@@ -2,16 +2,49 @@ use "format"
 
 primitive Bytes
 
-    fun val of[A: Integer[A] val](value: A): Array[U8 val] val =>
+    fun val of(value: (Signed val | Unsigned val)): Array[U8 val] iso^ =>
+        match value
+        | let v: U8 => ofU8(v)
+        | let v: I8 => ofI8(v)
+        | let v: U16 => ofU16(v)
+        | let v: I16 => ofI16(v)
+        | let v: U32 => ofU32(v)
+        | let v: I32 => ofI32(v)
+        // | let v: U64 => ofU64(v)
+        // | let v: I64 => ofI64(v)
+        // | let v: U128 => ofU128(v)
+        // | let v: I128 => ofI128(v)
+        // | let v: ULong => ofULong(v)
+        // | let v: ILong => ofILong(v)
+        // | let v: USize => ofUSize(v)
+        // | let v: ISize => ofISize(v)
+        else recover Array[U8]() end
+        end
+
+    fun val ofU8(value: U8): Array[U8 val] iso^ =>
+        recover [value] end
+
+    fun val ofI8(value: I8): Array[U8 val] iso^ =>
+        recover [value.u8()] end
+    
+    fun val ofU16(value: U16): Array[U8 val] iso^ =>
         recover
-            let data = Array[U8 val]()
-            var width: A = value.bitwidth()
-            let byte: A = A.from[U8](8)
-            while width.usize() > 0 do
-                width = width - byte
-                data.push((value >> width).u8())
-            end
-            data
+            [ (value >> 8).u8(), value.u8() ]
+        end
+
+    fun val ofI16(value: I16): Array[U8 val] iso^ =>
+        recover
+            [ (value >> 8).u8(), value.u8() ]
+        end
+
+    fun val ofU32(value: U32): Array[U8 val] iso^ =>
+        recover
+            [ (value >> 24).u8(), (value >> 16).u8(), (value >> 8).u8(), value.u8() ]
+        end
+
+    fun val ofI32(value: I32): Array[U8 val] iso^ =>
+        recover
+            [ (value >> 24).u8(), (value >> 16).u8(), (value >> 8).u8(), value.u8() ]
         end
 
     fun val i8(data: Array[U8 val] box): I8 val ? =>
