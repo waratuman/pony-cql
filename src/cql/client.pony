@@ -27,11 +27,12 @@ actor Client is FrameNotifiee
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
 
-    fun ref _authenticate(response: AuthenticateResponse val) ? =>
+    fun ref _authenticate(response: AuthenticateResponse val) =>
         var authenticator: Authenticator iso = match response.authenticator_name
-        | "org.apache.cassandra.auth.PasswordAuthenticator" =>
-            PasswordAuthenticator.create()
-        else error
+        | "org.apache.cassandra.auth.PasswordAuthenticator" => PasswordAuthenticator.create()
+        else
+            _authenticate_failed(ErrorResponse(0x0100, "Unkown authenticator: " + response.authenticator_name))
+            return
         end
         
         let returnedAuthenticator: Authenticator iso = _notify.authenticate(this, consume authenticator)
@@ -41,6 +42,9 @@ actor Client is FrameNotifiee
     fun ref _authenticated(response: AuthSuccessResponse val) =>
         _notify.authenticated(this)
         _notify.connected(this)
+
+    fun ref _authenticate_failed(response: ErrorResponse val) =>
+        _notify.authenticate_failed(this)
 
     fun ref _log(level: LogLevel, message: String val, loc: SourceLoc = __loc) =>
         match _logger
@@ -102,13 +106,9 @@ actor Client is FrameNotifiee
 
         match frame.body
         | let m: ReadyResponse => _ready(m)
-        | let m: AuthenticateResponse =>
-            try
-                _authenticate(m)
-            else
-                _notify.authenticate_failed(this)
-            end
+        | let m: AuthenticateResponse => _authenticate(m)
         | let m: AuthSuccessResponse => _authenticated(m)
+        | let m: ErrorResponse if m.code == 0x0100 => _authenticate_failed(m)
         end
 
     be throttled(conn: TCPConnection tag) =>

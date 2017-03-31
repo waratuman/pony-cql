@@ -1,5 +1,6 @@
 use "net"
 use "logger"
+use "itertools"
 
 actor Server
 
@@ -93,7 +94,20 @@ actor ServerConnection is FrameNotifiee
         | let a: Authenticator val =>
             match (message.token, a.token())
             | (let t1: Array[U8 val] val, let t2: Array[U8 val] val) =>
-                _send(frame.stream, AuthSuccessResponse())
+                var passed: Bool val = t1.size() == t2.size()
+                for (x, y) in Zip2[U8 val, U8 val](t1.values(), t2.values()) do
+                    if (x == y) then
+                        passed = true and passed
+                    else
+                        passed = false
+                    end
+                end
+                
+                if passed then
+                    _send(frame.stream, AuthSuccessResponse())
+                else
+                    _send(frame.stream, ErrorResponse(0x0100, "authentication failed"))
+                end
             else
                 _send(frame.stream, ErrorResponse(0x0100, "authentication failed"))
             end
