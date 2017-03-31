@@ -63,6 +63,7 @@ class FrameNotify is TCPConnectionNotify
         | 0x03 => parser.parseAuthenticateResponse()
         | 0x05 => parser.parseOptionsRequest()
         | 0x06 => parser.parseSupportedResponse()
+        | 0x0F => parser.parseAuthResponseRequest()
         | 0x10 => parser.parseAuthSuccessResponse()
         else error
         end

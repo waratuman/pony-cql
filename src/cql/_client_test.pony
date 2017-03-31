@@ -13,18 +13,42 @@ actor ClientTestList is TestList
 class _TestClientCreate is UnitTest
     fun name(): String => "Client.create"
 
-    fun tag apply(h: TestHelper) =>
-        None
-        // let logger = StringLogger(Fine, h.env.out)
-        // // let server = Server.create(h.env.root as AmbientAuth, "localhost", "7654", logger)
-        
-        // let client = Client(h.env.root as AmbientAuth, _TestClientCreateNotify.create(), "localhost", "7654", logger)
-        // h.long_test(200_000_000)
-        // h.dispose_when_done(client)
-        // // h.dispose_when_done(server)
+    fun tag apply(h: TestHelper) ? =>
+        h.expect_action("client connected")
+        let auth = h.env.root as AmbientAuth
+        let server: Server = Server(auth, _TestClientCreateServerNotify(h))
+        h.dispose_when_done(server)
+        h.long_test(20_000_000)
 
+class _TestClientCreateServerNotify  is ServerNotify
 
-class _TestClientCreateNotify is ClientNotify
+    let _h: TestHelper
+
+    new iso create(h: TestHelper) =>
+        _h = h
+
+    fun ref listening(server: Server ref) =>
+        try
+            (let host, let port) = server.local_address.name()
+            let client = Client(
+                _h.env.root as AmbientAuth,
+                _TestClientCreateClientNotify(_h),
+                host,
+                port
+            )
+            _h.dispose_when_done(client)
+        end
+
+class _TestClientCreateClientNotify is ClientNotify
+    
+    let _h: TestHelper
+
+    new iso create(h: TestHelper) =>
+        _h = h
+
+    fun ref connected(client: Client ref) =>
+        _h.complete_action("client connected")
+        client.close()
 
 // class _TestClientClosed is UnitTest
 

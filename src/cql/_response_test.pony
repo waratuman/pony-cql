@@ -67,7 +67,7 @@ class iso _TestAuthSuccessResponseString is UnitTest
             response.string()
         )
 
-        response = AuthSuccessResponse(recover [as U8: 0xAB, 0xCD] end)
+        response = AuthSuccessResponse(recover [as U8: 0xAB; 0xCD] end)
         h.assert_eq[String val](
             "AUTH_SUCCESS",
             response.string()

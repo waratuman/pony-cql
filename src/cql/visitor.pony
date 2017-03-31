@@ -19,10 +19,19 @@ primitive Visitor
         let opcode: U8 = match frame.body
         | let b: StartupRequest => 0x01
         | let b: ReadyResponse => 0x02
+        | let b: AuthenticateResponse => 0x03
         | let b: OptionsRequest => 0x05
         | let b: SupportedResponse => 0x06
         | let b: QueryRequest => 0x07
+        // | let b:  => 0x08
+        // | let b:  => 0x09
+        // | let b:  => 0x0A
+        // | let b:  => 0x0B
+        // | let b:  => 0x0C
+        // | let b:  => 0x0D
+        // | let b:  => 0x0E
         | let b: AuthResponseRequest => 0x0F
+        | let b: AuthSuccessResponse => 0x10
         else 0
         end
     

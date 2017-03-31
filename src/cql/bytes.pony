@@ -29,22 +29,22 @@ primitive Bytes
     
     fun val ofU16(value: U16): Array[U8 val] iso^ =>
         recover
-            [ (value >> 8).u8(), value.u8() ]
+            [ (value >> 8).u8(); value.u8() ]
         end
 
     fun val ofI16(value: I16): Array[U8 val] iso^ =>
         recover
-            [ (value >> 8).u8(), value.u8() ]
+            [ (value >> 8).u8(); value.u8() ]
         end
 
     fun val ofU32(value: U32): Array[U8 val] iso^ =>
         recover
-            [ (value >> 24).u8(), (value >> 16).u8(), (value >> 8).u8(), value.u8() ]
+            [ (value >> 24).u8(); (value >> 16).u8(); (value >> 8).u8(); value.u8() ]
         end
 
     fun val ofI32(value: I32): Array[U8 val] iso^ =>
         recover
-            [ (value >> 24).u8(), (value >> 16).u8(), (value >> 8).u8(), value.u8() ]
+            [ (value >> 24).u8(); (value >> 16).u8(); (value >> 8).u8(); value.u8() ]
         end
 
     fun val i8(data: Array[U8 val] box): I8 val ? =>

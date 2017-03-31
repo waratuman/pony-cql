@@ -35,7 +35,7 @@ class val AuthenticateResponse
 
     let authenticator_name: String val
 
-    new val create(authenticator_name': String) =>
+    new val create(authenticator_name': String val) =>
         authenticator_name = authenticator_name'
 
     fun string(): String val =>

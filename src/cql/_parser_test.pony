@@ -181,7 +181,7 @@ class iso _TestParseString is UnitTest
     fun name(): String => "Parser.parseString"
 
     fun tag apply(h: TestHelper) ? =>
-        let data: Array[U8 val] val = recover [as U8: 0x00, 0x09, 0x63, 0x61, 0x73, 0x73, 0x61, 0x6E, 0x64, 0x72, 0x61] end
+        let data: Array[U8 val] val = recover [as U8: 0x00; 0x09; 0x63; 0x61; 0x73; 0x73; 0x61; 0x6E; 0x64; 0x72; 0x61] end
         h.assert_eq[String val](
             "cassandra",
             Parser(data).parseString()
@@ -191,7 +191,7 @@ class iso _TestParseStringList is UnitTest
     fun name(): String => "Parser.parseStringList"
 
     fun tag apply(h: TestHelper) ? =>
-        let data: Array[U8 val] val = recover [as U8: 0x00, 0x01, 0x00, 0x09, 0x63, 0x61, 0x73, 0x73, 0x61, 0x6E, 0x64, 0x72, 0x61] end
+        let data: Array[U8 val] val = recover [as U8: 0x00; 0x01; 0x00; 0x09; 0x63; 0x61; 0x73; 0x73; 0x61; 0x6E; 0x64; 0x72; 0x61] end
         let result: Array[String val] val = Parser(data).parseStringList()
         h.assert_eq[String val](
             "cassandra",
@@ -202,7 +202,7 @@ class iso _TestParseShort is UnitTest
     fun name(): String => "Parser.parseShort"
 
     fun tag apply(h: TestHelper) ? =>
-        let data: Array[U8 val] val = recover [as U8: 0x00, 0x09] end
+        let data: Array[U8 val] val = recover [as U8: 0x00; 0x09] end
         h.assert_eq[U16 val](
             9,
             Parser(data).parseShort()
@@ -212,7 +212,7 @@ class iso _TestParseInt is UnitTest
     fun name(): String => "Parser.parseInt"
 
     fun tag apply(h: TestHelper) ? =>
-        let data: Array[U8 val] val = recover [as U8: 0xFF, 0xFF, 0xFF, 0xFF] end
+        let data: Array[U8 val] val = recover [as U8: 0xFF; 0xFF; 0xFF; 0xFF] end
         h.assert_eq[I32 val](
             -1,
             Parser(data).parseInt()
@@ -241,7 +241,7 @@ class iso _TestParseBytes is UnitTest
     fun name(): String => "Parser.parseBytes"
 
     fun tag apply(h: TestHelper) ? =>
-        var data: Array[U8 val] val = recover [as U8: 0x00, 0x00, 0x00, 0x02, 0xAB, 0xCD] end
+        var data: Array[U8 val] val = recover [as U8: 0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD] end
         var result = Parser(data).parseBytes()
         match result
         | let r: Array[U8 val] val =>
@@ -251,7 +251,7 @@ class iso _TestParseBytes is UnitTest
         end
         
 
-        data = recover [as U8: 0xFF, 0xFF, 0xFF, 0xFF] end
+        data = recover [as U8: 0xFF; 0xFF; 0xFF; 0xFF] end
         result = Parser(data).parseBytes()
         match result
         | let r: None => h.assert_eq[None val](None, r)

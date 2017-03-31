@@ -34,11 +34,12 @@ actor Client is FrameNotifiee
         else error
         end
         
-        let returnedAuthenticator: Authenticator box = _notify.authenticate(this, consume authenticator)
+        let returnedAuthenticator: Authenticator iso = _notify.authenticate(this, consume authenticator)
         let token = returnedAuthenticator.token()
         _send(AuthResponseRequest(token))
 
     fun ref _authenticated(response: AuthSuccessResponse val) =>
+        _notify.authenticated(this)
         _notify.connected(this)
 
     fun ref _log(level: LogLevel, message: String val, loc: SourceLoc = __loc) =>

@@ -42,7 +42,7 @@ class iso _TestVisitFrame is UnitTest
             Bytes.to_hex_string(result)
         )
 
-        request = recover AuthResponseRequest(recover [as U8: 0xAB, 0xCD] end) end
+        request = recover AuthResponseRequest(recover [as U8: 0xAB; 0xCD] end) end
         frame = recover Frame(4, 0, 0, request) end
         result = recover Visitor.visitFrame(frame) end
         h.assert_eq[String val](
@@ -80,7 +80,7 @@ class iso _TestVisitAuthResponseRequest is UnitTest
             Bytes.to_hex_string(result)
         )
 
-        request = recover AuthResponseRequest(recover [as U8: 0xAB, 0xCD] end) end
+        request = recover AuthResponseRequest(recover [as U8: 0xAB; 0xCD] end) end
         result = recover Visitor.visitAuthResponseRequest(request) end
         h.assert_eq[String val](
             "00000002ABCD",
@@ -132,7 +132,7 @@ class iso _TestVisitSupportedResponse is UnitTest
     fun name(): String => "Visitor.visitSupportedResponse"
 
     fun tag apply(h: TestHelper) =>
-        let response = SupportedResponse(recover ["3.0.0"] end, recover ["snappy", "lzo"] end)
+        let response = SupportedResponse(recover ["3.0.0"] end, recover ["snappy"; "lzo"] end)
         let result: Array[U8 val] val = recover Visitor.visitSupportedResponse(response) end
         h.assert_eq[String val](
             "0002000B434F4D5052455353494F4E00020006736E6170707900036C7A6F000B43514C5F56455253494F4E00010005332E302E30",
@@ -150,7 +150,7 @@ class iso _TestVisitAuthSuccessResponse is UnitTest
             Bytes.to_hex_string(result)
         )
 
-        response = recover AuthSuccessResponse(recover [as U8: 0xAB, 0xCD] end) end
+        response = recover AuthSuccessResponse(recover [as U8: 0xAB; 0xCD] end) end
         result = recover Visitor.visitAuthSuccessResponse(response) end
         h.assert_eq[String val](
             "00000002ABCD",
@@ -202,7 +202,7 @@ class iso _TestVisitBytes is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var collector = Array[U8 val]()
-        Visitor.visitBytes(recover [as U8: 0xAB, 0xCD] end, collector)
+        Visitor.visitBytes(recover [as U8: 0xAB; 0xCD] end, collector)
         h.assert_eq[U8](0x00, collector(0))
         h.assert_eq[U8](0x00, collector(1))
         h.assert_eq[U8](0x00, collector(2))
@@ -242,7 +242,7 @@ class iso _TestVisitStringList is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var collector = Array[U8 val]()
-        var data: Array[String val] val = recover ["1", "2"] end
+        var data: Array[String val] val = recover ["1"; "2"] end
         Visitor.visitStringList(data, collector)
         h.assert_eq[U8](0x00, collector(0))
         h.assert_eq[U8](0x02, collector(1))
