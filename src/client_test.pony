@@ -1,5 +1,4 @@
 use "ponytest"
-use "logger"
 
 actor ClientTestList is TestList
     
@@ -16,18 +15,18 @@ class _TestClientCreate is UnitTest
     fun tag apply(h: TestHelper) ? =>
         h.expect_action("client connected")
         let auth = h.env.root as AmbientAuth
-        let server: Server = Server(auth, _TestClientCreateServerNotify(h))
+        let server: TestServer = TestServer(auth, _TestClientCreateServerNotify(h))
         h.dispose_when_done(server)
         h.long_test(20_000_000)
 
-class _TestClientCreateServerNotify  is ServerNotify
+class _TestClientCreateServerNotify  is TestServerNotify
 
     let _h: TestHelper
 
     new iso create(h: TestHelper) =>
         _h = h
 
-    fun ref listening(server: Server ref) =>
+    fun ref listening(server: TestServer ref) =>
         try
             (let host, let port) = server.local_address.name()
             let client = Client(

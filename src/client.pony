@@ -1,5 +1,6 @@
 use "net"
 use "logger"
+use "./native_protocol"
 
 actor Client is FrameNotifiee
 

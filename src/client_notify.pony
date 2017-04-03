@@ -1,3 +1,5 @@
+use "./native_protocol"
+
 interface ClientNotify
 
     fun ref authenticate(client: Client ref, authenticator: Authenticator iso): Authenticator iso^ =>

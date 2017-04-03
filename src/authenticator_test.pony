@@ -1,4 +1,5 @@
 use "ponytest"
+use "./native_protocol"
 
 actor AuthenticatorTestList is TestList
     

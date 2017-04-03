@@ -3,11 +3,11 @@
 all: build
 
 build:
-	ponyc -p src -o build src/cql
+	ponyc -p src -o build src
 
 clean:
 	rm -rf build
 
 test:
-	ponyc -p src --debug -o build src/cql
-	./build/cql
+	ponyc -p src --debug -o build src
+	./build/src

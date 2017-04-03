@@ -1,4 +1,3 @@
-use "logger"
 use "ponytest"
 
 actor Main is TestList
@@ -20,7 +19,3 @@ actor Main is TestList
         FrameTestList.make().tests(test)
         RequestTestList.make().tests(test)
         ResponseTestList.make().tests(test)
-        AuthenticatorTestList.make().tests(test)
-
-        ClientTestList.make().tests(test)
-        ClientNotifyTestList.make().tests(test)

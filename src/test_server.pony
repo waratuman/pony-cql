@@ -1,17 +1,18 @@
 use "net"
 use "logger"
 use "itertools"
+use "./native_protocol"
 
-actor Server
+actor TestServer
 
     let _authenticator: (Authenticator val | None val)
     let _tcp_listener: TCPListener
-    let _notify: ServerNotify ref
+    let _notify: TestServerNotify ref
     let _logger: (Logger[String] | None)
 
     var local_address: NetAddress val = recover NetAddress end
 
-    new create(auth: TCPListenerAuth, listener: ServerNotify iso, authenticator: (Authenticator val | None val) = None, host: String = "", service: String = "0", logger: (Logger[String] | None) = None) =>
+    new create(auth: TCPListenerAuth, listener: TestServerNotify iso, authenticator: (Authenticator val | None val) = None, host: String = "", service: String = "0", logger: (Logger[String] | None) = None) =>
         _authenticator = authenticator
         _logger = logger
         _notify = consume listener
@@ -35,27 +36,27 @@ actor Server
     be closed(listener: TCPListener tag) =>
         _notify.closed(this)
     
-    be accepted(listener: TCPListener tag, conn: ServerConnection tag) =>
+    be accepted(listener: TCPListener tag, conn: TestServerConnection tag) =>
         _notify.accepted(this, conn)
 
     be dispose() =>
         _tcp_listener.dispose()
 
-interface ServerNotify
+interface TestServerNotify
 
-    fun ref listening(server: Server ref) =>
+    fun ref listening(server: TestServer ref) =>
         None
 
-    fun ref not_listening(server: Server ref) =>
+    fun ref not_listening(server: TestServer ref) =>
         None
 
-    fun ref closed(server: Server ref) =>
+    fun ref closed(server: TestServer ref) =>
         None
 
-    fun ref accepted(server: Server ref, serverConnection: ServerConnection tag) =>
+    fun ref accepted(server: TestServer ref, serverConnection: TestServerConnection tag) =>
         None
 
-actor ServerConnection is FrameNotifiee
+actor TestServerConnection is FrameNotifiee
 
     let _authenticator: (Authenticator val | None val)
     var _version: U8 val = 4
@@ -161,10 +162,10 @@ actor ServerConnection is FrameNotifiee
 class TCPListenNotifyServer is TCPListenNotify
 
     let _authenticator: (Authenticator val | None val)
-    let _server: Server
+    let _server: TestServer
     let _logger: (Logger[String] | None)
 
-    new iso create(server: Server, authenticator: (Authenticator val | None val), logger: (Logger[String] | None) = None) =>
+    new iso create(server: TestServer, authenticator: (Authenticator val | None val), logger: (Logger[String] | None) = None) =>
         _authenticator = authenticator
         _server = server
         _logger = logger
@@ -179,6 +180,6 @@ class TCPListenNotifyServer is TCPListenNotify
         _server.closed(listener)
     
     fun ref connected(listener: TCPListener ref): TCPConnectionNotify iso^ =>
-        let server_connection = ServerConnection.create(_authenticator, _logger)
+        let server_connection = TestServerConnection.create(_authenticator, _logger)
         _server.accepted(listener, server_connection)
         FrameNotify(server_connection, _logger)
