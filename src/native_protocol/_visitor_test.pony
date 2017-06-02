@@ -1,4 +1,6 @@
 use "crypto"
+use "chrono"
+use "net"
 use "format"
 use "ponytest"
 use collection = "collections"
@@ -14,6 +16,7 @@ actor VisitorTestList is TestList
         test(_TestVisitStartupRequest)
         test(_TestVisitAuthResponseRequest)
         test(_TestVisitOptionsRequest)
+        test(_TestVisitQueryRequest)
 
         test(_TestVisitErrorResponse)        
         test(_TestVistReadyResponse)
@@ -21,6 +24,9 @@ actor VisitorTestList is TestList
         test(_TestVisitSupportedResponse)
         test(_TestVisitAuthSuccessResponse)
 
+        test(_TestVisitQueryParameter)
+
+        test(_TestVisitConsistency)
         test(_TestVisitNone)
         test(_TestVisitInt)
         test(_TestVisitShort)
@@ -91,10 +97,24 @@ class iso _TestVisitOptionsRequest is UnitTest
     fun name(): String => "Visitor.visitOptionsRequest"
 
     fun tag apply(h: TestHelper) =>
-        let request: OptionsRequest val = recover OptionsRequest() end
+        let request: OptionsRequest val = OptionsRequest()
         let result: Array[U8 val] val = recover Visitor.visitOptionsRequest(request) end
         h.assert_eq[String val](
             "",
+            Bytes.to_hex_string(result)
+        )
+
+
+class iso _TestVisitQueryRequest is UnitTest
+    
+    fun name(): String val =>
+        "Visitor.visitQueryRequest"
+    
+    fun tag apply(h: TestHelper) =>
+        let request: QueryRequest val = QueryRequest("SELECT * FROM example")
+        let result: Array[U8 val] val = recover Visitor.visitQueryRequest(request) end
+        h.assert_eq[String val](
+            "0000001553454C454354202A2046524F4D206578616D706C65000400",
             Bytes.to_hex_string(result)
         )
 
@@ -156,6 +176,86 @@ class iso _TestVisitAuthSuccessResponse is UnitTest
             "00000002ABCD",
             Bytes.to_hex_string(result)
         )
+
+class iso _TestVisitQueryParameter is UnitTest
+
+    fun name(): String =>
+        "Visitor.visitQueryParameter"
+    
+    fun tag apply(h: TestHelper) ? =>
+        var result: Array[U8 val] val = recover Visitor.visitQueryParameter("test") end
+        h.assert_eq[String val]("0000000474657374", Bytes.to_hex_string(result))
+
+        let bigint: I64 = 64
+        result = recover Visitor.visitQueryParameter(bigint) end
+        h.assert_eq[String val]("000000080000000000000040", Bytes.to_hex_string(result))
+
+        let blob: Array[U8 val] val = recover [as U8: 0; 1; 2; 3; 4; 5; 0xFF] end
+        result = recover Visitor.visitQueryParameter(blob) end
+        h.assert_eq[String val]("00000007000102030405FF", Bytes.to_hex_string(result))
+
+        let bool: Bool = true
+        result = recover Visitor.visitQueryParameter(blob) end
+        h.assert_eq[String val]("00000007000102030405FF", Bytes.to_hex_string(result))
+
+        
+        // var date: Date val = recover Date(-2147483648) end
+        var date: Date val = recover Date.civil(-5877641, 6, 23) end//-2147483647) end  
+        result = recover Visitor.visitQueryParameter(date) end
+        h.assert_eq[String val]("0000000400000000", Bytes.to_hex_string(result))
+        
+        date = recover Date.civil(1970, 1, 1) end
+        h.env.out.print(date.format("%d/%b/%Y:%H:%M:%S +0000"))
+        h.env.out.print(Format.int[I64](date.timestamp() / 86400))
+        result = recover Visitor.visitQueryParameter(date) end
+        h.assert_eq[String val]("0000000480000000", Bytes.to_hex_string(result))
+
+        date = recover Date.civil(5881580, July, 11) end
+        result = recover Visitor.visitQueryParameter(date) end
+        h.assert_eq[String val]("00000004FFFFFFFF", Bytes.to_hex_string(result))
+
+        let double: F64 = 3.141592653589
+        result = recover Visitor.visitQueryParameter(double) end
+        h.assert_eq[String val]("00000008400921FB5444261E", Bytes.to_hex_string(result))
+
+        let float: F32 = F32.max_value()
+        result = recover Visitor.visitQueryParameter(float) end
+        h.assert_eq[String val]("000000047F7FFFFF", Bytes.to_hex_string(result))
+        
+        let net_address = DNS((h.env.root as AmbientAuth), "192.0.2.235", "80")(0)
+        result = recover Visitor.visitQueryParameter(net_address) end
+        h.assert_eq[String val]("00000004C00002EB", Bytes.to_hex_string(result))
+
+        let int: I32 val = 32
+        result = recover Visitor.visitQueryParameter(int) end
+        h.assert_eq[String val]("0000000400000020", Bytes.to_hex_string(result))
+
+        // let time: Time val =
+
+        // let timestamp: 
+
+        let tinyint: I16 val = 16
+        result = recover Visitor.visitQueryParameter(tinyint) end
+        h.assert_eq[String val]("000000020010", Bytes.to_hex_string(result))
+
+class iso _TestVisitConsistency is UnitTest
+
+    fun name(): String =>
+        "Visitor.visitConsistency"
+    
+    fun tag apply(h: TestHelper) =>
+        h.assert_eq[String val]("0000", Bytes.to_hex_string(Visitor.visitConsistency(AnyConsistency)))
+        h.assert_eq[String val]("0001", Bytes.to_hex_string(Visitor.visitConsistency(One)))
+        h.assert_eq[String val]("0002", Bytes.to_hex_string(Visitor.visitConsistency(Two)))
+        h.assert_eq[String val]("0003", Bytes.to_hex_string(Visitor.visitConsistency(Three)))
+        h.assert_eq[String val]("0004", Bytes.to_hex_string(Visitor.visitConsistency(Quorum)))
+        h.assert_eq[String val]("0005", Bytes.to_hex_string(Visitor.visitConsistency(All)))
+        h.assert_eq[String val]("0006", Bytes.to_hex_string(Visitor.visitConsistency(LocalQuorum)))
+        h.assert_eq[String val]("0007", Bytes.to_hex_string(Visitor.visitConsistency(EachQuorum)))
+        h.assert_eq[String val]("0008", Bytes.to_hex_string(Visitor.visitConsistency(Serial)))
+        h.assert_eq[String val]("0009", Bytes.to_hex_string(Visitor.visitConsistency(LocalSerial)))
+        h.assert_eq[String val]("000A", Bytes.to_hex_string(Visitor.visitConsistency(LocalOne)))
+        
 
 class iso _TestVisitNone is UnitTest
     fun name(): String => "Visitor.visitNone"

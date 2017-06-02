@@ -34,7 +34,9 @@ class iso _TestAuthenticatorToken is UnitTest
         end
 
 class iso _TestAuthenticatorName is UnitTest
-    fun name(): String => "Authenticator.name"
+    
+    fun name(): String =>
+        "Authenticator.name"
 
     fun tag apply(h: TestHelper) =>
         let authenticator = PasswordAuthenticator.create()

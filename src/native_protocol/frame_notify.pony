@@ -69,7 +69,7 @@ class FrameNotify is TCPConnectionNotify
         end
         _notify.received(conn, Frame(_version, _flags, _stream, message))
 
-    fun ref received(conn: TCPConnection ref, data: Array[U8 val] val): Bool val =>
+    fun ref received(conn: TCPConnection ref, data: Array[U8 val] val, times: USize val): Bool val =>
         // _log(Fine, Bytes.to_hex_string(data))
         try
             let body_present = match _header

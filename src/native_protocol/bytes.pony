@@ -93,15 +93,13 @@ primitive Bytes
             result
         end
 
-    fun val to_hex_string(data: Array[U8 val] val): String val =>
-        recover
-            let hexString = String()
-            for byte in data.values() do
-                hexString.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
-            end
-            hexString
+    fun val to_hex_string(data: Array[U8 val] box): String val =>
+        var result: String val = ""
+        for byte in data.values() do
+            result = result + Format.int[U8](byte, FormatHexBare, PrefixDefault, 2)
         end
-    
+        result
+
     fun _hexValue(byte: U8): U8 ? =>
         if (byte >= 48) and (byte <= 57) then
             byte - 48

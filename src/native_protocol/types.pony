@@ -1,6 +1,7 @@
 use collection = "collections" 
 
 // Consistency 
+primitive AnyConsistency
 primitive One
 primitive Two
 primitive Three
@@ -12,8 +13,8 @@ primitive Serial
 primitive LocalSerial
 primitive LocalOne
 
-type Consistency is (
-    Any
+type Consistency is
+    ( AnyConsistency
     | One
     | Two
     | Three
@@ -24,7 +25,7 @@ type Consistency is (
     | Serial
     | LocalSerial
     | LocalOne
-)
+    )
 
 primitive Values is collection.Flag[U8]
     fun value(): U8 => 0x01
@@ -54,7 +55,7 @@ primitive WithNamesForValues is collection.Flag[U8]
     fun value(): U8 => 0x40
     fun string(): String => "WithNamesForValues"
 
-type QueryFlags is (
+type QueryFlags is collection.Flags[(
     Values | SkipMetadata | PageSize | WithPagingState | WithSerialConsistency
     | WithDefaultTimestamp | WithNamesForValues
-)
+), U8]

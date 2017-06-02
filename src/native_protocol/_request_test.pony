@@ -19,6 +19,9 @@ actor RequestTestList is TestList
         test(_TestOptionsRequestCreate)
         test(_TestOptionsRequestString)
 
+        test(_TestQueryRequestCreate)
+        test(_TestQueryRequestString)
+
 class iso _TestStartupRequestCreate is UnitTest
     fun name(): String => "StartupRequest.create"
 
@@ -78,6 +81,7 @@ class iso _TestAuthResponseRequestCreate is UnitTest
         else h.fail()
         end
 
+
 class iso _TestAuthResponseRequestString is UnitTest
     fun name(): String => "AuthResponseRequest.string"
     
@@ -94,11 +98,13 @@ class iso _TestAuthResponseRequestString is UnitTest
             request.string()
         )
 
+
 class iso _TestOptionsRequestCreate is UnitTest
     fun name(): String => "OptionsRequest.create"
 
     fun tag apply(h: TestHelper) =>
         let request = OptionsRequest.create()
+
 
 class iso _TestOptionsRequestString is UnitTest
     fun name(): String => "OptionsRequest.string"
@@ -107,3 +113,21 @@ class iso _TestOptionsRequestString is UnitTest
         let request = OptionsRequest.create()
         h.assert_eq[String val]("OPTIONS", request.string())
 
+
+class iso _TestQueryRequestCreate is UnitTest
+
+    fun name(): String val =>
+        "QueryRequest.create"
+
+    fun tag apply(h: TestHelper) =>
+        None
+
+
+class iso _TestQueryRequestString is UnitTest
+
+    fun name(): String val =>
+        "QueryRequest.string"
+
+    fun tag apply(h: TestHelper) =>
+        let request = QueryRequest.create("SELECT * FROM example;")
+        h.assert_eq[String val]("QUERY \"SELECT * FROM example;\"", request.string())
