@@ -25,4 +25,7 @@ class Frame
         body.string()
 
 
-type Message is (Request | Response)
+type Message is
+    ( Request
+    | Response
+    )

@@ -101,41 +101,50 @@ primitive Visitor
         visitConsistency(request.consistency, c)
 
         var flag: QueryFlags ref = QueryFlags
+        let tail: Array[U8 val] ref = Array[U8 val]
 
-        match request.queryParameters
-        | let p: Array[QueryParameter val] val => flag.apply(Values)
+        match request.query_parameters
+        | let p: Array[QueryParameter val] val =>
+            flag.set(Values)
+            visitShort(p.size().u16(), tail)
+            for value in p.values() do
+                visitQueryParameter(value, tail)
+            end
         end
         
         if (not request.metadata) then
-            flag.apply(SkipMetadata)
+            flag.set(SkipMetadata)
         end
 
-        match request.pageSize
-        | U32 => flag.apply(PageSize)
+        match request.page_size
+        | let v: I32 =>
+            flag.set(PageSize)
+            visitInt(v, tail)
         end
 
-        match request.pagingState
-        | let _: Array[U8 val] val => flag.apply(WithPagingState)
+        match request.paging_state
+        | let v: Array[U8 val] val =>
+            flag.set(WithPagingState)
+            visitBytes(v, tail)
         end
 
-        match request.serialConsistency
-        | let _: Serial val => flag.apply(WithSerialConsistency)
-        | let _: LocalSerial val => flag.apply(WithSerialConsistency)
+        match request.serial_consistency
+        | let v: Serial val =>
+            flag.set(WithSerialConsistency)
+            visitConsistency(v, tail)
+        | let v: LocalSerial val =>
+            flag.set(WithSerialConsistency)
+            visitConsistency(v, tail)
         end
     
         match request.timestamp
-        | let _: U64 val => flag.apply(WithDefaultTimestamp)
+        | let v: I64 val =>
+            flag.set(WithDefaultTimestamp)
+            visitLong(v, tail)
         end
 
         c.push(flag.value())
-
-        match request.queryParameters
-        | let p: Array[QueryParameter val] val =>
-            for value in p.values() do
-                visitQueryParameter(value, c)
-            end
-        end
-
+        c.append(tail)
         c
 
     fun visitErrorResponse(response: ErrorResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
@@ -164,35 +173,27 @@ primitive Visitor
 
 
     fun visitConsistency(consistency: Consistency val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
-        match consistency
-        | AnyConsistency => visitShort(0x0000, c)
-        | One => visitShort(0x0001, c)
-        | Two => visitShort(0x0002, c)
-        | Three => visitShort(0x0003, c)
-        | Quorum => visitShort(0x0004, c)
-        | All => visitShort(0x0005, c)
-        | LocalQuorum => visitShort(0x0006, c)
-        | EachQuorum => visitShort(0x0007, c)
-        | Serial => visitShort(0x0008, c)
-        | LocalSerial => visitShort(0x0009, c)
-        | LocalOne => visitShort(0x000A, c)
-        end
+        visitShort(consistency.value(), c)
         c
     
     fun visitNone(data: None val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
 
     fun visitQueryParameter(parameter: QueryParameter val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
-        let value_collector: Array[U8 val] ref = Array[U8 val]
-        _visitQueryParameter(parameter, value_collector)
-        visitInt(value_collector.size().i32(), c)
-        c.append(value_collector)
+        _visitQueryParameter(parameter, c)
         c
-    fun _visitQueryParameter(value: String val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
-        let src = value.array()
-        src.copy_to(c, 0, 0, src.size())
+    fun _visitQueryParameter(value: None val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
+        visitInt(-1, c)
+        c
+    fun _visitQueryParameter(value: String val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        let v = value.array()
+        visitInt(value.size().i32(), c)
+        for byte in value.values() do
+            c.push(byte)
+        end
         c
     fun _visitQueryParameter(value: U64 val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(8, c)
         c.push((value >> 56).u8())
         c.push((value >> 48).u8())
         c.push((value >> 40).u8())
@@ -209,9 +210,11 @@ primitive Visitor
         _visitQueryParameter(value.u64(), c)
         c
     fun _visitQueryParameter(value: Array[U8 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(value.size().i32(), c)
         c.append(value)
         c
     fun _visitQueryParameter(value: Bool val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(1, c)
         if value == true then
             c.push(0x01)
         else
@@ -220,21 +223,26 @@ primitive Visitor
         c
     fun _visitQueryParameter(value: Date val, c: Array[U8 val] ref): Array[U8 val] ref =>
         let result: U32 val = ((value.timestamp() / 86400) + 2147483648).u32()
+        visitInt(4, c)
         visitUInt(result, c)
         c
     fun _visitQueryParameter(value: (I32 val | U32 val), c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(4, c)
         visitUInt(value.u32(), c)
         c
     fun _visitQueryParameter(value: F32 val, c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(4, c)
         visitUInt(value.bits(), c)
         c
     fun _visitQueryParameter(value: NetAddress, c: Array[U8 val] ref): Array[U8 val] ref =>
         if value.ip6() then
+            visitInt(16, c)
             visitUInt(value.addr1, c)
             visitUInt(value.addr2, c)
             visitUInt(value.addr3, c)
             visitUInt(value.addr4, c)
         else
+            visitInt(4, c)
             c.push(value.addr.u8())
             c.push((value.addr >> 8).u8())
             c.push((value.addr >> 16).u8())
@@ -242,12 +250,14 @@ primitive Visitor
         end
         c
     fun _visitQueryParameter(value: (I16 val | U16 val), c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(2, c)
         visitShort(value.u16(), c)
         c
     fun _visitQueryParameter(value: Time val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        _visitQueryParameter(value.nanos(), c)
+        _visitQueryParameter(value.u64(), c)
         c
     fun _visitQueryParameter(value: (U8 val | I8 val), c: Array[U8 val] ref): Array[U8 val] ref =>
+        visitInt(1, c)
         c.push(value.u8())
         c
     fun _visitQueryParameter(value: Seq[cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
@@ -362,6 +372,17 @@ primitive Visitor
         c.push(value.u8())
         c
 
+    fun visitLong(value: I64 val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
+        c.push((value >> 56).u8())
+        c.push((value >> 48).u8())
+        c.push((value >> 40).u8())
+        c.push((value >> 32).u8())
+        c.push((value >> 24).u8())
+        c.push((value >> 16).u8())
+        c.push((value >> 8).u8())
+        c.push(value.u8())
+        c
+
     fun visitShort(value: U16 val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c.push((value >> 8).u8())
         c.push(value.u8())
@@ -406,7 +427,3 @@ primitive Visitor
             visitString(pairs._2, c)
         end
         c
-    
-    // fun visitASCII(data: )
-    
-

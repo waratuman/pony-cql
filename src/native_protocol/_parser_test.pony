@@ -14,6 +14,7 @@ actor ParserTestList is TestList
         test(_TestParseStartupRequest)
         test(_TestParseAuthResponseRequest)
         test(_TestParseOptionsRequest)
+        test(_TestParseQueryRequest)
         
         test(_TestParseErrorResponse)
         test(_TestParseReadyResponse)
@@ -130,7 +131,9 @@ class iso _TestParseReadyResponse is UnitTest
 
 
 class iso _TestParseAuthenticateResponse is UnitTest
-    fun name(): String => "Parser.parseAuthenticateResponse"
+    
+    fun name(): String =>
+        "Parser.parseAuthenticateResponse"
 
     fun tag apply(h: TestHelper) ? =>
         var data: Array[U8 val] val = Bytes.from_hex_string("002F6F72672E6170616368652E63617373616E6472612E617574682E50617373776F726441757468656E74696361746F72")
@@ -142,7 +145,8 @@ class iso _TestParseAuthenticateResponse is UnitTest
 
 class iso _TestParseSupportedResponse is UnitTest
 
-    fun name(): String => "Parser.parseSupportedResponse"
+    fun name(): String =>
+        "Parser.parseSupportedResponse"
 
     fun tag apply(h: TestHelper) ? =>
         var data: Array[U8 val] val = Bytes.from_hex_string("0002000B434F4D5052455353494F4E00020006736E6170707900036C7A6F000B43514C5F56455253494F4E00010005332E302E30")
@@ -151,12 +155,28 @@ class iso _TestParseSupportedResponse is UnitTest
         h.assert_eq[String val]("snappy", response.compression(0))
         h.assert_eq[String val]("lzo", response.compression(1))
 
-        // h.assert_eq[Array[String val] val](
-        //     ["snappy"], response.compression
-        // )
+
+class iso _TestParseQueryRequest is UnitTest
+
+    fun name(): String val =>
+        "Parser.parseQueryResponse"
+
+    fun tag apply(h: TestHelper) ? =>
+        var data: Array[U8 val] val = Bytes.from_hex_string("0000001553454C454354202A2046524F4D206578616D706C65000400")
+        var request = Parser(data).parseQueryRequest()
+        h.assert_eq[String val]("SELECT * FROM example", request.query)
+        h.assert_eq[Bool val](true, request.query_parameters is None)
+        h.assert_eq[Bool val](true, request.metadata)
+        h.assert_eq[Bool val](true, request.page_size is None)
+        h.assert_eq[Bool val](true, request.paging_state is None)
+        h.assert_eq[Bool val](true, request.serial_consistency is None)
+        h.assert_eq[Bool val](true, request.timestamp is None)
+
 
 class iso _TestParseAuthSuccessResponse is UnitTest
-    fun name(): String => "Parser.parseAuthSuccessResponse"
+    
+    fun name(): String =>
+        "Parser.parseAuthSuccessResponse"
 
     fun tag apply(h: TestHelper) ? =>
         var data = Bytes.from_hex_string("FFFFFFFF")
@@ -177,8 +197,11 @@ class iso _TestParseAuthSuccessResponse is UnitTest
         else h.fail()
         end
 
+
 class iso _TestParseString is UnitTest
-    fun name(): String => "Parser.parseString"
+
+    fun name(): String =>
+        "Parser.parseString"
 
     fun tag apply(h: TestHelper) ? =>
         let data: Array[U8 val] val = recover [as U8: 0x00; 0x09; 0x63; 0x61; 0x73; 0x73; 0x61; 0x6E; 0x64; 0x72; 0x61] end
@@ -188,7 +211,9 @@ class iso _TestParseString is UnitTest
         )
 
 class iso _TestParseStringList is UnitTest
-    fun name(): String => "Parser.parseStringList"
+
+    fun name(): String =>
+        "Parser.parseStringList"
 
     fun tag apply(h: TestHelper) ? =>
         let data: Array[U8 val] val = recover [as U8: 0x00; 0x01; 0x00; 0x09; 0x63; 0x61; 0x73; 0x73; 0x61; 0x6E; 0x64; 0x72; 0x61] end
@@ -199,7 +224,9 @@ class iso _TestParseStringList is UnitTest
         )
 
 class iso _TestParseShort is UnitTest
-    fun name(): String => "Parser.parseShort"
+
+    fun name(): String =>
+        "Parser.parseShort"
 
     fun tag apply(h: TestHelper) ? =>
         let data: Array[U8 val] val = recover [as U8: 0x00; 0x09] end
@@ -209,7 +236,9 @@ class iso _TestParseShort is UnitTest
         )
 
 class iso _TestParseInt is UnitTest
-    fun name(): String => "Parser.parseInt"
+
+    fun name(): String =>
+        "Parser.parseInt"
 
     fun tag apply(h: TestHelper) ? =>
         let data: Array[U8 val] val = recover [as U8: 0xFF; 0xFF; 0xFF; 0xFF] end
@@ -219,7 +248,9 @@ class iso _TestParseInt is UnitTest
         )
 
 class iso _TestParseStringMap is UnitTest
-    fun name(): String => "Parser.parseStringMap"
+
+    fun name(): String =>
+        "Parser.parseStringMap"
 
     fun tag apply(h: TestHelper) ? =>
         let data = Bytes.from_hex_string("0002000B434F4D5052455353494F4E0006736E61707079000B43514C5F56455253494F4E0005332E302E30")

@@ -10,13 +10,14 @@ type Blob is Array[U8 val] val
 
 type Boolean is Bool
     
-type Type is (
-    NativeType val
+type Type is
+    ( NativeType val
     | CollectionType val
-)
+    )
 
-type NativeType is (
-    String val              // ascii
+type NativeType is
+    ( None val              // null
+    | String val            // ascii
     | I64 val               // bigint
     | Array[U8 val] val     // blob
     | Bool val              // boolean
@@ -27,24 +28,27 @@ type NativeType is (
     | F32 val               // float
     | NetAddress val        // inet
     | I32 val               // int
+                            // list
+                            // map
+                            // set
     | I16 val               // smallint
-                            // time
-    | Time val              // timestamp
+    | Time val              // time
+                            // timestamp
                             // timeuuid
     | I8 val                // tinyint
                             // uuid
                             // varchar
                             // varint
-)
+    )
 
-type CollectionType is (
-    Seq[NativeType val] val     // list
+type CollectionType is
+    ( Seq[NativeType val] val     // list
     | SetType val
     | MapType val
-)
+    )
 
-type SetType is (
-    Set[String val] val
+type SetType is
+    ( Set[String val] val
     | Set[I64 val] val
     // | Set[Array[U8 val] val] val
     // | Set[Bool val] val
@@ -56,10 +60,10 @@ type SetType is (
     | Set[I16 val] val
     // | Set[Time val] val
     | Set[I8 val] val
-)
+    )
 
-type MapType is (
-    Map[String val, NativeType val] val
+type MapType is
+    ( Map[String val, NativeType val] val
     | Map[I64 val, NativeType val] val
     // | Map[Array[U8 val] val, NativeType val] val
     // | Map[Bool val, NativeType val] val
@@ -71,4 +75,4 @@ type MapType is (
     | Map[I16 val, NativeType val] val
     // | Map[Time val, NativeType val] val
     | Map[I8 val, NativeType val] val
-)
+    )

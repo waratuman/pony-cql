@@ -13,6 +13,8 @@ actor ResponseTestList is TestList
         test(_TestErrorResponseString)
         test(_TestReadyResponseString)
         test(_TestAuthenticateResponseString)
+        test(_TestSupportedResponseString)
+        test(_TestResultResponseString)
         test(_TestAuthSuccessResponseString)
         
 class iso _TestErrorResponseCreate is UnitTest
@@ -54,6 +56,30 @@ class iso _TestAuthenticateResponseString is UnitTest
         let response = AuthenticateResponse("org.apache.cassandra.auth.PasswordAuthenticator")
         h.assert_eq[String val](
             "AUTHENTICATE org.apache.cassandra.auth.PasswordAuthenticator",
+            response.string()
+        )
+
+class iso _TestSupportedResponseString is UnitTest
+
+    fun name(): String val =>
+        "SupportedResponse.string"
+
+    fun tag apply(h: TestHelper) =>
+        let response = SupportedResponse(recover ["3.0.0"] end, recover ["lzo"; "gzip"] end)
+        h.assert_eq[String val](
+            "SUPPORTED { \"COMPRESSION\": [\"lzo\", \"gzip\"], \"CQL_VERSION\": [\"3.0.0\"] }",
+            response.string()
+        )
+
+class iso _TestResultResponseString is UnitTest
+
+    fun name(): String val =>
+        "SupportedResponse.string"
+
+    fun tag apply(h: TestHelper) =>
+        let response = VoidResultResponse.create()
+        h.assert_eq[String val](
+            "RESULT VOID",
             response.string()
         )
 

@@ -2,16 +2,27 @@ use collection = "collections"
 
 // Consistency 
 primitive AnyConsistency
+    fun value(): U16 => 0x0000
 primitive One
+    fun value(): U16 => 0x0001
 primitive Two
+    fun value(): U16 => 0x0002
 primitive Three
+    fun value(): U16 => 0x0003
 primitive Quorum
+    fun value(): U16 => 0x0004
 primitive All
+    fun value(): U16 => 0x0005
 primitive LocalQuorum
+    fun value(): U16 => 0x0006
 primitive EachQuorum
+    fun value(): U16 => 0x0007
 primitive Serial
+    fun value(): U16 => 0x0008
 primitive LocalSerial
+    fun value(): U16 => 0x0009
 primitive LocalOne
+    fun value(): U16 => 0x000A
 
 type Consistency is
     ( AnyConsistency

@@ -1,10 +1,11 @@
 use "format"
 
-type Response is (
-    ErrorResponse
+type Response is
+    ( ErrorResponse
     | ReadyResponse
     | AuthenticateResponse
     | SupportedResponse
+    | ResultResponse
     | AuthSuccessResponse
 )
 
@@ -20,6 +21,7 @@ class val ErrorResponse
     fun string(): String val =>
         "ERROR " + Format.int[I32](code, FormatHex, PrefixDefault, 8) + " " + message
 
+
 class val ReadyResponse
 
     new val apply() =>
@@ -30,6 +32,7 @@ class val ReadyResponse
 
     fun string(): String val =>
         "READY"
+
 
 class val AuthenticateResponse
 
@@ -72,6 +75,21 @@ class val SupportedResponse
             output.append(" }")
             output
         end
+
+
+type ResultResponse is
+    ( VoidResultResponse
+    )
+
+
+class val VoidResultResponse
+
+    new val create() =>
+        None
+
+    fun string(): String val =>
+        "RESULT VOID"
+
 
 class val AuthSuccessResponse
 

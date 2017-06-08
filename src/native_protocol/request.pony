@@ -1,12 +1,12 @@
 use cql = "../cql"
 use collection = "collections" 
 
-type Request is (
-    StartupRequest
+type Request is
+    ( StartupRequest
     | AuthResponseRequest
     | OptionsRequest
     | QueryRequest
-)
+    )
 
 class val StartupRequest
 
@@ -31,6 +31,7 @@ class val StartupRequest
             output.append(" }")
             output
         end
+
 
 class val AuthResponseRequest
     
@@ -58,31 +59,31 @@ type QueryParameter is cql.Type
 class val QueryRequest
 
     let query: String val
-    let queryParameters: (Array[QueryParameter val] val | None val)
+    let query_parameters: (Array[QueryParameter val] val | None val)
     let consistency: Consistency val
     let metadata: Bool val
-    let pageSize: (None val | U32 val)
-    let pagingState: (None val | Array[U8 val] val)
-    let serialConsistency: (None val | Serial val | LocalSerial val)
-    let timestamp: (None val | U64 val)
+    let page_size: (None val | I32 val)
+    let paging_state: (None val | Array[U8 val] val)
+    let serial_consistency: (None val | Serial val | LocalSerial val)
+    let timestamp: (None val | I64 val)
 
     new val create(
         query': String val,
-        queryParameters': (Array[QueryParameter val] val | None val) = None,
+        query_parameters': (Array[QueryParameter val] val | None val) = None,
         consistency': Consistency val = Quorum,
         metadata': Bool val = true,
-        pageSize': (None val | U32 val) = None,
-        pagingState': (None val | Array[U8 val] val) = None,
-        serialConsistency': (None val | Serial val | LocalSerial val) = None,
-        timestamp': (None val | U64 val) = None
+        page_size': (None val | I32 val) = None,
+        paging_state': (None val | Array[U8 val] val) = None,
+        serial_consistency': (None val | Serial val | LocalSerial val) = None,
+        timestamp': (None val | I64 val) = None
     ) =>
         query = query'
-        queryParameters = queryParameters'
+        query_parameters = query_parameters'
         consistency = consistency'
         metadata = metadata'
-        pageSize = pageSize'
-        pagingState = pagingState'
-        serialConsistency = serialConsistency'
+        page_size = page_size'
+        paging_state = paging_state'
+        serial_consistency = serial_consistency'
         timestamp = timestamp'
 
     fun string(): String val =>

@@ -2,6 +2,7 @@ use "net"
 use "logger"
 use "./native_protocol"
 
+
 actor Client is FrameNotifiee
 
     let _auth: TCPConnectionAuth
@@ -22,11 +23,14 @@ actor Client is FrameNotifiee
         _logger = logger
         _conn = TCPConnection(_auth, FrameNotify(this, logger), host, service, "", 64, 268435456)
 
+
     fun ref _createFrame(body: Request val): Frame val =>
         recover Frame(4, _flags, _nextStream(), body) end
 
+
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
+
 
     fun ref _authenticate(response: AuthenticateResponse val) =>
         var authenticator: Authenticator iso = match response.authenticator_name
@@ -40,23 +44,29 @@ actor Client is FrameNotifiee
         let token = returnedAuthenticator.token()
         _send(AuthResponseRequest(token))
 
+
     fun ref _authenticated(response: AuthSuccessResponse val) =>
         _notify.authenticated(this)
         _notify.connected(this)
 
+
     fun ref _authenticate_failed(response: ErrorResponse val) =>
         _notify.authenticate_failed(this)
+
 
     fun ref _log(level: LogLevel, message: String val, loc: SourceLoc = __loc) =>
         match _logger
         | let l: Logger[String] => l(level) and l.log(message, loc)
         end
-    
+
+
     fun ref _ready(response: ReadyResponse val) =>
         _notify.connected(this)
 
+
     fun ref _startup() =>
         _send(StartupRequest.create(cqlVersion))
+
 
     fun ref _send(request: Request val) =>
         let frame = _createFrame(request)
@@ -69,34 +79,43 @@ actor Client is FrameNotifiee
             _log(Info, "-| " + request.string())
         end
 
+
     fun ref close() =>
         _closed = true
         _conn.dispose()
 
+
     be options() =>
         _send(OptionsRequest)
     
+
     be accepted(conn: TCPConnection tag) =>
         None
+
 
     be closed(conn: TCPConnection tag) =>
         _log(Info, "__ Connection closed")
         _notify.closed(this)
     
+
     be connecting(conn': TCPConnection, count: U32 val) =>
         _log(Info, ".. connecting")
         _notify.connecting(this, count)
+
 
     be connect_failed(conn': TCPConnection tag) =>
         _notify.connect_failed(this)
         _log(Warn, "!! connection failed")
     
+
     be connected(conn: TCPConnection tag) =>
         _log(Info, "-- connection established")
         _startup()
 
+
     be dispose() =>
         close()
+
 
     be received(conn: TCPConnection tag, frame: Frame val) =>
         _log(Info, "<- " + frame.body.string())
@@ -112,8 +131,14 @@ actor Client is FrameNotifiee
         | let m: ErrorResponse if m.code == 0x0100 => _authenticate_failed(m)
         end
 
+
     be throttled(conn: TCPConnection tag) =>
         None
 
+
     be unthrottled(conn: TCPConnection tag) =>
         None
+
+
+    be query(q: QueryRequest val) =>
+        _send(q)

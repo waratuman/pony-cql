@@ -45,7 +45,7 @@ class Parser
         | 0x03 => parseAuthenticateResponse()
         | 0x05 => parseOptionsRequest()
         | 0x06 => parseSupportedResponse()
-        // | 0x07 => parseQueryRequest()
+        | 0x07 => parseQueryRequest()
         // | 0x08 => parseResultResponse()
         // | 0x09 => parsePrepareRequest()
         // | 0x0A => parseExecuteRequest()
@@ -102,7 +102,57 @@ class Parser
         end
 
         SupportedResponse(cql_version, compression)
-    
+
+
+    fun ref parseQueryRequest(): QueryRequest val ? =>
+        let query_string: String val = parseLongString()
+        let consistency: Consistency val = parseConsistency()
+
+        let flag = shift()
+        let flags: QueryFlags ref = QueryFlags
+
+        if (flag and 0x01) == 0x01 then
+            flags.set(Values)
+        end
+        // let flags: QueryFlags val = shift()
+        // let flag: QueryFlags val = recover
+        //     let f = QueryFlags
+        //     f.set(flagsByte)
+        //     f
+        // end
+
+        let binding = if flags(Values) then
+            let n: U16 val = parseShort()
+            let i: U16 val = 0
+            let result: Array[QueryParameter val] ref = Array[QueryParameter val]
+            while i < n do
+                let size = parseInt().usize()
+                result.push(if size < 0 then
+                    None
+                else
+                    shiftN(size)
+                end)
+            end
+            result
+        else
+            None
+        end
+
+        // if flag(PageSize) then
+        // end
+
+        // if flag(WithPagingState) then
+        // end
+
+        // if flag(WithSerialConsistency) then
+        // end
+
+        // if flag(WithDefaultTimestamp) then
+        // end
+
+        // let query_parameters: Array[QueryParameter val] val
+        QueryRequest(query_string)
+
     fun ref parseAuthSuccessResponse(): AuthSuccessResponse val ? =>
         let token = parseBytes()
         AuthSuccessResponse(token)
@@ -110,6 +160,12 @@ class Parser
     fun ref parseString(): String val ? =>
         let length = parseShort().usize()
         String.from_array(shiftN(length))
+
+
+    fun ref parseLongString(): String val ? =>
+        let length = parseInt().usize()
+        String.from_array(shiftN(length))
+
 
     fun ref parseStringList(): Array[String val] val ? =>
         recover
@@ -134,6 +190,22 @@ class Parser
         let c = shift().i32()
         let d = shift().i32()
         (a << 24) or (b << 16) or (c << 8) or d
+
+    fun ref parseConsistency(): Consistency val ? =>
+        match parseShort()
+        | 0x0000 => AnyConsistency
+        | 0x0001 => One
+        | 0x0002 => Two
+        | 0x0003 => Three
+        | 0x0004 => Quorum
+        | 0x0005 => All
+        | 0x0006 => LocalQuorum
+        | 0x0007 => EachQuorum
+        | 0x0008 => Serial
+        | 0x0009 => LocalSerial
+        | 0x000A => LocalOne
+        else AnyConsistency
+        end
 
     fun ref parseStringMap(): collections.Map[String val, String val] val ? =>
         recover
@@ -162,6 +234,7 @@ class Parser
             end
             result
         end
+
 
     fun ref parseBytes(): (Array[U8 val] val | None) ? =>
         let length = parseInt()
