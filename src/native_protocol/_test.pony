@@ -5,7 +5,8 @@ actor Main is TestList
     new create(env: Env) =>
         PonyTest(env, this)
 
-    new make() => None
+    new make() =>
+        None
 
     fun tag tests(test: PonyTest) =>
         BytesTestList.make().tests(test)

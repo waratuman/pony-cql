@@ -1,29 +1,5 @@
 use collection = "collections" 
 
-// Consistency 
-primitive AnyConsistency
-    fun value(): U16 => 0x0000
-primitive One
-    fun value(): U16 => 0x0001
-primitive Two
-    fun value(): U16 => 0x0002
-primitive Three
-    fun value(): U16 => 0x0003
-primitive Quorum
-    fun value(): U16 => 0x0004
-primitive All
-    fun value(): U16 => 0x0005
-primitive LocalQuorum
-    fun value(): U16 => 0x0006
-primitive EachQuorum
-    fun value(): U16 => 0x0007
-primitive Serial
-    fun value(): U16 => 0x0008
-primitive LocalSerial
-    fun value(): U16 => 0x0009
-primitive LocalOne
-    fun value(): U16 => 0x000A
-
 type Consistency is
     ( AnyConsistency
     | One
@@ -37,6 +13,94 @@ type Consistency is
     | LocalSerial
     | LocalOne
     )
+
+primitive AnyConsistency is Equatable[Consistency]
+    
+    fun value(): U16 =>
+        0x0000
+
+    fun string(): String iso^ =>
+        "Any".string()
+
+primitive One is Equatable[Consistency]
+
+    fun value(): U16 =>
+        0x0001
+
+    fun string(): String iso^ =>
+        "One".string()
+
+primitive Two is Equatable[Consistency]
+    
+    fun value(): U16 =>
+        0x0002
+
+    fun string(): String iso^ =>
+        "Two".string()
+
+primitive Three is Equatable[Consistency]
+
+    fun value(): U16 =>
+        0x0003
+
+    fun string(): String iso^ =>
+        "Three".string()
+
+primitive Quorum is Equatable[Consistency]
+
+    fun value(): U16 =>
+        0x0004
+
+    fun string(): String iso^ =>
+        "Quorum".string()
+
+primitive All is Equatable[Consistency]
+    
+    fun value(): U16 =>
+        0x0005
+
+    fun string(): String iso^ =>
+        "All".string()
+
+primitive LocalQuorum is Equatable[Consistency]
+    
+    fun value(): U16 =>
+        0x0006
+
+    fun string(): String iso^ =>
+        "LocalQuorum".string()
+
+primitive EachQuorum is Equatable[Consistency]
+    
+    fun value(): U16 =>
+        0x0007
+
+    fun string(): String iso^ =>
+        "EachQuorum".string()
+
+primitive Serial is Equatable[Consistency]
+    
+    fun value(): U16 =>
+        0x0008
+
+    fun string(): String iso^ =>
+        "Serial".string()
+
+primitive LocalSerial is Equatable[Consistency]
+
+    fun value(): U16 =>
+        0x0009
+
+    fun string(): String iso^ =>
+        "LocalSerial".string()
+
+primitive LocalOne is Equatable[Consistency]
+
+    fun value(): U16 => 0x000A
+
+    fun string(): String iso^ =>
+        "LocalOne".string()
+
 
 primitive Values is collection.Flag[U8]
     fun value(): U8 => 0x01
@@ -66,7 +130,12 @@ primitive WithNamesForValues is collection.Flag[U8]
     fun value(): U8 => 0x40
     fun string(): String => "WithNamesForValues"
 
-type QueryFlags is collection.Flags[(
-    Values | SkipMetadata | PageSize | WithPagingState | WithSerialConsistency
-    | WithDefaultTimestamp | WithNamesForValues
-), U8]
+type QueryFlags is collection.Flags[
+    ( Values
+    | SkipMetadata
+    | PageSize
+    | WithPagingState
+    | WithSerialConsistency
+    | WithDefaultTimestamp
+    | WithNamesForValues
+    ), U8]

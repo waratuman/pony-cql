@@ -79,6 +79,10 @@ class val SupportedResponse
 
 type ResultResponse is
     ( VoidResultResponse
+    // | RowsResultResponse
+    // | SetKeyspaceResultResponse
+    // | PreparedResultResponse
+    // | SchemaChangeResultResponse
     )
 
 
@@ -88,7 +92,16 @@ class val VoidResultResponse
         None
 
     fun string(): String val =>
-        "RESULT VOID"
+        "RESULT: VOID"
+
+
+// class val RowsResultResponse
+
+//     new val create() =>
+//         None
+    
+//     fun string(): String val =>
+//         "RESULT: "
 
 
 class val AuthSuccessResponse

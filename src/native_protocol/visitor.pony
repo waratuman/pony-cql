@@ -26,7 +26,7 @@ primitive Visitor
         | let b: OptionsRequest => 0x05
         | let b: SupportedResponse => 0x06
         | let b: QueryRequest => 0x07
-        // | let b:  => 0x08
+        // | let b: ResultResponse => 0x08
         // | let b:  => 0x09
         // | let b:  => 0x0A
         // | let b:  => 0x0B
@@ -147,6 +147,9 @@ primitive Visitor
         c.append(tail)
         c
 
+    // fun visitResultResponse(respons: ResultResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+    //     c
+
     fun visitErrorResponse(response: ErrorResponse val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         visitInt(response.code, c)
         visitString(response.message, c)
@@ -261,101 +264,131 @@ primitive Visitor
         c.push(value.u8())
         c
     fun _visitQueryParameter(value: Seq[cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[String val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[I64 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[F64 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[I32 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[F32 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[I16 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Set[I8 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for subvalue in value.values() do
-            visitQueryParameter(subvalue, c)
+            visitQueryParameter(subvalue, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[String val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[I64 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[F64 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[F32 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[I32 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[I16 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     fun _visitQueryParameter(value: collection.Map[I8 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visitInt(value.size().i32(), c)
+        let tail = visitInt(value.size().i32())
         for (k, v) in value.pairs() do
-            _visitQueryParameter(k, c)
-            _visitQueryParameter(v, c)
+            _visitQueryParameter(k, tail)
+            _visitQueryParameter(v, tail)
         end
+        visitInt(tail.size().i32(), c)
+        c.append(tail)
         c
     
     fun visitUInt(value: U32 val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
