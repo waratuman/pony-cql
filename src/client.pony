@@ -9,7 +9,7 @@ actor Client is FrameNotifiee
     let _notify: ClientNotify
     let _logger: (Logger[String] | None)
 
-    let cqlVersion: String = "3.0.0"
+    let cql_version: String = "3.0.0"
     let compression: (String val | None val) = None
     let _flags: U8 = 0x00
     var _stream: U16 = 0x0000
@@ -65,7 +65,7 @@ actor Client is FrameNotifiee
 
 
     fun ref _startup() =>
-        _send(StartupRequest.create(cqlVersion))
+        _send(StartupRequest.create(cql_version))
 
 
     fun ref _send(request: Request val) =>

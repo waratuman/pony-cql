@@ -76,3 +76,18 @@ type MapType is
     // | Map[Time val, NativeType val] val
     | Map[I8 val, NativeType val] val
     )
+
+class Inet is Equatable[Inet]
+
+    var host: (U32 val | U128 val)
+    var port: U32 val
+
+    fun box string(): String iso^ =>
+        (host.string() + ":" + port.string()).string()
+
+    new ref create(host': (U32 val | U128 val), port': U32 val) =>
+        host = host'
+        port = port'
+
+    fun box eq(that: Inet box): Bool val =>
+        (host.i128() == that.host.i128()) and (port == that.port)

@@ -1,14 +1,23 @@
 use collection = "collections" 
 
+
 primitive Compression   fun value(): U8 => 0x01
 primitive Tracing       fun value(): U8 => 0x02
 primitive CustomPayload fun value(): U8 => 0x04
 primitive Warning       fun value(): U8 => 0x08
 primitive Beta          fun value(): U8 => 0x10
 
+
 type Flag is collection.Flags[(Compression | Tracing | CustomPayload | Warning | Beta), U8]
 
-class Frame
+
+type Message is
+    ( Request
+    | Response
+    )
+
+
+class Frame is Stringable
 
     let version: U8 val
     let flags: U8 val
@@ -21,11 +30,5 @@ class Frame
         stream = stream'
         body = body'
 
-    fun string(): String val =>
+    fun string(): String iso^ =>
         body.string()
-
-
-type Message is
-    ( Request
-    | Response
-    )

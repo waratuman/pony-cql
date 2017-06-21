@@ -72,7 +72,7 @@ primitive Visitor
 
     fun visitStartupRequest(request: StartupRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         let compression = request.compression
-        let cqlVersion = request.cqlVersion
+        let cql_version = request.cql_version
     
         let pairs: U16 = if compression is None then 1 else 2 end
 
@@ -85,7 +85,7 @@ primitive Visitor
         end
 
         visitString("CQL_VERSION", c)
-        visitString(cqlVersion, c)
+        visitString(cql_version, c)
 
         c
 
@@ -103,7 +103,7 @@ primitive Visitor
         var flag: QueryFlags ref = QueryFlags
         let tail: Array[U8 val] ref = Array[U8 val]
 
-        match request.query_parameters
+        match request.binding
         | let p: Array[QueryParameter val] val =>
             flag.set(Values)
             visitShort(p.size().u16(), tail)

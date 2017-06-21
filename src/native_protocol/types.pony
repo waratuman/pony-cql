@@ -102,6 +102,16 @@ primitive LocalOne is Equatable[Consistency]
         "LocalOne".string()
 
 
+type QueryFlags is collection.Flags[
+    ( Values
+    | SkipMetadata
+    | PageSize
+    | WithPagingState
+    | WithSerialConsistency
+    | WithDefaultTimestamp
+    | WithNamesForValues
+    ), U8]
+
 primitive Values is collection.Flag[U8]
     fun value(): U8 => 0x01
     fun string(): String => "Values"
@@ -129,13 +139,3 @@ primitive WithDefaultTimestamp is collection.Flag[U8]
 primitive WithNamesForValues is collection.Flag[U8]
     fun value(): U8 => 0x40
     fun string(): String => "WithNamesForValues"
-
-type QueryFlags is collection.Flags[
-    ( Values
-    | SkipMetadata
-    | PageSize
-    | WithPagingState
-    | WithSerialConsistency
-    | WithDefaultTimestamp
-    | WithNamesForValues
-    ), U8]

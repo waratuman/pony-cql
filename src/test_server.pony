@@ -61,7 +61,7 @@ actor TestServerConnection is FrameNotifiee
     let _authenticator: (Authenticator val | None val)
     var _version: U8 val = 4
     var _conn: (TCPConnection tag | None) = None
-    var _cqlVersion: String = "3.0.0"
+    var _cql_version: String = "3.0.0"
     var _compression: (String val | None val) = None
     
     let _logger: (Logger[String] | None)
@@ -77,7 +77,7 @@ actor TestServerConnection is FrameNotifiee
 
     fun ref _startup(frame: Frame val, message: StartupRequest) =>
         _version = frame.version
-        _cqlVersion = message.cqlVersion
+        _cql_version = message.cql_version
         _compression = message.compression
 
         match _authenticator
@@ -87,8 +87,8 @@ actor TestServerConnection is FrameNotifiee
 
     fun ref _options(frame: Frame val, message: OptionsRequest) =>
         let compression: Array[String val] val = recover Array[String val]() end
-        let cqlVersion: Array[String val] val = recover ["3.0.0"] end 
-        _send(frame.stream, SupportedResponse(cqlVersion, compression))
+        let cql_version: Array[String val] val = recover ["3.0.0"] end 
+        _send(frame.stream, SupportedResponse(cql_version, compression))
 
     fun ref _auth_response(frame: Frame val, message: AuthResponseRequest) =>
         match _authenticator

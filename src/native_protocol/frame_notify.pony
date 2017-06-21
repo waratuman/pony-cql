@@ -1,24 +1,6 @@
 use "net"
 use "logger"
 
-interface FrameNotifiee
-
-    be accepted(conn: TCPConnection tag)
-
-    be closed(conn: TCPConnection tag)
-
-    be connecting(conn: TCPConnection tag, count: U32 val)
-
-    be connect_failed(conn: TCPConnection tag)
-
-    be connected(conn: TCPConnection tag)
-
-    be received(conn: TCPConnection tag, frame: Frame val)
-
-    be throttled(conn: TCPConnection tag)
-
-    be unthrottled(conn: TCPConnection tag)
-
 class FrameNotify is TCPConnectionNotify
 
     let _notify: FrameNotifiee tag
@@ -55,19 +37,9 @@ class FrameNotify is TCPConnectionNotify
         _notify.connect_failed(conn)
 
     fun ref _received_frame(conn: TCPConnection ref, data: Array[U8 val] val) ? =>
-        let parser = Parser(data)
-        let message: Message = match _opcode
-        | 0x00 => parser.parseErrorResponse()
-        | 0x01 => parser.parseStartupRequest()
-        | 0x02 => parser.parseReadyResponse()
-        | 0x03 => parser.parseAuthenticateResponse()
-        | 0x05 => parser.parseOptionsRequest()
-        | 0x06 => parser.parseSupportedResponse()
-        | 0x0F => parser.parseAuthResponseRequest()
-        | 0x10 => parser.parseAuthSuccessResponse()
-        else error
-        end
-        _notify.received(conn, Frame(_version, _flags, _stream, message))
+        let stack = ParserStack(data)
+        let frame: Frame val = FrameParser(stack).parse()
+        _notify.received(conn, frame)
 
     fun ref received(conn: TCPConnection ref, data: Array[U8 val] val, times: USize val): Bool val =>
         // _log(Fine, Bytes.to_hex_string(data))
@@ -94,7 +66,13 @@ class FrameNotify is TCPConnectionNotify
                 conn.expect(_length.usize())
                 true
             else
-                _received_frame(conn, data)
+                match _header
+                | let h: Array[U8 val] val =>
+                    let d: Array[U8 val] iso = recover Array[U8 val] end
+                    d.append(h)
+                    d.append(data)
+                    _received_frame(conn, consume d)
+                end
                 conn.expect(9)
                 _header = None
                 false

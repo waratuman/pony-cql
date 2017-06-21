@@ -19,7 +19,8 @@ class _TestClientNotify is (UnitTest & ClientNotify)
 
     var _client: (Client ref | None val) = None
 
-    fun name(): String => "ClientNotify"
+    fun name(): String =>
+        "ClientNotify"
 
     fun ref apply(h: TestHelper) ? =>
         h.expect_action("server listening")
@@ -30,9 +31,9 @@ class _TestClientNotify is (UnitTest & ClientNotify)
         h.expect_action("server accepted")
 
         let auth = h.env.root as AmbientAuth
-        // let logger = StringLogger(Fine, h.env.out)
-        // let server = TestServer(auth, _TestClientNotifyServerNotify(h), "", "", logger)
-        let server = TestServer(auth, _TestClientNotifyServerNotify(h))
+        let logger = StringLogger(Fine, h.env.out)
+        let server = TestServer(auth, _TestClientNotifyServerNotify(h), None, "", "0", logger)
+        // let server = TestServer(auth, _TestClientNotifyServerNotify(h))
         h.dispose_when_done(server)
         h.long_test(20_000_000)
     
@@ -79,6 +80,8 @@ class _TestClientNotifyClientNotify is ClientNotify
         client.options()
 
     fun ref received(client: Client ref, message: Message val) =>
+        _h.env.out.print(message.string())
+        _h.env.out.print("message.string()-----------------------------------")
         _h.complete_action("client received")
         client.close()
 
