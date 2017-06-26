@@ -1,6 +1,5 @@
 interface Parser
 
-    new create(stack: ParserStack ref)
+    new ref create(stack: Stack ref)
 
     fun ref parse(): Any ?
-

@@ -9,7 +9,7 @@ actor Client is FrameNotifiee
     let _notify: ClientNotify
     let _logger: (Logger[String] | None)
 
-    let cql_version: String = "3.0.0"
+    let cql_version: String val = "3.0.0"
     let compression: (String val | None val) = None
     let _flags: U8 = 0x00
     var _stream: U16 = 0x0000
@@ -23,14 +23,12 @@ actor Client is FrameNotifiee
         _logger = logger
         _conn = TCPConnection(_auth, FrameNotify(this, logger), host, service, "", 64, 268435456)
 
-
-    fun ref _createFrame(body: Request val): Frame val =>
-        recover Frame(4, _flags, _nextStream(), body) end
-
+    fun ref _createFrame(body: Request val): Frame iso^ =>
+        let frame = Frame(4, _flags, _nextStream(), body)
+        consume frame
 
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
-
 
     fun ref _authenticate(response: AuthenticateResponse val) =>
         var authenticator: Authenticator iso = match response.authenticator_name
@@ -69,14 +67,15 @@ actor Client is FrameNotifiee
 
 
     fun ref _send(request: Request val) =>
-        let frame = _createFrame(request)
-        let data = Visitor(frame)
+        let request_string: String val = request.string()
+        let frame: Frame val = _createFrame(request)
+        let data = OldVisitor(frame)
         
         if not _closed then
             _conn.write(data)
-            _log(Info, "-> " + request.string())
+            _log(Info, "-> " + request_string)
         else
-            _log(Info, "-| " + request.string())
+            _log(Info, "-| " + request_string)
         end
 
 
@@ -121,14 +120,11 @@ actor Client is FrameNotifiee
         _log(Info, "<- " + frame.body.string())
 
         match frame.body
-        | let m: Response => _notify.received(this, m)
-        end
-
-        match frame.body
-        | let m: ReadyResponse => _ready(m)
-        | let m: AuthenticateResponse => _authenticate(m)
-        | let m: AuthSuccessResponse => _authenticated(m)
-        | let m: ErrorResponse if m.code == 0x0100 => _authenticate_failed(m)
+        | let m: ReadyResponse val => _ready(m)
+        | let m: AuthenticateResponse val => _authenticate(m)
+        | let m: AuthSuccessResponse val => _authenticated(m)
+        | let m: ErrorResponse val if m.code == 0x0100 => _authenticate_failed(m)
+        | let m: Response val => _notify.received(this, m)
         end
 
 
@@ -140,5 +136,5 @@ actor Client is FrameNotifiee
         None
 
 
-    be query(q: QueryRequest val) =>
-        _send(q)
+    be query(q: QueryRequest iso) =>
+        _send(consume q)

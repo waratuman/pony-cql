@@ -1,10 +1,7 @@
-class val OptionsRequest is Stringable
+class iso OptionsRequest is Stringable
 
-    new val apply() =>
+    new iso create() =>
         None
 
-    new val create() =>
-        None
-
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         "OPTIONS".string()

@@ -75,22 +75,22 @@ actor TestServerConnection is FrameNotifiee
         | let l: Logger[String] => l(level) and l.log(message, loc)
         end
 
-    fun ref _startup(frame: Frame val, message: StartupRequest) =>
+    fun ref _startup(frame: Frame val, message: StartupRequest val) =>
         _version = frame.version
         _cql_version = message.cql_version
         _compression = message.compression
 
         match _authenticator
-        | None => _send(frame.stream, ReadyResponse())
+        | None => _send(frame.stream, ReadyResponse)
         | let a: Authenticator val => _send(frame.stream, AuthenticateResponse(a.name()))
         end
 
-    fun ref _options(frame: Frame val, message: OptionsRequest) =>
+    fun ref _options(frame: Frame val, message: OptionsRequest val) =>
         let compression: Array[String val] val = recover Array[String val]() end
         let cql_version: Array[String val] val = recover ["3.0.0"] end 
         _send(frame.stream, SupportedResponse(cql_version, compression))
 
-    fun ref _auth_response(frame: Frame val, message: AuthResponseRequest) =>
+    fun ref _auth_response(frame: Frame val, message: AuthResponseRequest val) =>
         match _authenticator
         | let a: Authenticator val =>
             match (message.token, a.token())
@@ -116,16 +116,17 @@ actor TestServerConnection is FrameNotifiee
             _send(frame.stream, ErrorResponse(0x0100, "authentication failed"))
         end
 
-    fun ref _send(stream: U16 val, message: Message val) =>
-        let frame = Frame(_version or 0x80, 0x00, stream, message)
-        let data = Visitor(frame)
+    fun ref _send(stream: U16 val, message: Message iso) =>
+        let message_string: String val = message.string()
+        let frame: Frame val = Frame(_version or 0x80, 0x00, stream, consume message)
+        let data = OldVisitor(frame)
 
         match _conn
         | let c: TCPConnection tag =>
-            _log(Info, "-> " + message.string())
+            _log(Info, "-> " + message_string)
             c.write(data)
         else
-            _log(Info, "-| " + message.string())
+            _log(Info, "-| " + message_string)
         end
 
     be accepted(conn: TCPConnection tag) =>
@@ -146,9 +147,9 @@ actor TestServerConnection is FrameNotifiee
     be received(conn: TCPConnection tag, frame: Frame val) =>
         _log(Info, "<- " + frame.body.string())
         match frame.body
-        | let m: StartupRequest => _startup(frame, m)
-        | let m: OptionsRequest => _options(frame, m)
-        | let m: AuthResponseRequest => _auth_response(frame, m)
+        | let m: StartupRequest val => _startup(frame, m)
+        | let m: OptionsRequest val => _options(frame, m)
+        | let m: AuthResponseRequest val => _auth_response(frame, m)
         else _send(frame.stream, ErrorResponse(0, "Unrecognized request"))
         end
 

@@ -1,13 +1,13 @@
-class val StartupRequest is Stringable
+class iso StartupRequest is Stringable
 
     let cql_version: String val
     let compression: (String val | None val)
 
-    new val create(cql_version': String, compression': (String val | None val) = None) =>
+    new iso create(cql_version': String, compression': (String val | None val) = None) =>
         cql_version = cql_version'
         compression = compression'
 
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         let output: String iso = recover String() end
         output.append("STARTUP {")
 

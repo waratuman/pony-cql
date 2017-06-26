@@ -12,7 +12,7 @@ interface FrameNotifiee
 
     be connected(conn: TCPConnection tag)
 
-    be received(conn: TCPConnection tag, frame: Frame val)
+    be received(conn: TCPConnection tag, frame: Frame iso)
 
     be throttled(conn: TCPConnection tag)
 

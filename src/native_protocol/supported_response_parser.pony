@@ -1,12 +1,12 @@
 class SupportedResponseParser is Parser
 
-    let stack: ParserStack ref
+    let stack: Stack ref
 
-    new create(stack': ParserStack ref) =>
+    new create(stack': Stack ref) =>
         stack = stack'
 
-    fun ref parse(): SupportedResponse val ? =>
-        let map = stack.string_multimap()
+    fun ref parse(): SupportedResponse iso^ ? =>
+        let map = stack.take_string_multimap()
 
         let compression: Array[String val] val = if map.contains("COMPRESSION") then
             map("COMPRESSION")

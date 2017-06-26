@@ -18,5 +18,5 @@ class iso _TestReadyResponseString is UnitTest
         "ReadyResponse.string"
     
     fun tag apply(h: TestHelper) => 
-        let response = ReadyResponse()
+        let response = ReadyResponse
         h.assert_eq[String val]("READY", response.string())

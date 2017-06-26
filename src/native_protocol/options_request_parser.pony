@@ -1,9 +1,9 @@
 class OptionsRequestParser is Parser
 
-    let stack: ParserStack ref
+    let stack: Stack ref
 
-    new create(stack': ParserStack ref) =>
+    new create(stack': Stack ref) =>
         stack = stack'
 
-    fun ref parse(): OptionsRequest val =>
+    fun ref parse(): OptionsRequest iso^ =>
         OptionsRequest

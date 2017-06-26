@@ -1,4 +1,4 @@
-class val QueryRequest is Stringable
+class iso QueryRequest is Stringable
 
     let query: String val
     let binding: (Array[QueryParameter val] val | None val)
@@ -9,7 +9,7 @@ class val QueryRequest is Stringable
     let serial_consistency: (None val | Serial val | LocalSerial val)
     let timestamp: (None val | I64 val)
 
-    new val create(
+    new iso create(
         query': String val,
         binding': (Array[QueryParameter val] val | None val) = None,
         consistency': Consistency val = Quorum,
@@ -28,5 +28,5 @@ class val QueryRequest is Stringable
         serial_consistency = serial_consistency'
         timestamp = timestamp'
 
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         ("QUERY \"" + query + "\"").string()

@@ -21,13 +21,13 @@ actor Main is TestList
         FrameTestList.make().tests(test)
         OptionsRequestParserTestList.make().tests(test)
         QueryRequestParserTestList.make().tests(test)
-        ParserStackTestList.make().tests(test)
+        StackTestList.make().tests(test)
         ReadyResponseParserTestList.make().tests(test)
         StartupRequestParserTestList.make().tests(test)
         SupportedResponseParserTestList.make().tests(test)
 
         // Not refactored:
         BytesTestList.make().tests(test)
-        VisitorTestList.make().tests(test)
+        OldVisitorTestList.make().tests(test)
         RequestTestList.make().tests(test)
         ResponseTestList.make().tests(test)

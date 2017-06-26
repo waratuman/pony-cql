@@ -1,9 +1,9 @@
 class AuthenticateResponseParser is Parser
 
-    let stack: ParserStack ref
+    let stack: Stack ref
 
-    new create(stack': ParserStack ref) =>
+    new create(stack': Stack ref) =>
         stack = stack'
 
-    fun ref parse(): AuthenticateResponse val ? =>
-        AuthenticateResponse(stack.string())
+    fun ref parse(): AuthenticateResponse iso^ ? =>
+        AuthenticateResponse(stack.take_string())

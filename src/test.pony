@@ -31,4 +31,4 @@ class ClientNotifyTest is ClientNotify
 
     fun ref connected(client: Client ref): None val =>
         let query = np.QueryRequest("LIST USERS;")
-        client.query(query)
+        client.query(consume query)

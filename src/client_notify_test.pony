@@ -80,8 +80,6 @@ class _TestClientNotifyClientNotify is ClientNotify
         client.options()
 
     fun ref received(client: Client ref, message: Message val) =>
-        _h.env.out.print(message.string())
-        _h.env.out.print("message.string()-----------------------------------")
         _h.complete_action("client received")
         client.close()
 
@@ -101,7 +99,7 @@ class _TestClientNotifyAuthenticated is (UnitTest & ClientNotify)
         h.expect_action("client authenticate")
         h.expect_action("client authenticated")
         h.expect_action("client connected")
-        h.expect_action("client received")
+        // h.expect_action("client received")
         h.expect_action("client closed")
         h.expect_action("server accepted")
 
@@ -158,23 +156,18 @@ class _TestClientNotifyAuthenticatedClientNotify is ClientNotify
             a
         end
 
-    fun ref authenticated(client: Client) =>
+    fun ref authenticated(client: Client ref) =>
         _h.complete_action("client authenticated")
+        client.close()
 
-    fun ref closed(client: Client) =>
+    fun ref closed(client: Client ref) =>
         _h.complete_action("client closed")
 
-    fun ref connecting(client: Client, count: U32) =>
+    fun ref connecting(client: Client ref, count: U32) =>
         _h.complete_action("client connecting")
 
-    fun ref connected(client: Client) =>
+    fun ref connected(client: Client ref) =>
         _h.complete_action("client connected")
-
-    fun ref received(client: Client ref, message: Message val) =>
-        _h.complete_action("client received")
-        match message
-        | let m: AuthSuccessResponse val => client.close()
-        end
 
 class _TestClientNotifyAuthenticateFailed is (UnitTest & ClientNotify)
 
@@ -188,7 +181,6 @@ class _TestClientNotifyAuthenticateFailed is (UnitTest & ClientNotify)
         h.expect_action("server accepted")
         h.expect_action("client authenticate")
         h.expect_action("client authenticate failed")
-        h.expect_action("client received")
         h.expect_action("client closed")
         
         let auth = h.env.root as AmbientAuth
@@ -244,23 +236,19 @@ class _TestClientNotifyAuthenticateFailedClientNotify is ClientNotify
             a
         end
 
-    fun ref authenticated(client: Client) =>
+    fun ref authenticated(client: Client ref) =>
         _h.fail_action("client authenticate failed")
 
-    fun ref authenticate_failed(client: Client) =>
+    fun ref authenticate_failed(client: Client ref) =>
         _h.complete_action("client authenticate failed")
+        client.close()
 
-    fun ref closed(client: Client) =>
+    fun ref closed(client: Client ref) =>
         _h.complete_action("client closed")
 
     fun ref connecting(client: Client, count: U32) =>
         _h.complete_action("client connecting")
 
-    fun ref received(client: Client ref, message: Message val) =>
-        _h.complete_action("client received")
-        match message
-        | let m: ErrorResponse val => client.close()
-        end
 
 // class _TestClientNotifyConnectFailed is UnitTest
 

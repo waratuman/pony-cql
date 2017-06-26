@@ -1,10 +1,7 @@
-class val ReadyResponse is Stringable
+class iso ReadyResponse is Stringable
 
-    new val apply() =>
+    new iso create() =>
         None
 
-    new val create() =>
-        None
-
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         "READY".string()

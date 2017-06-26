@@ -1,15 +1,15 @@
 use "format"
 
-class val ErrorResponse is Stringable
+class iso ErrorResponse is Stringable
 
     let code: I32 val
     let message: String val
 
-    new val create(code': I32 val, message': String val) =>
+    new iso create(code': I32 val, message': String val) =>
         code = code'
         message = message'
     
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         recover
             let result: String ref = String
 

@@ -7,10 +7,10 @@ type ResultResponse is
     )
 
 
-class val VoidResultResponse is Stringable
+class iso VoidResultResponse is Stringable
 
-    new val create() =>
+    new iso create() =>
         None
 
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         "RESULT: VOID".string()

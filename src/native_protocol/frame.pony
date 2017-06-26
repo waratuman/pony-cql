@@ -17,14 +17,14 @@ type Message is
     )
 
 
-class Frame is Stringable
+class iso Frame is Stringable
 
     let version: U8 val
     let flags: U8 val
     let stream: U16 val
     let body: Message val
 
-    new val create(version': U8 val, flags': U8 val, stream': U16 val, body': Message val) =>
+    new iso create(version': U8 val, flags': U8 val, stream': U16 val, body': Message val) =>
         version = version'
         flags = flags'
         stream = stream'

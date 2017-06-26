@@ -1,18 +1,18 @@
 class FrameParser is Parser
 
-    let stack: ParserStack ref
+    let stack: Stack ref
 
-    new create(stack': ParserStack ref) =>
+    new create(stack': Stack ref) =>
         stack = stack'
 
-    fun ref parse(): Frame val ? =>
+    fun ref parse(): Frame iso^ ? =>
         let version: U8 val = (stack.byte() and 0b0111)
         let flags: U8 val = stack.byte()
-        let stream: U16 val = stack.short()
+        let stream: U16 val = stack.take_short()
         let opcode: U8 val = stack.byte()
-        let length: I32 val = stack.int()
+        let length: I32 val = stack.take_int()
 
-        let message: Message = match opcode
+        let message: Message val = match opcode
         | 0x00 => ErrorResponseParser.create(stack).parse()
         | 0x01 => StartupRequestParser.create(stack).parse()
         | 0x02 => ReadyResponseParser.create(stack).parse()

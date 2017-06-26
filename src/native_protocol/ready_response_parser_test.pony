@@ -21,6 +21,6 @@ class iso ReadyResponseParserTest is UnitTest
         var data: Array[U8 val] val = recover [as U8:
             0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF
         ] end
-        var stack = ParserStack(data)
+        var stack = Stack(data)
         var response: ReadyResponse val = ReadyResponseParser.create(stack).parse()
         h.assert_eq[USize val](8, stack.size())

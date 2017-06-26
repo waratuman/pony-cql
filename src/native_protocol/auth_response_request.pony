@@ -1,9 +1,9 @@
-class val AuthResponseRequest is Stringable
+class iso AuthResponseRequest is Stringable
     
     let token: (Array[U8 val] val | None val)
 
-    new val create(token': (Array[U8 val] val | None val) = None) =>
+    new iso create(token': (Array[U8 val] val | None val) = None) =>
         token = token'
     
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         "AUTH_RESPONSE".string()

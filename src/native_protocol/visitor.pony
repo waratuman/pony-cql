@@ -3,14 +3,25 @@ use "chrono"
 use cql = "../cql"
 use collection = "collections"
 
-primitive Visitor
+interface Visitor[A]
+
+    fun ref apply(obj: A, collector: Stack ref): Stack ref
+
+// interface Visitor
+
+//     new ref create(collector: Stack ref)
+
+//     fun ref visit(obj: Any): Stack ref
+
+
+primitive OldVisitor
     
     fun apply(frame: Frame val): Array[U8 val] val =>
         recover visitFrame(frame) end
     
     fun visitFrame(frame: Frame val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         let version: U8 = match frame.body
-        | let b: Request => 0x7F and frame.version
+        | let b: Request val => 0x7F and frame.version
         else frame.version
         end
         c.push(version)
@@ -20,12 +31,12 @@ primitive Visitor
         visitShort(frame.stream, c)
 
         let opcode: U8 = match frame.body
-        | let b: StartupRequest => 0x01
-        | let b: ReadyResponse => 0x02
-        | let b: AuthenticateResponse => 0x03
-        | let b: OptionsRequest => 0x05
-        | let b: SupportedResponse => 0x06
-        | let b: QueryRequest => 0x07
+        | let b: StartupRequest val => 0x01
+        | let b: ReadyResponse val => 0x02
+        | let b: AuthenticateResponse val => 0x03
+        | let b: OptionsRequest val => 0x05
+        | let b: SupportedResponse val => 0x06
+        | let b: QueryRequest val => 0x07
         // | let b: ResultResponse => 0x08
         // | let b:  => 0x09
         // | let b:  => 0x0A
@@ -33,8 +44,8 @@ primitive Visitor
         // | let b:  => 0x0C
         // | let b:  => 0x0D
         // | let b:  => 0x0E
-        | let b: AuthResponseRequest => 0x0F
-        | let b: AuthSuccessResponse => 0x10
+        | let b: AuthResponseRequest val => 0x0F
+        | let b: AuthSuccessResponse val => 0x10
         else 0
         end
     
@@ -89,7 +100,7 @@ primitive Visitor
 
         c
 
-    fun visitOptionsRequest(request: OptionsRequest, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
+    fun visitOptionsRequest(request: OptionsRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>
         c
 
     fun visitAuthResponseRequest(request: AuthResponseRequest val, c: Array[U8 val] ref = Array[U8 val]()): Array[U8 val] ref =>

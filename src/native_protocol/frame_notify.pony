@@ -6,7 +6,7 @@ class FrameNotify is TCPConnectionNotify
     let _notify: FrameNotifiee tag
     let _logger: (Logger[String] | None)
     
-    var _header: (Array[U8 val] val | None) = None
+    var _header: (Array[U8 val] iso | None) = None
     var _version: U8 val = 4
     var _flags: U8 val = 0
     var _stream: U16 val = 0
@@ -37,17 +37,22 @@ class FrameNotify is TCPConnectionNotify
         _notify.connect_failed(conn)
 
     fun ref _received_frame(conn: TCPConnection ref, data: Array[U8 val] val) ? =>
-        let stack = ParserStack(data)
-        let frame: Frame val = FrameParser(stack).parse()
-        _notify.received(conn, frame)
+        let stack = Stack(data)
+        _notify.received(conn, FrameParser(stack).parse())
 
-    fun ref received(conn: TCPConnection ref, data: Array[U8 val] val, times: USize val): Bool val =>
-        // _log(Fine, Bytes.to_hex_string(data))
-        try
-            let body_present = match _header
-            | None =>
-                _header = data
-                
+    fun ref received(conn: TCPConnection ref, data: Array[U8 val] iso, times: USize val): Bool val =>    
+        match _header = None
+        | let h: Array[U8 val] iso =>
+            h.append(consume data)
+            try
+                _received_frame(conn, consume h)
+            else
+                _log(Error, "Error parsing frame body.")
+            end
+            conn.expect(9)
+            true
+        | None =>
+            try
                 _version = data(0) and 0b0111
                 _flags = data(1)
                 _stream = ((data(2).u16() << 8) or data(3).u16())
@@ -57,34 +62,19 @@ class FrameNotify is TCPConnectionNotify
                     or (data(7).i32() << 8)
                     or data(8).i32()
 
-                _length != 0
-            | let h: Array[U8 val] val => false
-            else error
-            end
-
-            if body_present then
-                conn.expect(_length.usize())
+                if (_length == 0) then
+                    conn.expect(9)
+                    _received_frame(conn, consume data)
+                else
+                    _header = consume data
+                    conn.expect(_length.usize())
+                end
                 true
             else
-                match _header
-                | let h: Array[U8 val] val =>
-                    let d: Array[U8 val] iso = recover Array[U8 val] end
-                    d.append(h)
-                    d.append(data)
-                    _received_frame(conn, consume d)
-                end
-                conn.expect(9)
-                _header = None
+                _log(Error, "Error parsing frame header.")
                 false
             end
-        else
-            match _header
-            | None =>
-                _log(Error, "Error parsing frame header: " + Bytes.to_hex_string(data))
-            | let h: Array[U8 val] val => 
-                _log(Error, "Error parsing frame body: " + Bytes.to_hex_string(h) + Bytes.to_hex_string(data))
-            end
-            false
+        else false
         end
 
     fun ref closed(conn: TCPConnection ref) =>

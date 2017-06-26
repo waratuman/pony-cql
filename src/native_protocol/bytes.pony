@@ -77,30 +77,29 @@ primitive Bytes
         let d = data(3).u32()
         (a << 24) or (b << 16) or (c << 8) or d
 
-    fun val from_hex_string(data: String val): Array[U8 val] val ? => 
-        recover
-            let result = Array[U8 val]()
-            var index: USize = 0
-            var value: U8 = 0
+    fun val from_hex_string(data: String box): Array[U8 val] iso^ ? => 
+        let result: Array[U8 val] iso = recover Array[U8 val] end
+        var index: USize val = 0
+        var value: U8 val = 0
 
-            while index < (data.size() - 1) do
-                var msb = _hexValue(data(index))
-                var lsb = _hexValue(data(index + 1))
+        while index < (data.size() - 1) do
+            var msb = _hexValue(data(index))
+            var lsb = _hexValue(data(index - 1))
 
-                result.push((msb << 4) or lsb)
-                index = index + 2
-            end
-            result
+            result.push((msb << 4) or lsb)
+            index = index + 2
         end
 
-    fun val to_hex_string(data: Array[U8 val] box): String val =>
-        var result: String val = ""
+        consume result
+
+    fun val to_hex_string(data: Array[U8 val] box): String iso^ =>
+        var result: String iso = recover String end
         for byte in data.values() do
-            result = result + Format.int[U8](byte, FormatHexBare, PrefixDefault, 2)
+            result.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))
         end
-        result
+        consume result
 
-    fun _hexValue(byte: U8): U8 ? =>
+    fun _hexValue(byte: U8 val): U8 val ? =>
         if (byte >= 48) and (byte <= 57) then
             byte - 48
         elseif (byte >= 97) and (byte <= 102) then

@@ -21,7 +21,7 @@ class iso AuthSuccessResponseParserTest is UnitTest
         var data: Array[U8 val] val = recover [as U8:
             0xFF; 0xFF; 0xFF; 0xFF
         ] end
-        var stack = ParserStack(data)
+        var stack = Stack(data)
         var response: AuthSuccessResponse val = AuthSuccessResponseParser(stack).parse()
         match response.token
         | let t: None => h.assert_eq[None val](None, t)
@@ -31,7 +31,7 @@ class iso AuthSuccessResponseParserTest is UnitTest
         data = recover [as U8:
             0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD
         ] end
-        stack = ParserStack(data)
+        stack = Stack(data)
         response = AuthSuccessResponseParser(stack).parse()
 
         match response.token

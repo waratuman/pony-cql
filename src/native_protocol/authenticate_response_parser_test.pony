@@ -25,7 +25,7 @@ class iso AuthenticateResponseParserTest is UnitTest
             0x6F; 0x72; 0x64; 0x41; 0x75; 0x74; 0x68; 0x65; 0x6E; 0x74; 0x69
             0x63; 0x61; 0x74; 0x6F; 0x72
         ] end
-        var stack = ParserStack(data)
+        var stack = Stack(data)
         var response = AuthenticateResponseParser(stack).parse()
 
         h.assert_eq[String val](

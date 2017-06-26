@@ -16,7 +16,7 @@ interface ClientNotify
         """
         consume authenticator
 
-    fun ref authenticate_failed(client: Client): None val =>
+    fun ref authenticate_failed(client: Client ref): None val =>
         None
 
     fun ref authenticated(client: Client ref): None val =>

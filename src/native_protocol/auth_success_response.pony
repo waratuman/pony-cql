@@ -1,9 +1,9 @@
-class val AuthSuccessResponse is Stringable
+class iso AuthSuccessResponse is Stringable
 
     let token: (Array[U8 val] val | None)
 
-    new val create(token': (Array[U8 val] val | None) = None) =>
+    new iso create(token': (Array[U8 val] val | None) = None) =>
         token = token'
     
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
         "AUTH_SUCCESS".string()

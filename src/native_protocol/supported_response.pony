@@ -1,13 +1,13 @@
-class val SupportedResponse is Stringable
+class iso SupportedResponse is Stringable
 
     let cql_version: Array[String val] val
     let compression: Array[String val] val
 
-    new val create(cql_version': Array[String val] val, compression': Array[String val] val) =>
+    new iso create(cql_version': Array[String val] val, compression': Array[String val] val) =>
         cql_version = cql_version'
         compression = compression'
 
-    fun string(): String iso^ =>
+    fun box string(): String iso^ =>
 
         let output: String iso = recover String() end
         output.append("SUPPORTED {")

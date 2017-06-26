@@ -1,7 +1,11 @@
 interface Authenticator
+
     new iso create()
+
     fun box name(): String val
+
     fun box token(): (Array[U8 val] val | None val)
+
 
 class iso PasswordAuthenticator is Authenticator
 
