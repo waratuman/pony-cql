@@ -13,6 +13,7 @@ actor Main is TestList
         ResponseTestList.make().tests(test)
 
         // Parsers
+        ParserTestList.make().tests(test)
         AuthResponseRequestParserTestList.make().tests(test)
         AuthenticateResponseParserTestList.make().tests(test)
         AuthSuccessResponseParserTestList.make().tests(test)
@@ -21,10 +22,12 @@ actor Main is TestList
         FrameTestList.make().tests(test)
         OptionsRequestParserTestList.make().tests(test)
         QueryRequestParserTestList.make().tests(test)
-        StackTestList.make().tests(test)
         ReadyResponseParserTestList.make().tests(test)
         StartupRequestParserTestList.make().tests(test)
         SupportedResponseParserTestList.make().tests(test)
+
+        // Visitors
+        FrameVisitorTestList.make().tests(test)
 
         // Not refactored:
         BytesTestList.make().tests(test)

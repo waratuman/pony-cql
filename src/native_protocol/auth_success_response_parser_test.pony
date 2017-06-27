@@ -18,21 +18,17 @@ class iso AuthSuccessResponseParserTest is UnitTest
         "AuthSuccessResponseParser.parse"
     
     fun tag apply(h: TestHelper) ? =>
-        var data: Array[U8 val] val = recover [as U8:
-            0xFF; 0xFF; 0xFF; 0xFF
-        ] end
-        var stack = Stack(data)
-        var response: AuthSuccessResponse val = AuthSuccessResponseParser(stack).parse()
+        var data: Array[U8 val] ref = [as U8: 0xFF; 0xFF; 0xFF; 0xFF ]
+        var response: AuthSuccessResponse val = AuthSuccessResponseParser(data)
         match response.token
         | let t: None => h.assert_eq[None val](None, t)
         else h.fail()
         end
 
-        data = recover [as U8:
+        data = [as U8:
             0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD
-        ] end
-        stack = Stack(data)
-        response = AuthSuccessResponseParser(stack).parse()
+        ]
+        response = AuthSuccessResponseParser(data)
 
         match response.token
         | let t: Array[U8 val] val =>

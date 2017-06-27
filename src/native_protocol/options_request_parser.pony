@@ -1,9 +1,4 @@
-class OptionsRequestParser is Parser
+class OptionsRequestParser is NewParser[OptionsRequest]
 
-    let stack: Stack ref
-
-    new create(stack': Stack ref) =>
-        stack = stack'
-
-    fun ref parse(): OptionsRequest iso^ =>
+    fun box apply(data: Seq[U8 val] ref): OptionsRequest iso^ =>
         OptionsRequest

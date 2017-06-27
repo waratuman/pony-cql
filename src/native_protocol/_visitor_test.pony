@@ -243,7 +243,7 @@ class iso _TestVistReadyResponse is UnitTest
 
     fun tag apply(h: TestHelper) =>
         let collector = Array[U8 val]()
-        OldVisitor.visitReadyResponse(ReadyResponse, collector)
+        OldVisitor.visitReadyResponse(recover iso ReadyResponse end, collector)
         h.assert_eq[USize](0, collector.size())
 
 class iso _TestVisitAuthenticateResponse is UnitTest
@@ -261,7 +261,7 @@ class iso _TestVisitSupportedResponse is UnitTest
     fun name(): String => "OldVisitor.visitSupportedResponse"
 
     fun tag apply(h: TestHelper) =>
-        let response: SupportedResponse val = SupportedResponse(recover ["3.0.0"] end, recover ["snappy"; "lzo"] end)
+        let response: SupportedResponse val = recover iso SupportedResponse(recover ["3.0.0"] end, recover ["snappy"; "lzo"] end) end
         let result: Array[U8 val] val = recover OldVisitor.visitSupportedResponse(response) end
         h.assert_eq[String val](
             "0002000B434F4D5052455353494F4E00020006736E6170707900036C7A6F000B43514C5F56455253494F4E00010005332E302E30",

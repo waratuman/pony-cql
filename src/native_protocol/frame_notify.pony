@@ -36,9 +36,8 @@ class FrameNotify is TCPConnectionNotify
     fun ref connect_failed(conn: TCPConnection ref) =>
         _notify.connect_failed(conn)
 
-    fun ref _received_frame(conn: TCPConnection ref, data: Array[U8 val] val) ? =>
-        let stack = Stack(data)
-        _notify.received(conn, FrameParser(stack).parse())
+    fun ref _received_frame(conn: TCPConnection ref, data: Array[U8 val] iso) ? =>
+        _notify.received(conn, FrameParser(consume data))
 
     fun ref received(conn: TCPConnection ref, data: Array[U8 val] iso, times: USize val): Bool val =>    
         match _header = None

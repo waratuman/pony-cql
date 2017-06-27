@@ -23,9 +23,8 @@ actor Client is FrameNotifiee
         _logger = logger
         _conn = TCPConnection(_auth, FrameNotify(this, logger), host, service, "", 64, 268435456)
 
-    fun ref _createFrame(body: Request val): Frame iso^ =>
-        let frame = Frame(4, _flags, _nextStream(), body)
-        consume frame
+    fun ref _createFrame(body: Request iso): Frame iso^ =>
+        Frame(4, _flags, _nextStream(), consume body)
 
     fun ref _nextStream(): U16 =>
         _stream = _stream + 1
@@ -63,12 +62,12 @@ actor Client is FrameNotifiee
 
 
     fun ref _startup() =>
-        _send(StartupRequest.create(cql_version))
+        _send(recover iso StartupRequest.create(cql_version) end)
 
 
-    fun ref _send(request: Request val) =>
+    fun ref _send(request: Request iso) =>
         let request_string: String val = request.string()
-        let frame: Frame val = _createFrame(request)
+        let frame: Frame val = _createFrame(consume request)
         let data = OldVisitor(frame)
         
         if not _closed then

@@ -1,23 +1,24 @@
-class SupportedResponseParser is Parser
+use collections = "collections"
 
-    let stack: Stack ref
+primitive SupportedResponseParser is NewParser[SupportedResponse]
 
-    new create(stack': Stack ref) =>
-        stack = stack'
+    fun box apply(data: Seq[U8 val] ref): SupportedResponse iso^ ? =>
+        let isomap: collections.Map[String val, Array[String val] ref] iso = StringMultiMapParser(data)
 
-    fun ref parse(): SupportedResponse iso^ ? =>
-        let map = stack.take_string_multimap()
+        recover iso
+            let map: collections.Map[String val, Array[String val] ref] ref = consume isomap
 
-        let compression: Array[String val] val = if map.contains("COMPRESSION") then
-            map("COMPRESSION")
-        else
-             recover Array[String val] end
+            let compression: Array[String val] ref = if map.contains("COMPRESSION") then
+                map("COMPRESSION")
+            else
+                Array[String val]
+            end
+
+            let cql_version: Array[String val] ref = if map.contains("CQL_VERSION") then
+                map("CQL_VERSION")
+            else
+                Array[String val]
+            end
+
+            SupportedResponse(cql_version, compression)
         end
-
-        let cql_version: Array[String val] val = if map.contains("CQL_VERSION") then
-            map("CQL_VERSION")
-        else
-             recover Array[String val] end
-        end
-
-        SupportedResponse(cql_version, compression)

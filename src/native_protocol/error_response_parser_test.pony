@@ -15,14 +15,13 @@ actor ErrorResponseParserTestList is TestList
 class iso ErrorResponseParserTest is UnitTest
 
     fun name(): String =>
-        "ErrorResponseParser.parse"
+        "ErrorResponseParser.apply"
     
     fun tag apply(h: TestHelper) ? =>
-        var data: Array[U8 val] val = recover [as U8:
+        var data = [as U8:
             0x00; 0x00; 0x00; 0x00; 0x00; 0x0C; 0x53; 0x65; 0x72; 0x76; 0x65
             0x72; 0x20; 0x65; 0x72; 0x72; 0x6F; 0x72
-        ] end
-        var stack = Stack(data)
-        var response = ErrorResponseParser.create(stack).parse()
+        ]
+        var response = ErrorResponseParser(data)
         h.assert_eq[I32 val](0, response.code)
         h.assert_eq[String val]("Server error", response.message)

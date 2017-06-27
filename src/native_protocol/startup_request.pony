@@ -1,9 +1,9 @@
-class iso StartupRequest is Stringable
+class ref StartupRequest is Stringable
 
     let cql_version: String val
     let compression: (String val | None val)
 
-    new iso create(cql_version': String, compression': (String val | None val) = None) =>
+    new ref create(cql_version': String, compression': (String val | None val) = None) =>
         cql_version = cql_version'
         compression = compression'
 

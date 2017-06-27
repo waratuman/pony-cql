@@ -81,14 +81,17 @@ actor TestServerConnection is FrameNotifiee
         _compression = message.compression
 
         match _authenticator
-        | None => _send(frame.stream, ReadyResponse)
+        | None => _send(frame.stream, recover iso ReadyResponse end)
         | let a: Authenticator val => _send(frame.stream, AuthenticateResponse(a.name()))
         end
 
     fun ref _options(frame: Frame val, message: OptionsRequest val) =>
-        let compression: Array[String val] val = recover Array[String val]() end
-        let cql_version: Array[String val] val = recover ["3.0.0"] end 
-        _send(frame.stream, SupportedResponse(cql_version, compression))
+        let msg = recover iso
+            let compression: Array[String val] ref = Array[String val]()
+            let cql_version: Array[String val] ref = ["3.0.0"]
+            SupportedResponse(cql_version, compression)
+        end
+        _send(frame.stream, consume msg)
 
     fun ref _auth_response(frame: Frame val, message: AuthResponseRequest val) =>
         match _authenticator

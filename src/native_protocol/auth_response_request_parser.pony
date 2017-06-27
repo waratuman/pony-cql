@@ -1,10 +1,5 @@
-class AuthResponseRequestParser is Parser
+primitive AuthResponseRequestParser is NewParser[AuthResponseRequest]
 
-    let stack: Stack ref
-
-    new create(stack': Stack ref) =>
-        stack = stack'
-
-    fun ref parse(): AuthResponseRequest iso^ ? =>
-        let token = stack.take_bytes()
-        AuthResponseRequest(token)
+    fun box apply(data: Seq[U8 val] ref): AuthResponseRequest iso^ ? =>
+        let token = BytesParser(data)
+        recover iso AuthResponseRequest(consume token) end

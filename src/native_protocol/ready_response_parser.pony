@@ -1,9 +1,4 @@
-class ReadyResponseParser is Parser
+primitive ReadyResponseParser is NewParser[ReadyResponse]
 
-    let stack: Stack ref
-
-    new create(stack': Stack ref) =>
-        stack = stack'
-
-    fun ref parse(): ReadyResponse iso^ =>
-        ReadyResponse
+    fun box apply(data: Seq[U8 val] ref): ReadyResponse iso^ =>
+        recover iso ReadyResponse end

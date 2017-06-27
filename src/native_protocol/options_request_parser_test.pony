@@ -18,9 +18,8 @@ class iso OptionsRequestParserTest is UnitTest
         "OptionsRequestParser.parse"
     
     fun tag apply(h: TestHelper) =>
-        var data: Array[U8 val] val = recover Array[U8 val]() end
-        var stack = Stack(data)
-        var request: OptionsRequest val = OptionsRequestParser(stack).parse()
+        var data: Array[U8 val] ref = Array[U8 val]
+        var request: OptionsRequest val = OptionsRequestParser(data)
         try request as OptionsRequest
             h.complete(true)
         else

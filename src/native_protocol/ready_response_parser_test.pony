@@ -18,9 +18,8 @@ class iso ReadyResponseParserTest is UnitTest
         "ReadyResponseParser.parse"
     
     fun tag apply(h: TestHelper) =>
-        var data: Array[U8 val] val = recover [as U8:
+        var data: Array[U8 val] ref = [as U8:
             0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF
-        ] end
-        var stack = Stack(data)
-        var response: ReadyResponse val = ReadyResponseParser.create(stack).parse()
-        h.assert_eq[USize val](8, stack.size())
+        ]
+        var response: ReadyResponse ref = ReadyResponseParser(data)
+        h.assert_eq[USize val](8, data.size())

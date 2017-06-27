@@ -1,6 +1,6 @@
-class iso ReadyResponse is Stringable
+class ref ReadyResponse is Stringable
 
-    new iso create() =>
+    new ref create() =>
         None
 
     fun box string(): String iso^ =>

@@ -5,13 +5,7 @@ use collection = "collections"
 
 interface Visitor[A]
 
-    fun ref apply(obj: A, collector: Stack ref): Stack ref
-
-// interface Visitor
-
-//     new ref create(collector: Stack ref)
-
-//     fun ref visit(obj: Any): Stack ref
+    fun apply(obj: A, collector: Array[U8 val] iso): Array[U8 val] iso^
 
 
 primitive OldVisitor

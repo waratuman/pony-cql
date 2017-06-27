@@ -1,10 +1,5 @@
-class AuthSuccessResponseParser is Parser
+class AuthSuccessResponseParser is NewParser[AuthSuccessResponse]
 
-    let stack: Stack ref
-
-    new create(stack': Stack ref) =>
-        stack = stack'
-
-    fun ref parse(): AuthSuccessResponse iso^ ? =>
-        let token = stack.take_bytes()
-        AuthSuccessResponse(token)
+    fun box apply(data: Seq[U8 val] ref): AuthSuccessResponse iso^ ? =>
+        let token: (Array[U8 val] iso | None val) = BytesParser(data)
+        recover iso AuthSuccessResponse(consume token) end

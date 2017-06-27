@@ -20,12 +20,11 @@ actor QueryRequestParserTestList is TestList
 class iso QueryRequestParserTest is UnitTest
 
     fun name(): String =>
-        "QueryRequestParser.parse"
+        "QueryRequestParser.apply"
     
     fun tag apply(h: TestHelper) ? =>
-        var data: Array[U8 val] val = Bytes.from_hex_string("0000001553454C454354202A2046524F4D206578616D706C65000400")
-        var stack = Stack(data)
-        var request = QueryRequestParser(stack).parse()
+        var data: Array[U8 val] ref = Bytes.from_hex_string("0000001553454C454354202A2046524F4D206578616D706C65000400")
+        var request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example", request.query)
         h.assert_eq[Bool val](true, request.binding is None)
         h.assert_eq[Consistency val](request.consistency, Quorum)
@@ -36,7 +35,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Bool val](true, request.timestamp is None)
 
         data = Bytes.from_hex_string("0000002253454C454354202A2046524F4D206578616D706C65205748455245206964203D203F0004010001FFFFFFFF")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example WHERE id = ?", request.query)
         h.assert_eq[USize val](1, (request.binding as Array[QueryParameter val] val).size())
         h.assert_eq[Bool val](true, (request.binding as Array[QueryParameter val] val)(0) is None)
@@ -48,7 +47,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Bool val](true, request.timestamp is None)
 
         data = Bytes.from_hex_string("0000002553454C454354202A2046524F4D206578616D706C6520574845524520656D61696C203D203F00040100010000001361646472657373406578616D706C652E636F6D")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example WHERE email = ?", request.query)
         h.assert_eq[String val](
             "address@example.com",
@@ -98,7 +97,7 @@ class iso QueryRequestParserTest is UnitTest
             set.set("value")
             set
         end
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         let params = request.binding as Array[QueryParameter val] val
         h.assert_eq[String val]("SELECT * FROM example WHERE id = ?", request.query)
         h.assert_eq[USize val](16, params.size())
@@ -119,12 +118,12 @@ class iso QueryRequestParserTest is UnitTest
         let consistencies = [as Consistency: AnyConsistency; One; Two; Three; Quorum; All; LocalQuorum; EachQuorum; Serial; LocalSerial; LocalOne]
         for consistency in consistencies.values() do
             data = Bytes.from_hex_string("0000001553454C454354202A2046524F4D206578616D706C65" + Bytes.to_hex_string(Bytes.ofU16(consistency.value())) + "00")
-            request = QueryRequestParser(Stack(data)).parse()
+            request = QueryRequestParser(data)
             h.assert_eq[Consistency val](request.consistency, consistency)
         end
 
         data = Bytes.from_hex_string("0000001653454C454354202A2046524F4D206578616D706C653B000402")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example;", request.query)
         h.assert_eq[Bool val](true, request.binding is None)
         h.assert_eq[Consistency val](request.consistency, Quorum)
@@ -135,7 +134,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Bool val](true, request.timestamp is None)
         
         data = Bytes.from_hex_string("0000001653454C454354202A2046524F4D206578616D706C653B00040400000001")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example;", request.query)
         h.assert_eq[Bool val](true, request.binding is None)
         h.assert_eq[Consistency val](request.consistency, Quorum)
@@ -146,7 +145,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Bool val](true, request.timestamp is None)
 
         data = Bytes.from_hex_string("0000001653454C454354202A2046524F4D206578616D706C653B0004080000000401020304")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example;", request.query)
         h.assert_eq[Bool val](true, request.binding is None)
         h.assert_eq[Consistency val](request.consistency, Quorum)
@@ -159,7 +158,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Bool val](true, request.timestamp is None)
 
         data = Bytes.from_hex_string("0000001653454C454354202A2046524F4D206578616D706C653B0004100009")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example;", request.query)
         h.assert_eq[Bool val](true, request.binding is None)
         h.assert_eq[Consistency val](request.consistency, Quorum)
@@ -170,7 +169,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Bool val](true, request.timestamp is None)
 
         data = Bytes.from_hex_string("0000001653454C454354202A2046524F4D206578616D706C653B00042000000002540BE3FF")
-        request = QueryRequestParser(Stack(data)).parse()
+        request = QueryRequestParser(data)
         h.assert_eq[String val]("SELECT * FROM example;", request.query)
         h.assert_eq[Bool val](true, request.binding is None)
         h.assert_eq[Consistency val](request.consistency, Quorum)

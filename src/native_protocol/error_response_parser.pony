@@ -1,9 +1,4 @@
-class ErrorResponseParser is Parser
+class ErrorResponseParser is NewParser[ErrorResponse]
 
-    let stack: Stack ref
-
-    new create(stack': Stack ref) =>
-        stack = stack'
-
-    fun ref parse(): ErrorResponse iso^ ? =>
-        ErrorResponse(stack.take_int(), stack.take_string())
+    fun box apply(data: Seq[U8 val] ref): ErrorResponse iso^ ? =>
+        ErrorResponse(IntParser(data), StringParser(data))

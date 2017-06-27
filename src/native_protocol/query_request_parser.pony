@@ -1,15 +1,10 @@
-class QueryRequestParser is Parser
+class QueryRequestParser is NewParser[QueryRequest]
 
-    let stack: Stack ref
+    fun box apply(data: Seq[U8 val] ref): QueryRequest iso^ ? =>
+        let query_string: String val = LongStringParser(data)
+        let consistency: Consistency val = ConsistencyParser(data)
 
-    new create(stack': Stack ref) =>
-        stack = stack'
-
-    fun ref parse(): QueryRequest iso^ ? =>
-        let query_string: String val = stack.take_long_string()
-        let consistency: Consistency val = stack.take_consistency()
-
-        let flag = stack.byte()
+        let flag = data.shift()
         let flags: QueryFlags ref = QueryFlags
 
 
@@ -42,15 +37,19 @@ class QueryRequestParser is Parser
         end
 
         let binding: (Array[QueryParameter val] val | None val) = if flags(Values) then
-            let n: U16 val = stack.take_short()
+            let n: U16 val = ShortParser(data)
             var i: U16 val = 0
             let result: Array[QueryParameter val] iso = recover Array[QueryParameter val] end
             while i < n do
-                let value_size = stack.take_int()
+                var value_size = IntParser(data)
                 result.push(if value_size < 0 then
                     None
                 else
-                    stack.take_n(value_size.usize())
+                    let r: Array[U8 val] iso = recover iso Array[U8 val] end
+                    while (value_size = value_size - 1) > 0 do
+                        r.push(data.shift())
+                    end
+                    consume r
                 end)
                 i = i + 1
             end
@@ -60,25 +59,25 @@ class QueryRequestParser is Parser
         end
 
         let page_size: (None val | I32 val) = if flags(PageSize) then
-            stack.take_int()
+            IntParser(data)
         else
             None
         end
 
         let paging_state: (None val | Array[U8 val] val) = if flags(WithPagingState) then
-            stack.take_bytes()
+            BytesParser(data)
         else
             None
         end
 
         let serial_consistency: (None val | Serial val | LocalSerial val) = if flags(WithSerialConsistency) then
-            stack.take_consistency() as (Serial val | LocalSerial val)
+            ConsistencyParser(data) as (Serial val | LocalSerial val)
         else
             None
         end
 
         let timestamp: (None val | I64 val) = if flags(WithDefaultTimestamp) then
-            stack.take_long()
+            LongParser(data)
         else
             None
         end

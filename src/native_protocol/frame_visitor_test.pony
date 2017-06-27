@@ -1,6 +1,6 @@
 use "ponytest"
 
-actor FrameParserTestList is TestList
+actor FrameVisitorTestList is TestList
 
     new create(env: Env) =>
         PonyTest(env, this)
@@ -9,13 +9,13 @@ actor FrameParserTestList is TestList
         None
     
     fun tag tests(test: PonyTest) =>
-        test(FrameParserTest)
+        test(FrameVisitorTest)
 
 
-class iso FrameParserTest is UnitTest
+class iso FrameVisitorTest is UnitTest
 
     fun name(): String =>
-        "FrameParser.apply"
+        "FrameVisitor.apply"
     
     fun tag apply(h: TestHelper) ? =>
         var data = [as U8:

@@ -1,9 +1,9 @@
-class iso SupportedResponse is Stringable
+class ref SupportedResponse is Stringable
 
-    let cql_version: Array[String val] val
-    let compression: Array[String val] val
+    let cql_version: Array[String val] ref
+    let compression: Array[String val] ref
 
-    new iso create(cql_version': Array[String val] val, compression': Array[String val] val) =>
+    new ref create(cql_version': Array[String val] ref, compression': Array[String val] ref) =>
         cql_version = cql_version'
         compression = compression'
 

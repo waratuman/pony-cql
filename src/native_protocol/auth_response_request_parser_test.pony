@@ -18,18 +18,16 @@ class iso AuthResponseRequestParserTest is UnitTest
         "AuthResponseRequestParser.parse"
     
     fun tag apply(h: TestHelper) ? =>
-        var data: Array[U8 val] val = recover [as U8: 0xFF; 0xFF; 0xFF; 0xFF] end
-        var stack = Stack(data)
-        var request: AuthResponseRequest val = AuthResponseRequestParser(stack).parse()
+        var data: Array[U8 val] ref = [as U8: 0xFF; 0xFF; 0xFF; 0xFF]
+        var request: AuthResponseRequest val = AuthResponseRequestParser(data)
 
         match request.token
         | let t: None => h.assert_eq[None val](None, t)
         else h.fail()
         end
 
-        data = recover [as U8: 0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD] end
-        stack = Stack(data)
-        request = AuthResponseRequestParser(stack).parse()
+        data = [as U8: 0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD]
+        request = AuthResponseRequestParser(data)
 
         match request.token
         | let t: Array[U8 val] val =>

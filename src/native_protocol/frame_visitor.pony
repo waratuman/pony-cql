@@ -1,4 +1,4 @@
-primitive FrameVisitor is Visitor[Frame]
+// primitive FrameVisitor is Visitor[Frame]
 
-    fun ref apply(frame: Frame, collector: Stack ref): Stack ref =>
-        collector
+//     fun ref apply(frame: Frame box, collector: Stack iso): Stack iso^ =>
+//         collector
