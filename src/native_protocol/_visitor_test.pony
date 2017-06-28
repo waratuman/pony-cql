@@ -42,7 +42,7 @@ class iso _TestVisitFrame is UnitTest
     fun tag apply(h: TestHelper) =>
         var request: Request val = recover StartupRequest("3.0.0") end
         var frame: Frame val = recover Frame(4, 0, 0, request) end
-        var result: Array[U8 val] val = recover OldVisitor.visitFrame(frame) end
+        var result: Array[U8 val] val = recover FrameVisitor(frame) end
         
         h.assert_eq[String val](
             "0400000001000000160001000B43514C5F56455253494F4E0005332E302E30",
@@ -51,7 +51,7 @@ class iso _TestVisitFrame is UnitTest
 
         request = recover AuthResponseRequest(recover [as U8: 0xAB; 0xCD] end) end
         frame = recover Frame(4, 0, 0, request) end
-        result = recover OldVisitor.visitFrame(frame) end
+        result = recover FrameVisitor(frame) end
         h.assert_eq[String val](
             "040000000F0000000600000002ABCD",
             Bytes.to_hex_string(result)
@@ -62,7 +62,7 @@ class iso _TestVisitStartupRequest is UnitTest
 
     fun tag apply(h: TestHelper) =>
         var request: StartupRequest val = recover StartupRequest("3.0.0") end
-        var result: Array[U8 val] val = recover OldVisitor.visitStartupRequest(request) end
+        var result: Array[U8 val] val = recover StartupRequestVisitor(request) end
         
         h.assert_eq[String val](
             "0001000B43514C5F56455253494F4E0005332E302E30",
@@ -70,7 +70,7 @@ class iso _TestVisitStartupRequest is UnitTest
         )
 
         request = recover StartupRequest("3.0.0", "snappy") end
-        result = recover OldVisitor.visitStartupRequest(request) end
+        result = recover StartupRequestVisitor(request) end
         h.assert_eq[String val](
             "0002000B434F4D5052455353494F4E0006736E61707079000B43514C5F56455253494F4E0005332E302E30",
             Bytes.to_hex_string(result)

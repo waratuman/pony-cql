@@ -12,6 +12,18 @@ actor ParserTestList is TestList
         None
     
     fun tag tests(test: PonyTest) =>
+        AuthResponseRequestParserTestList.make().tests(test)
+        AuthenticateResponseParserTestList.make().tests(test)
+        AuthSuccessResponseParserTestList.make().tests(test)
+        ErrorResponseParserTestList.make().tests(test)
+        FrameParserTestList.make().tests(test)
+        FrameTestList.make().tests(test)
+        OptionsRequestParserTestList.make().tests(test)
+        QueryRequestParserTestList.make().tests(test)
+        ReadyResponseParserTestList.make().tests(test)
+        StartupRequestParserTestList.make().tests(test)
+        SupportedResponseParserTestList.make().tests(test)
+
         test(ByteParserTest)
         test(UIntParserTest)
         test(IntParserTest)
@@ -119,7 +131,7 @@ class iso LongStringParserTest is UnitTest
 class iso UUIDParserTest is UnitTest
 
     fun name(): String =>
-        "LongStringParser.apply"
+        "UUIDParser.apply"
 
     fun tag apply(h: TestHelper) ? =>
         let data = [as U8:

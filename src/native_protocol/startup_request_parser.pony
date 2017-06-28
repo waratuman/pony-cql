@@ -1,4 +1,4 @@
-primitive StartupRequestParser is NewParser[StartupRequest]
+primitive StartupRequestParser is Parser[StartupRequest]
 
     fun box apply(data: Seq[U8 val] ref): StartupRequest iso^ ? =>
         let map = StringMapParser(data)

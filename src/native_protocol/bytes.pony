@@ -92,7 +92,7 @@ primitive Bytes
 
         consume result
 
-    fun val to_hex_string(data: Array[U8 val] box): String iso^ =>
+    fun val to_hex_string(data: Seq[U8 val] box): String iso^ =>
         var result: String iso = recover String end
         for byte in data.values() do
             result.append(Format.int[U8](byte, FormatHexBare, PrefixDefault, 2))

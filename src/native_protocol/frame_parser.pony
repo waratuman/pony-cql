@@ -1,4 +1,4 @@
-primitive FrameParser is NewParser[Frame]
+primitive FrameParser is Parser[Frame]
 
     fun box apply(data: Seq[U8 val] ref): Frame iso^ ? =>
         let version: U8 val = (ByteParser(data) and 0b0111)

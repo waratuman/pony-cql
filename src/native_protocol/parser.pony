@@ -2,22 +2,21 @@ use "../cql"
 use collections = "collections"
 
 
-interface NewParser[A]
+interface Parser[A]
 
     fun box apply(data: Seq[U8 val] iso): A ?
 
 
-primitive ByteParser is NewParser[U8 val]
+primitive ByteParser is Parser[U8 val]
 
     fun box apply(data: Seq[U8 val] ref): U8 val ? =>
         data.shift()
 
 
-primitive UIntParser is NewParser[U32 val]
+primitive UIntParser is Parser[U32 val]
     """
     A 4 byte unsigned integer.
     """
-
 
     fun box apply(data: Seq[U8 val] ref): U32 val ? =>
         let a = data.shift().u32()
@@ -27,7 +26,7 @@ primitive UIntParser is NewParser[U32 val]
         (a << 24) or (b << 16) or (c << 8) or d
 
 
-primitive IntParser is NewParser[I32 val]
+primitive IntParser is Parser[I32 val]
     """
     A 4 byte signed integer.
     """
@@ -40,7 +39,7 @@ primitive IntParser is NewParser[I32 val]
         (a << 24) or (b << 16) or (c << 8) or d
 
 
-primitive LongParser is NewParser[I64 val]
+primitive LongParser is Parser[I64 val]
     """
     A 8 byte signed integer.
     """
@@ -57,7 +56,7 @@ primitive LongParser is NewParser[I64 val]
         (a << 56) or (b << 48) or (c << 40) or (d << 32) or (e << 24) or (f << 16) or (g << 8) or h
 
 
-primitive ShortParser is NewParser[U16 val]
+primitive ShortParser is Parser[U16 val]
     """
     A 2 byte unsigned integer.
     """
@@ -68,7 +67,7 @@ primitive ShortParser is NewParser[U16 val]
         ((a << 8) or b)
 
 
-primitive StringParser is NewParser[String ref]
+primitive StringParser is Parser[String ref]
     """
     A short, n, followed by a n byte UTF-8 string.
     """
@@ -82,7 +81,7 @@ primitive StringParser is NewParser[String ref]
         consume result
 
 
-primitive LongStringParser is NewParser[String]
+primitive LongStringParser is Parser[String]
     """
     An int, n, followed by a n byte UTF-8 string.
     """
@@ -96,7 +95,7 @@ primitive LongStringParser is NewParser[String]
         consume result
 
 
-primitive UUIDParser is NewParser[Array[U8 val]]
+primitive UUIDParser is Parser[Array[U8 val]]
     """
     A 16 byte long uuid.
     """
@@ -110,7 +109,7 @@ primitive UUIDParser is NewParser[Array[U8 val]]
         consume result
 
 
-primitive StringListParser is NewParser[Array[String val]]
+primitive StringListParser is Parser[Array[String val]]
     """
     A short, n, followed by n strings.
     """
@@ -124,7 +123,7 @@ primitive StringListParser is NewParser[Array[String val]]
         consume result
 
 
-primitive BytesParser is NewParser[(Array[U8 val] | None)]
+primitive BytesParser is Parser[(Array[U8 val] | None)]
     """
     An int, n, followed by n bytes. If n < 0, no bytes follow and None is
     returned.
@@ -143,7 +142,7 @@ primitive BytesParser is NewParser[(Array[U8 val] | None)]
         consume result
 
 
-primitive ValueParser is NewParser[(Array[U8 val] ref | None)]
+primitive ValueParser is Parser[(Array[U8 val] ref | None)]
     """
     An int, n, followed by n bytes. If n == -1 the value None is returned.
     The docs mention n == -2 meaning not set. This is not implemented yet.
@@ -165,7 +164,7 @@ primitive ValueParser is NewParser[(Array[U8 val] ref | None)]
         result
 
 
-primitive ShortBytesParser is NewParser[Array[U8 val] ref]
+primitive ShortBytesParser is Parser[Array[U8 val] ref]
     """
     A short, n, followed by n bytes. If n < 0, no bytes follow and None is
     returned.
@@ -180,7 +179,7 @@ primitive ShortBytesParser is NewParser[Array[U8 val] ref]
         result
 
 
-primitive InetParser is NewParser[Inet ref]
+primitive InetParser is Parser[Inet ref]
     """
     An address (ip and port) to a node. It consists of one byte, n, that
     represents the address size, followed by n bytes representing the IP
@@ -202,7 +201,7 @@ primitive InetParser is NewParser[Inet ref]
         Inet(host, port)
 
 
-primitive InetAddrParser is NewParser[(U32 val | U128 val)]
+primitive InetAddrParser is Parser[(U32 val | U128 val)]
     """
     An IP address (without port) to a node. It consists of one byte, n, that
     represents the address size, followed by n bytes representing the IP
@@ -220,7 +219,7 @@ primitive InetAddrParser is NewParser[(U32 val | U128 val)]
         end
 
 
-primitive ConsistencyParser is NewParser[Consistency val]
+primitive ConsistencyParser is Parser[Consistency val]
     """
     A consistency level specification. This is a short.
     """
@@ -242,7 +241,7 @@ primitive ConsistencyParser is NewParser[Consistency val]
         end
 
 
-primitive StringMapParser is NewParser[collections.Map[String val, String val]]
+primitive StringMapParser is Parser[collections.Map[String val, String val]]
     """
     A short, n, followed by n pair <k><v> where <k> and <v>
     are a string.
@@ -257,7 +256,7 @@ primitive StringMapParser is NewParser[collections.Map[String val, String val]]
         consume result
 
 
-primitive StringMultiMapParser is NewParser[collections.Map[String val, Array[String val] ref]]
+primitive StringMultiMapParser is Parser[collections.Map[String val, Array[String val] ref]]
     """
     A short, n, followed by n pair <k><v> where <k> is a
     string and <v> is a take_string_list.
@@ -272,7 +271,7 @@ primitive StringMultiMapParser is NewParser[collections.Map[String val, Array[St
         consume result
 
 
-primitive BytesMapParser is NewParser[collections.Map[String box, (Array[U8 val] ref | None val)]]
+primitive BytesMapParser is Parser[collections.Map[String box, (Array[U8 val] ref | None val)]]
     """
     A short, n, followed by n pair <k><v> where <k> is a string and <v>
     is a bytes.

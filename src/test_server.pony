@@ -122,12 +122,12 @@ actor TestServerConnection is FrameNotifiee
     fun ref _send(stream: U16 val, message: Message iso) =>
         let message_string: String val = message.string()
         let frame: Frame val = Frame(_version or 0x80, 0x00, stream, consume message)
-        let data = OldVisitor(frame)
+        let data = recover iso FrameVisitor(frame) end
 
         match _conn
         | let c: TCPConnection tag =>
             _log(Info, "-> " + message_string)
-            c.write(data)
+            c.write(consume data)
         else
             _log(Info, "-| " + message_string)
         end

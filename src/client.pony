@@ -68,10 +68,10 @@ actor Client is FrameNotifiee
     fun ref _send(request: Request iso) =>
         let request_string: String val = request.string()
         let frame: Frame val = _createFrame(consume request)
-        let data = OldVisitor(frame)
+        let data = recover iso FrameVisitor(frame) end
         
         if not _closed then
-            _conn.write(data)
+            _conn.write(consume data)
             _log(Info, "-> " + request_string)
         else
             _log(Info, "-| " + request_string)

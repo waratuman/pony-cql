@@ -1,6 +1,6 @@
 use collections = "collections"
 
-primitive SupportedResponseParser is NewParser[SupportedResponse]
+primitive SupportedResponseParser is Parser[SupportedResponse]
 
     fun box apply(data: Seq[U8 val] ref): SupportedResponse iso^ ? =>
         let isomap: collections.Map[String val, Array[String val] ref] iso = StringMultiMapParser(data)

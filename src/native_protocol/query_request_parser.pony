@@ -1,4 +1,4 @@
-class QueryRequestParser is NewParser[QueryRequest]
+class QueryRequestParser is Parser[QueryRequest]
 
     fun box apply(data: Seq[U8 val] ref): QueryRequest iso^ ? =>
         let query_string: String val = LongStringParser(data)
