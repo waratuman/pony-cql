@@ -1,4 +1,5 @@
 use "ponytest"
+use "itertools"
 
 actor ErrorResponseVisitorTestList is TestList
 
@@ -18,7 +19,10 @@ class iso ErrorResponseVisitorTest is UnitTest
     fun tag apply(h: TestHelper) =>
         let request: ErrorResponse val = ErrorResponse(0x0000, "Server error")
         let result: Array[U8 val] val = recover ErrorResponseVisitor(request) end
-        h.assert_eq[String val](
-            "00000000000C536572766572206572726F72",
-            Bytes.to_hex_string(result)
-        )
+        let data = [ as U8:
+            0x00; 0x00; 0x00; 0x00; 0x00; 0x0C; 0x53; 0x65; 0x72; 0x76; 0x65
+            0x72; 0x20; 0x65; 0x72; 0x72; 0x6F; 0x72
+        ]
+        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+            h.assert_eq[U8](a, b)
+        end

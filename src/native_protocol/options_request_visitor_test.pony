@@ -1,4 +1,5 @@
 use "ponytest"
+use "itertools"
 
 actor OptionsRequestVisitorTestList is TestList
 
@@ -18,7 +19,7 @@ class iso OptionsRequestVisitorTest is UnitTest
     fun tag apply(h: TestHelper) =>
         let request: OptionsRequest val = OptionsRequest
         let result: Array[U8 val] val = recover OptionsRequestVisitor(request) end
-        h.assert_eq[String val](
-            "",
-            Bytes.to_hex_string(result)
-        )
+        let data = Array[U8 val]
+        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+            h.assert_eq[U8](a, b)
+        end

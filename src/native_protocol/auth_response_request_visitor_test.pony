@@ -1,4 +1,5 @@
 use "ponytest"
+use "itertools"
 
 actor AuthResponseRequestVisitorTestList is TestList
 
@@ -20,14 +21,14 @@ class iso AuthResponseRequestVisitorTest is UnitTest
     fun tag apply(h: TestHelper) =>
         var request: AuthResponseRequest val = recover AuthResponseRequest() end
         var result: Array[U8 val] val = recover AuthResponseRequestVisitor(request) end
-        h.assert_eq[String val](
-            "FFFFFFFF",
-            Bytes.to_hex_string(result)
-        )
+        var data = [ as U8: 0xFF; 0xFF; 0xFF; 0xFF ]
+        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+            h.assert_eq[U8](a, b)
+        end
 
         request = recover AuthResponseRequest(recover [as U8: 0xAB; 0xCD] end) end
         result = recover AuthResponseRequestVisitor(request) end
-        h.assert_eq[String val](
-            "00000002ABCD",
-            Bytes.to_hex_string(result)
-        )
+        data = [ as U8: 0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD ]
+        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+            h.assert_eq[U8](a, b)
+        end

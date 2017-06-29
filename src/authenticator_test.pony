@@ -1,4 +1,5 @@
 use "ponytest"
+use "itertools"
 use "./native_protocol"
 
 actor AuthenticatorTestList is TestList
@@ -12,26 +13,36 @@ actor AuthenticatorTestList is TestList
         test(_TestAuthenticatorToken)
         test(_TestAuthenticatorName)
 
+
 class iso _TestAuthenticatorCreate is UnitTest
-    fun name(): String => "Authenticator.create"
+
+    fun name(): String =>
+        "Authenticator.create"
 
     fun tag apply(h: TestHelper) =>
         let authenticator = PasswordAuthenticator.create()
 
+
 class iso _TestAuthenticatorToken is UnitTest
-    fun name(): String => "Authenticator.token"
+
+    fun name(): String =>
+        "Authenticator.token"
 
     fun tag apply(h: TestHelper) =>
         let authenticator: PasswordAuthenticator ref = PasswordAuthenticator.create()
         authenticator("username", "password")
         match authenticator.token()
         | let t: Array[U8 val] val => 
-            h.assert_eq[String val](
-                "00757365726E616D650070617373776F7264",
-                Bytes.to_hex_string(t)
-            )
+            let data = [as U8:
+                0x00; 0x75; 0x73; 0x65; 0x72; 0x6E; 0x61; 0x6D; 0x65
+                0x00; 0x70; 0x61; 0x73; 0x73; 0x77; 0x6F; 0x72; 0x64
+            ]
+            for (a, b) in Zip2[U8, U8](data.values(), t.values()) do
+                h.assert_eq[U8](a, b)
+            end
         else h.fail()
         end
+
 
 class iso _TestAuthenticatorName is UnitTest
     

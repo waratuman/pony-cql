@@ -1,4 +1,5 @@
 use "ponytest"
+use "itertools"
 
 
 actor AuthenticateResponseVisitorTestList is TestList
@@ -21,7 +22,13 @@ class iso AuthenticateResponseVisitorTest is UnitTest
     fun tag apply(h: TestHelper) =>
         let response: AuthenticateResponse val = recover AuthenticateResponse("org.apache.cassandra.auth.PasswordAuthenticator") end
         let result: Array[U8 val] val = recover AuthenticateResponseVisitor(response) end
-        h.assert_eq[String val](
-            "002F6F72672E6170616368652E63617373616E6472612E617574682E50617373776F726441757468656E74696361746F72",
-            Bytes.to_hex_string(result)
-        )
+        let data = [ as U8:
+            0x00; 0x2F; 0x6F; 0x72; 0x67; 0x2E; 0x61; 0x70; 0x61; 0x63; 0x68
+            0x65; 0x2E; 0x63; 0x61; 0x73; 0x73; 0x61; 0x6E; 0x64; 0x72; 0x61
+            0x2E; 0x61; 0x75; 0x74; 0x68; 0x2E; 0x50; 0x61; 0x73; 0x73; 0x77
+            0x6F; 0x72; 0x64; 0x41; 0x75; 0x74; 0x68; 0x65; 0x6E; 0x74; 0x69
+            0x63; 0x61; 0x74; 0x6F; 0x72
+        ]
+        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+            h.assert_eq[U8](a, b)
+        end
