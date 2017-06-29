@@ -41,13 +41,13 @@ primitive FrameBodyVisitor is Visitor[Message val]
 
         fun box apply(msg: Message val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
             match msg
-            | let r: ErrorResponse val => OldVisitor.visitErrorResponse(r, c)      
+            | let r: ErrorResponse val => ErrorResponseVisitor(r, c)      
             | let r: StartupRequest val => StartupRequestVisitor(r, c)
-            | let r: ReadyResponse val => OldVisitor.visitReadyResponse(r, c)
-            | let r: AuthenticateResponse val => OldVisitor.visitAuthenticateResponse(r, c)
-            | let r: OptionsRequest val => OldVisitor.visitOptionsRequest(r, c)
-            | let r: SupportedResponse val => OldVisitor.visitSupportedResponse(r, c)
-            | let r: QueryRequest val => OldVisitor.visitQueryRequest(r, c)
+            | let r: ReadyResponse val => ReadyResponseVisitor(r, c)
+            | let r: AuthenticateResponse val => AuthenticateResponseVisitor(r, c)
+            | let r: OptionsRequest val => OptionsRequestVisitor(r, c)
+            | let r: SupportedResponse val => SupportedResponseVisitor(r, c)
+            | let r: QueryRequest val => QueryRequestVisitor(r, c)
             // | let r: ResultResponse val => OldVisitor.OldVisitor.visitResultResponse(r, c)
             // | let r: PrepareRequest val => OldVisitor.visitPrepareRequest(r, c)
             // | let r: ExecuteRequest val => OldVisitor.visitExecuteRequest(r, c)
@@ -55,8 +55,8 @@ primitive FrameBodyVisitor is Visitor[Message val]
             // | let r: EventResponse val => OldVisitor.visitEventResponse(r, c)
             // | let r: BatchRequest val => OldVisitor.visitBatchRequest(r, c)
             // | let r: AuthChallengeResponse val => OldVisitor.visitAuthChallengeResponse(r, c)
-            | let r: AuthResponseRequest val => OldVisitor.visitAuthResponseRequest(r, c)
-            | let r: AuthSuccessResponse val => OldVisitor.visitAuthSuccessResponse(r, c)
+            | let r: AuthResponseRequest val => AuthResponseRequestVisitor(r, c)
+            | let r: AuthSuccessResponse val => AuthSuccessResponseVisitor(r, c)
             else c
             end
             c

@@ -17,10 +17,9 @@ actor Main is TestList
 
         // Visitors
         VisitorTestList.make().tests(test)
-        FrameVisitorTestList.make().tests(test)
-
+    
         // Not refactored:
         BytesTestList.make().tests(test)
-        OldVisitorTestList.make().tests(test)
+        
         RequestTestList.make().tests(test)
         ResponseTestList.make().tests(test)

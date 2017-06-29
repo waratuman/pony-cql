@@ -13,6 +13,17 @@ actor VisitorTestList is TestList
         None
 
     fun tag tests(test: PonyTest) =>
+        AuthResponseRequestVisitorTestList.make().tests(test)
+        AuthSuccessResponseVisitorTestList.make().tests(test)
+        AuthenticateResponseVisitorTestList.make().tests(test)
+        ErrorResponseVisitorTestList.make().tests(test)
+        FrameVisitorTestList.make().tests(test)
+        OptionsRequestVisitorTestList.make().tests(test)
+        QueryRequestVisitorTestList.make().tests(test)
+        ReadyResponseVisitorTestList.make().tests(test)
+        StartupRequestVisitorTestList.make().tests(test)
+        SupportedResponseVisitorTestList.make().tests(test)
+
         test(ByteVisitorTest)
         test(UIntVisitorTest)
         test(IntVisitorTest)
