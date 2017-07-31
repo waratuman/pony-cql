@@ -7,22 +7,22 @@ primitive FrameVisitor is Visitor[Frame val]
         end
 
         let opcode: U8 = match frame.body
+        | let b: ErrorResponse val => 0x00
         | let b: StartupRequest val => 0x01
         | let b: ReadyResponse val => 0x02
         | let b: AuthenticateResponse val => 0x03
         | let b: OptionsRequest val => 0x05
         | let b: SupportedResponse val => 0x06
         | let b: QueryRequest val => 0x07
-        // | let b: ResultResponse => 0x08
-        // | let b:  => 0x09
-        // | let b:  => 0x0A
-        // | let b:  => 0x0B
-        // | let b:  => 0x0C
-        // | let b:  => 0x0D
-        // | let b:  => 0x0E
+        | let b: ResultResponse val => 0x08
+        // | let b: PrepareRequest => 0x09
+        // | let b: ExecuteRequest => 0x0A
+        // | let b: RegisterRequest => 0x0B
+        // | let b: EventResponse => 0x0C
+        // | let b: BatchRequest => 0x0D
+        // | let b: AuthChallengeResponse => 0x0E
         | let b: AuthResponseRequest val => 0x0F
         | let b: AuthSuccessResponse val => 0x10
-        else 0
         end
     
         let body = Array[U8 val]()

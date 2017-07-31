@@ -19,7 +19,7 @@ class iso AuthResponseRequestParserTest is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var data: Array[U8 val] ref = [as U8: 0xFF; 0xFF; 0xFF; 0xFF]
-        var request: AuthResponseRequest val = AuthResponseRequestParser(data)
+        var request: AuthResponseRequest val = AuthResponseRequestParser(data)?
 
         match request.token
         | let t: None => h.assert_eq[None val](None, t)
@@ -27,11 +27,11 @@ class iso AuthResponseRequestParserTest is UnitTest
         end
 
         data = [as U8: 0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD]
-        request = AuthResponseRequestParser(data)
+        request = AuthResponseRequestParser(data)?
 
         match request.token
         | let t: Array[U8 val] val =>
-            h.assert_eq[U8](0xAB, t(0))
-            h.assert_eq[U8](0xCD, t(1))
+            h.assert_eq[U8](0xAB, t(0)?)
+            h.assert_eq[U8](0xCD, t(1)?)
         else h.fail()
         end

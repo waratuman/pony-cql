@@ -28,8 +28,8 @@ class iso _TestAuthResponseRequestCreate is UnitTest
         request = AuthResponseRequest(recover [as U8: 0xAB; 0xCD] end)
         match request.token
         | let t: Array[U8 val] val =>
-            h.assert_eq[U8](0xAB, t(0))
-            h.assert_eq[U8](0xCD, t(1))
+            h.assert_eq[U8](0xAB, t(0)?)
+            h.assert_eq[U8](0xCD, t(1)?)
         else h.fail()
         end
 

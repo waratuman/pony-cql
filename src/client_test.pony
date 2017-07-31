@@ -33,7 +33,7 @@ class _TestClientCreateServerNotify  is TestServerNotify
 
     fun ref listening(server: TestServer ref) =>
         try
-            (let host, let port) = server.local_address.name()
+            (let host, let port) = server.local_address.name()?
             let client = Client(
                 _h.env.root as AmbientAuth,
                 _TestClientCreateClientNotify(_h),

@@ -233,7 +233,6 @@ primitive ConsistencyVisitor is Visitor[Consistency val]
         | Serial => 0x08
         | LocalSerial => 0x09
         | LocalOne => 0x0A
-        else 0x00
         end)
         collector
 

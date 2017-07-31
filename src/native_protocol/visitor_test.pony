@@ -54,7 +54,7 @@ class iso ByteVisitorTest is UnitTest
     fun tag apply(h: TestHelper) ? =>
         let collector = ByteVisitor(3)
         h.assert_eq[USize](1, collector.size())
-        h.assert_eq[U8](3, collector(0))
+        h.assert_eq[U8](3, collector(0)?)
 
 
 class iso UIntVisitorTest is UnitTest
@@ -364,8 +364,8 @@ class iso StringMapVisitorTest is UnitTest
         ]
 
         let map = collections.Map[String val, String val](2)
-        map.insert("COMPRESSION", "snappy")
-        map.insert("CQL_VERSION", "3.0.0")
+        map.insert("COMPRESSION", "snappy")?
+        map.insert("CQL_VERSION", "3.0.0")?
         for (a, b) in Zip2[U8 val, U8 val](StringMapVisitor(map).values(), data.values()) do
             h.assert_eq[U8 val](a, b)
         end
@@ -386,8 +386,8 @@ class iso StringMultiMapVisitorTest is UnitTest
         ]
         
         let map = collections.Map[String val, Array[String val] ref]
-        map.insert("COMPRESSION", [as String val: "snappy"; "lzo"])
-        map.insert("CQL_VERSION", [as String val: "3.0.0"])
+        map.insert("COMPRESSION", [as String val: "snappy"; "lzo"])?
+        map.insert("CQL_VERSION", [as String val: "3.0.0"])?
         for (a, b) in Zip2[U8 val, U8 val](StringMultiMapVisitor(map).values(), data.values()) do
             h.assert_eq[U8 val](a, b)
         end
@@ -408,8 +408,8 @@ class iso BytesMapVisitorTest is UnitTest
         ]
         
         let map = collections.Map[String val, (Array[U8 val] ref | None val)]
-        map.insert("COMPRESSION", [as U8 val: 0x73; 0x6E; 0x61; 0x70; 0x70; 0x79])
-        map.insert("CQL_VERSION", [as U8 val: 0x33; 0x2E; 0x30; 0x2E; 0x30])
+        map.insert("COMPRESSION", [as U8 val: 0x73; 0x6E; 0x61; 0x70; 0x70; 0x79])?
+        map.insert("CQL_VERSION", [as U8 val: 0x33; 0x2E; 0x30; 0x2E; 0x30])?
         for (a, b) in Zip2[U8 val, U8 val](BytesMapVisitor(map).values(), data.values()) do
             h.assert_eq[U8 val](a, b)
         end

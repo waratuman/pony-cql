@@ -10,7 +10,7 @@ interface Parser[A]
 primitive ByteParser is Parser[U8 val]
 
     fun box apply(data: Seq[U8 val] ref): U8 val ? =>
-        data.shift()
+        data.shift()?
 
 
 primitive UIntParser is Parser[U32 val]
@@ -19,10 +19,10 @@ primitive UIntParser is Parser[U32 val]
     """
 
     fun box apply(data: Seq[U8 val] ref): U32 val ? =>
-        let a = data.shift().u32()
-        let b = data.shift().u32()
-        let c = data.shift().u32()
-        let d = data.shift().u32()
+        let a = data.shift()?.u32()
+        let b = data.shift()?.u32()
+        let c = data.shift()?.u32()
+        let d = data.shift()?.u32()
         (a << 24) or (b << 16) or (c << 8) or d
 
 
@@ -32,10 +32,10 @@ primitive IntParser is Parser[I32 val]
     """
 
     fun box apply(data: Seq[U8 val] ref): I32 val ? =>
-        let a = data.shift().i32()
-        let b = data.shift().i32()
-        let c = data.shift().i32()
-        let d = data.shift().i32()
+        let a = data.shift()?.i32()
+        let b = data.shift()?.i32()
+        let c = data.shift()?.i32()
+        let d = data.shift()?.i32()
         (a << 24) or (b << 16) or (c << 8) or d
 
 
@@ -45,14 +45,14 @@ primitive LongParser is Parser[I64 val]
     """
 
     fun box apply(data: Seq[U8 val] ref): I64 val ? =>
-        let a = data.shift().i64()
-        let b = data.shift().i64()
-        let c = data.shift().i64()
-        let d = data.shift().i64()
-        let e = data.shift().i64()
-        let f = data.shift().i64()
-        let g = data.shift().i64()
-        let h = data.shift().i64()
+        let a = data.shift()?.i64()
+        let b = data.shift()?.i64()
+        let c = data.shift()?.i64()
+        let d = data.shift()?.i64()
+        let e = data.shift()?.i64()
+        let f = data.shift()?.i64()
+        let g = data.shift()?.i64()
+        let h = data.shift()?.i64()
         (a << 56) or (b << 48) or (c << 40) or (d << 32) or (e << 24) or (f << 16) or (g << 8) or h
 
 
@@ -62,8 +62,8 @@ primitive ShortParser is Parser[U16 val]
     """
 
     fun box apply(data: Seq[U8 val] ref): U16 val ? =>
-        let a = data.shift().u16()
-        let b = data.shift().u16()
+        let a = data.shift()?.u16()
+        let b = data.shift()?.u16()
         ((a << 8) or b)
 
 
@@ -73,10 +73,10 @@ primitive StringParser is Parser[String ref]
     """
 
     fun box apply(data: Seq[U8 val] ref): String iso^ ? =>
-        var length = ShortParser(data).usize()
+        var length = ShortParser(data)?.usize()
         let result = recover iso String end
         while (length = length - 1) > 0 do
-            result.push(data.shift())
+            result.push(data.shift()?)
         end
         consume result
 
@@ -87,10 +87,10 @@ primitive LongStringParser is Parser[String]
     """
 
     fun box apply(data: Seq[U8 val] ref): String iso^ ? =>
-        var length = IntParser(data).usize()
+        var length = IntParser(data)?.usize()
         let result = recover iso String end
         while (length = length - 1) > 0 do
-            result.push(data.shift())
+            result.push(data.shift()?)
         end
         consume result
 
@@ -104,7 +104,7 @@ primitive UUIDParser is Parser[Array[U8 val]]
         let result = recover iso Array[U8 val] end
         var length: USize val = 16
         while (length = length - 1) > 0 do
-            result.push(data.shift())
+            result.push(data.shift()?)
         end
         consume result
 
@@ -116,9 +116,9 @@ primitive StringListParser is Parser[Array[String val]]
 
     fun box apply(data: Seq[U8 val] ref): Array[String val] iso^ ? =>
         let result = recover iso Array[String val] end
-        var length: U16 val = ShortParser(data)
+        var length: U16 val = ShortParser(data)?
         while (length = length - 1) > 0 do
-            result.push(StringParser(data))
+            result.push(StringParser(data)?)
         end
         consume result
 
@@ -130,14 +130,14 @@ primitive BytesParser is Parser[(Array[U8 val] | None)]
     """
 
     fun box apply(data: Seq[U8 val] ref): (Array[U8 val] iso^ | None) ? =>
-        var length = IntParser(data)
+        var length = IntParser(data)?
         if (length < 0) then
             return None
         end
 
         let result: Array[U8 val] iso = recover iso Array[U8 val] end
         while (length = length - 1) > 0 do
-            result.push(data.shift())
+            result.push(data.shift()?)
         end
         consume result
 
@@ -150,7 +150,7 @@ primitive ValueParser is Parser[(Array[U8 val] ref | None)]
     """
 
     fun box apply(data: Seq[U8 val] ref): (Array[U8 val] ref | None) ? =>
-        var length = IntParser(data)
+        var length = IntParser(data)?
         if (length < -2) then
             error
         elseif (length < 0) then
@@ -159,7 +159,7 @@ primitive ValueParser is Parser[(Array[U8 val] ref | None)]
 
         let result = Array[U8 val]
         while (length = length - 1) > 0 do
-            result.push(data.shift())
+            result.push(data.shift()?)
         end
         result
 
@@ -171,10 +171,10 @@ primitive ShortBytesParser is Parser[Array[U8 val] ref]
     """
 
     fun box apply(data: Seq[U8 val] ref): Array[U8 val] ref ? =>
-        var length = ShortParser(data)
+        var length = ShortParser(data)?
         let result = Array[U8 val]
         while (length = length - 1) > 0 do
-            result.push(data.shift())
+            result.push(data.shift()?)
         end
         result
 
@@ -188,16 +188,16 @@ primitive InetParser is Parser[Inet ref]
     """
 
     fun box apply(data: Seq[U8 val] ref): Inet ref ? =>
-        let size = ByteParser(data)
+        let size = ByteParser(data)?
         let host: (U32 val | U128 val) = if size == 4 then
-            UIntParser(data)
+            UIntParser(data)?
         elseif size == 16 then
-            (LongParser(data).u128() << 64) or LongParser(data).u128()
+            (LongParser(data)?.u128() << 64) or LongParser(data)?.u128()
         else
             error
         end
 
-        let port = UIntParser(data)
+        let port = UIntParser(data)?
         Inet(host, port)
 
 
@@ -209,11 +209,11 @@ primitive InetAddrParser is Parser[(U32 val | U128 val)]
     """
 
     fun box apply(data: Seq[U8 val] ref): (U32 val | U128 val) ? =>
-        let size = ByteParser(data)
+        let size = ByteParser(data)?
         if size == 4 then
-            UIntParser(data)
+            UIntParser(data)?
         elseif size == 16 then
-            (LongParser(data).u128() << 64) or LongParser(data).u128()
+            (LongParser(data)?.u128() << 64) or LongParser(data)?.u128()
         else
             error
         end
@@ -225,7 +225,7 @@ primitive ConsistencyParser is Parser[Consistency val]
     """
 
     fun box apply(data: Seq[U8 val] ref): Consistency val ? =>
-        match ShortParser(data)
+        match ShortParser(data)?
         | 0x0000 => AnyConsistency
         | 0x0001 => One
         | 0x0002 => Two
@@ -248,10 +248,10 @@ primitive StringMapParser is Parser[collections.Map[String val, String val]]
     """
     
     fun box apply(data: Seq[U8 val] ref): collections.Map[String val, String val] iso^ ? =>
-        var pairs = ShortParser(data)
+        var pairs = ShortParser(data)?
         let result = recover iso collections.Map[String val, String val](pairs.usize()) end
         while (pairs = pairs - 1) > 0 do
-            result.insert(StringParser(data), StringParser(data))
+            result.insert(StringParser(data)?, StringParser(data)?)?
         end
         consume result
 
@@ -263,10 +263,10 @@ primitive StringMultiMapParser is Parser[collections.Map[String val, Array[Strin
     """
 
     fun box apply(data: Seq[U8 val] ref): collections.Map[String val, Array[String val] ref] iso^ ? =>
-        var pairs = ShortParser(data)
+        var pairs = ShortParser(data)?
         let result = recover iso collections.Map[String val, Array[String val]](pairs.usize()) end
         while (pairs = pairs - 1) > 0 do
-            result.insert(StringParser(data), StringListParser(data))
+            result.insert(StringParser(data)?, StringListParser(data)?)?
         end
         consume result
 
@@ -278,9 +278,9 @@ primitive BytesMapParser is Parser[collections.Map[String box, (Array[U8 val] re
     """
     
     fun box apply(data: Seq[U8 val] ref): collections.Map[String box, (Array[U8 val] ref | None val)] iso^ ? =>
-        var pairs = ShortParser(data)
+        var pairs = ShortParser(data)?
         let result = recover iso collections.Map[String box, (Array[U8 val] ref | None val)](pairs.usize()) end
         while (pairs = pairs - 1) > 0 do
-            result.insert(StringParser(data), BytesParser(data))
+            result.insert(StringParser(data)?, BytesParser(data)?)?
         end
         consume result

@@ -32,11 +32,11 @@ class iso _TestQueryRequestCreate is UnitTest
             )
 
         h.assert_eq[String val](query, request.query as String)
-        h.assert_eq[Bool val](true, (request.binding as Array[QueryParameter val] val)(0) as Bool)
+        h.assert_eq[Bool val](true, (request.binding as Array[QueryParameter val] val)(0)? as Bool)
         h.assert_eq[Consistency val](Three, request.consistency)
         h.assert_eq[Bool val](false, request.metadata as Bool val)
         h.assert_eq[I32 val](10, request.page_size as I32 val)
-        h.assert_eq[U8 val](1, (request.paging_state as Array[U8 val] val)(0))
+        h.assert_eq[U8 val](1, (request.paging_state as Array[U8 val] val)(0)?)
         h.assert_eq[Consistency val](LocalSerial, request.serial_consistency as Consistency val)
         h.assert_eq[I64 val](0, request.timestamp as I64)
 

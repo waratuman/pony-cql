@@ -20,8 +20,8 @@ class iso _TestSupportedResponseCreate is UnitTest
     
     fun tag apply(h: TestHelper) ? =>
         var response = SupportedResponse(recover ["3.0.1"] end, recover ["lzo"] end)
-        h.assert_eq[String val]("3.0.1", response.cql_version(0))
-        h.assert_eq[String val]("lzo", response.compression(0))
+        h.assert_eq[String val]("3.0.1", response.cql_version(0)?)
+        h.assert_eq[String val]("lzo", response.compression(0)?)
 
 
 class iso _TestSupportedResponseString is UnitTest

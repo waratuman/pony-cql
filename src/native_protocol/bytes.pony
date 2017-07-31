@@ -48,33 +48,33 @@ primitive Bytes
         end
 
     fun val i8(data: Array[U8 val] box): I8 val ? =>
-        data(0).i8()
+        data(0)?.i8()
 
     fun val u8(data: Array[U8 val] box): U8 val ? =>
-        data(0).u8()
+        data(0)?.u8()
 
     fun val i16(data: Array[U8 val] box): I16 val ? =>
-        let a = data(0).i16()
-        let b = data(1).i16()
+        let a = data(0)?.i16()
+        let b = data(1)?.i16()
         ((a << 8) or b)
     
     fun val u16(data: Array[U8 val] box): U16 val ? =>
-        let a = data(0).u16()
-        let b = data(1).u16()
+        let a = data(0)?.u16()
+        let b = data(1)?.u16()
         ((a << 8) or b)
 
     fun val i32(data: Array[U8 val] box): I32 val ? =>
-        let a = data(0).i32()
-        let b = data(1).i32()
-        let c = data(2).i32()
-        let d = data(3).i32()
+        let a = data(0)?.i32()
+        let b = data(1)?.i32()
+        let c = data(2)?.i32()
+        let d = data(3)?.i32()
         (a << 24) or (b << 16) or (c << 8) or d
 
     fun val u32(data: Array[U8 val] box): U32 val ? =>
-        let a = data(0).u32()
-        let b = data(1).u32()
-        let c = data(2).u32()
-        let d = data(3).u32()
+        let a = data(0)?.u32()
+        let b = data(1)?.u32()
+        let c = data(2)?.u32()
+        let d = data(3)?.u32()
         (a << 24) or (b << 16) or (c << 8) or d
 
     fun val from_hex_string(data: String box): Array[U8 val] iso^ ? => 
@@ -83,8 +83,8 @@ primitive Bytes
         var value: U8 val = 0
 
         while index < (data.size() - 1) do
-            var msb = _hexValue(data(index))
-            var lsb = _hexValue(data(index - 1))
+            var msb = _hexValue(data(index)?)?
+            var lsb = _hexValue(data(index + 1)?)?
 
             result.push((msb << 4) or lsb)
             index = index + 2

@@ -25,7 +25,7 @@ class iso AuthenticateResponseParserTest is UnitTest
             0x6F; 0x72; 0x64; 0x41; 0x75; 0x74; 0x68; 0x65; 0x6E; 0x74; 0x69
             0x63; 0x61; 0x74; 0x6F; 0x72
         ]
-        var response = AuthenticateResponseParser(data)
+        var response = AuthenticateResponseParser(data)?
 
         h.assert_eq[String val](
             "org.apache.cassandra.auth.PasswordAuthenticator",

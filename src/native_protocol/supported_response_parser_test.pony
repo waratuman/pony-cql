@@ -25,7 +25,7 @@ class iso SupportedResponseParserTest is UnitTest
             0x51; 0x4C; 0x5F; 0x56; 0x45; 0x52; 0x53; 0x49; 0x4F; 0x4E; 0x00
             0x01; 0x00; 0x05; 0x33; 0x2E; 0x30; 0x2E; 0x30
         ]
-        let response: SupportedResponse ref = SupportedResponseParser(data)
-        h.assert_eq[String val]("3.0.0", response.cql_version(0))
-        h.assert_eq[String val]("snappy", response.compression(0))
-        h.assert_eq[String val]("lzo", response.compression(1))
+        let response: SupportedResponse ref = SupportedResponseParser(data)?
+        h.assert_eq[String val]("3.0.0", response.cql_version(0)?)
+        h.assert_eq[String val]("snappy", response.compression(0)?)
+        h.assert_eq[String val]("lzo", response.compression(1)?)

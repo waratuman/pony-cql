@@ -20,4 +20,4 @@ class iso _TestResultResponseString is UnitTest
 
     fun tag apply(h: TestHelper) =>
         let response = VoidResultResponse.create()
-        h.assert_eq[String val]("RESULT VOID", response.string())
+        h.assert_eq[String val]("RESULT: VOID", response.string())

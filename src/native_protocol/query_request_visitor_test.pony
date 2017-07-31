@@ -57,7 +57,7 @@ class iso QueryRequestVisitorTest is UnitTest
         let date: Date val = recover Date(0) end
         let f64: F64 val = 64.64
         let f32: F32 val = 32.32
-        let net_address = DNS((h.env.root as AmbientAuth), "192.0.2.235", "80")(0)
+        let net_address = DNS((h.env.root as AmbientAuth), "192.0.2.235", "80")(0)?
         let i32: I32 val = 32
         let i16: I16 val = 16
         let time: Time val = recover Time.civil(12, 15, 42) end
@@ -65,18 +65,18 @@ class iso QueryRequestVisitorTest is UnitTest
         let list: Seq[cql.NativeType val] val = recover [as cql.NativeType: none; ascii; i64; blob; bool; date; f64; f32; net_address; i32; i16; time; i8] end
         let map: cql.MapType val = recover
             let map = collections.Map[String val, cql.NativeType val]()
-            map.insert("null", none)
-            map.insert("ascii", ascii)
-            map.insert("bigint", i64)
-            map.insert("blob", blob)
-            map.insert("date", date)
-            map.insert("f64", f64)
-            map.insert("f32", f32)
-            map.insert("net_address", net_address)
-            map.insert("i32", i32)
-            map.insert("i16", i16)
-            map.insert("time", time)
-            map.insert("i8", i8)
+            map.insert("null", none)?
+            map.insert("ascii", ascii)?
+            map.insert("bigint", i64)?
+            map.insert("blob", blob)?
+            map.insert("date", date)?
+            map.insert("f64", f64)?
+            map.insert("f32", f32)?
+            map.insert("net_address", net_address)?
+            map.insert("i32", i32)?
+            map.insert("i16", i16)?
+            map.insert("time", time)?
+            map.insert("i8", i8)?
             map
         end
         let set: cql.SetType val = recover
@@ -181,11 +181,11 @@ class iso QueryRequestParameterVisitorTest is UnitTest
         result = recover QueryRequestParameterVisitor(float) end
         h.assert_eq[String val]("000000047F7FFFFF", Bytes.to_hex_string(result))
         
-        var net_address = DNS((h.env.root as AmbientAuth), "192.0.2.235", "80")(0)
+        var net_address = DNS((h.env.root as AmbientAuth), "192.0.2.235", "80")(0)?
         result = recover QueryRequestParameterVisitor(net_address) end
         h.assert_eq[String val]("00000004C00002EB", Bytes.to_hex_string(result))
 
-        net_address = DNS((h.env.root as AmbientAuth), "2001:0db8:85a3:0000:0000:8a2e:0370:7334", "80")(0)
+        net_address = DNS((h.env.root as AmbientAuth), "2001:0db8:85a3:0000:0000:8a2e:0370:7334", "80")(0)?
         result = recover QueryRequestParameterVisitor(net_address) end
         h.assert_eq[String val]("00000010B80D01200000A3852E8A000034737003", Bytes.to_hex_string(result))
 

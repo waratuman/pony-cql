@@ -4,7 +4,11 @@ primitive StartupRequestVisitor is Visitor[StartupRequest val]
         let compression = req.compression
         let cql_version = req.cql_version
     
-        let pairs: U16 = if compression is None then 1 else 2 end
+        let pairs: U16 = if compression is None then
+            1
+        else
+            2
+        end
 
         ShortVisitor(pairs, c)
 

@@ -23,7 +23,7 @@ class iso FrameParserTest is UnitTest
             0x00; 0x0B; 0x43; 0x51; 0x4C; 0x5F; 0x56; 0x45; 0x52; 0x53; 0x49
             0x4F; 0x4E; 0x00; 0x05; 0x33; 0x2E; 0x30; 0x2E; 0x30
         ]
-        var frame = FrameParser(data)
+        var frame = FrameParser(data)?
 
         h.assert_eq[U8](4, frame.version)
         h.assert_eq[U8](0, frame.flags)
@@ -38,7 +38,7 @@ class iso FrameParserTest is UnitTest
             0x04; 0x00; 0x00; 0x01; 0x0F; 0x00; 0x00; 0x00; 0x04; 0xFF; 0xFF
             0xFF; 0xFF
         ]
-        frame = FrameParser(data)
+        frame = FrameParser(data)?
         
         h.assert_eq[U8](4, frame.version)
         h.assert_eq[U8](0, frame.flags)

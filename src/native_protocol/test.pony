@@ -20,6 +20,3 @@ actor Main is TestList
     
         // Not refactored:
         BytesTestList.make().tests(test)
-        
-        RequestTestList.make().tests(test)
-        ResponseTestList.make().tests(test)
