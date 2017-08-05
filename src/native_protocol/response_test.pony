@@ -14,5 +14,3 @@ actor ResponseTestList is TestList
         ReadyResponseTestList.make().tests(test)
         SupportedResponseTestList.make().tests(test)
         ResultResponseTestList.make().tests(test)
-
-

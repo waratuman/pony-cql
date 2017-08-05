@@ -117,7 +117,6 @@ actor Client is FrameNotifiee
 
     be received(conn: TCPConnection tag, frame: Frame val) =>
         _log(Info, "<- " + frame.body.string())
-
         match frame.body
         | let m: ReadyResponse val => _ready(m)
         | let m: AuthenticateResponse val => _authenticate(m)

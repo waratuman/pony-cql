@@ -15,7 +15,7 @@ primitive FrameParser is Parser[Frame]
         | 0x05 => OptionsRequestParser(data)
         | 0x06 => SupportedResponseParser(data)?
         | 0x07 => QueryRequestParser(data)?
-        // | 0x08 => ResultResponseParser(data)
+        | 0x08 => ResultResponseParser(data)?
         // | 0x09 => PrepareRequestParser(data)
         // | 0x0A => ExecuteRequestParser(data)
         // | 0x0B => RegisterRequestParser(data)

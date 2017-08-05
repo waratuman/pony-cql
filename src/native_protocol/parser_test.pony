@@ -23,6 +23,7 @@ actor ParserTestList is TestList
         ReadyResponseParserTestList.make().tests(test)
         StartupRequestParserTestList.make().tests(test)
         SupportedResponseParserTestList.make().tests(test)
+        ResultResponseParserTestList.make().tests(test)
 
         test(ByteParserTest)
         test(UIntParserTest)
@@ -36,8 +37,8 @@ actor ParserTestList is TestList
         test(BytesParserTest)
         test(ValueParserTest)
         test(ShortBytesParserTest)
-        test(OptionParser)
-        test(OptionListParser)
+        test(OptionParserTest)
+        test(OptionListParserTest)
         test(InetParserTest)
         test(InetAddrParserTest)
         test(ConsistencyParserTest)
@@ -235,7 +236,7 @@ class iso ShortBytesParserTest is UnitTest
         h.assert_eq[USize val](0, data.size())
 
 
-class iso OptionParser is UnitTest
+class iso OptionParserTest is UnitTest
 
     fun name(): String =>
         "OptionParser.apply"
@@ -244,7 +245,7 @@ class iso OptionParser is UnitTest
         h.fail()
 
 
-class iso OptionListParser is UnitTest
+class iso OptionListParserTest is UnitTest
 
     fun name(): String =>
         "OptionListParser.apply"

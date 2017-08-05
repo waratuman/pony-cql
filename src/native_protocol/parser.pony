@@ -179,6 +179,21 @@ primitive ShortBytesParser is Parser[Array[U8 val] ref]
         result
 
 
+primitive OptionParser is Parser[(U16 val, (Array[U8 val] ref | None))]
+    """
+    A pair of <id><value> where <id> is a short representing
+    the option id and <value> depends on that option (and can be
+    of size 0). The supported id (and the corresponding <value>)
+    will be described when this is used.
+    """
+
+    fun box apply(data: Seq[U8 val] ref): (U16 val, (Array[U8 val] ref | None)) ? =>
+        let id = ShortParser(data)?
+        let value = None
+
+        (id, value)
+
+
 primitive InetParser is Parser[Inet ref]
     """
     An address (ip and port) to a node. It consists of one byte, n, that

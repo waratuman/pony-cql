@@ -2,7 +2,6 @@ use "net"
 use "ponytest"
 use "chrono"
 use "itertools"
-use "debug"
 
 use cql = "../cql"
 use collections = "collections"

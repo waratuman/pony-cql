@@ -1,6 +1,7 @@
 use "net"
 use "logger"
 
+
 class FrameNotify is TCPConnectionNotify
 
     let _notify: FrameNotifiee tag
@@ -42,7 +43,11 @@ class FrameNotify is TCPConnectionNotify
     fun ref received(conn: TCPConnection ref, data: Array[U8 val] iso, times: USize val): Bool val =>    
         match _header = None
         | let h: Array[U8 val] iso =>
-            h.append(consume data)
+            let data2 = recover iso
+                let y: Array[U8 val] ref = consume data
+                y
+            end
+            h.append(consume data2)
             try
                 _received_frame(conn, consume h)?
             else

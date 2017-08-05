@@ -91,3 +91,5 @@ class Inet is Equatable[Inet]
 
     fun box eq(that: Inet box): Bool val =>
         (host.i128() == that.host.i128()) and (port == that.port)
+
+

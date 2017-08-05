@@ -1,4 +1,5 @@
 use "ponytest"
+use cql = "../cql"
 
 
 actor ResultResponseTestList is TestList
@@ -10,14 +11,29 @@ actor ResultResponseTestList is TestList
         None
 
     fun tag tests(test: PonyTest) =>
-        test(_TestResultResponseString)
+        test(_TestVoidResultResponseString)
+        test(_TestRowsResultResponseString)
 
 
-class iso _TestResultResponseString is UnitTest
+class iso _TestVoidResultResponseString is UnitTest
 
     fun name(): String val =>
-        "ResultResponse.string"
+        "VoidResultResponse.string"
 
     fun tag apply(h: TestHelper) =>
-        let response = VoidResultResponse.create()
-        h.assert_eq[String val]("RESULT: VOID", response.string())
+        let response = VoidResultResponse
+        h.assert_eq[String val]("VOID RESULT", response.string())
+
+
+class iso _TestRowsResultResponseString is UnitTest
+
+    fun name(): String val =>
+        "RowsResultResponse.string"
+
+    fun tag apply(h: TestHelper) =>
+        let rows = recover iso
+            [[ as cql.Type: None]]
+        end
+        let response = RowsResultResponse(consume rows)
+        h.assert_eq[String val]("ROW RESULTS", response.string())
+
