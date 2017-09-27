@@ -29,6 +29,6 @@ class iso AuthenticateResponseVisitorTest is UnitTest
             0x6F; 0x72; 0x64; 0x41; 0x75; 0x74; 0x68; 0x65; 0x6E; 0x74; 0x69
             0x63; 0x61; 0x74; 0x6F; 0x72
         ]
-        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
             h.assert_eq[U8](a, b)
         end

@@ -13,15 +13,15 @@ class ref SupportedResponse is Stringable
         output.append("SUPPORTED {")
 
         if compression.size() > 0 then
-            output.append(" \"COMPRESSION\": [\"" + "\", \"".join(compression) + "\"],")
+            output.append(" \"COMPRESSION\": [\"" + "\", \"".join(compression.values()) + "\"],")
         else
-            output.append(" \"COMPRESSION\": [" + "\", \"".join(compression) + "],")
+            output.append(" \"COMPRESSION\": [" + "\", \"".join(compression.values()) + "],")
         end
         
         if cql_version.size() > 0 then
-            output.append(" \"CQL_VERSION\": [\"" + "\", \"".join(cql_version) + "\"]")
+            output.append(" \"CQL_VERSION\": [\"" + "\", \"".join(cql_version.values()) + "\"]")
         else
-            output.append(" \"CQL_VERSION\": [" + "\", \"".join(cql_version) + "]")
+            output.append(" \"CQL_VERSION\": [" + "\", \"".join(cql_version.values()) + "]")
         end
                 
         output.append(" }")

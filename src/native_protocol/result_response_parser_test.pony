@@ -20,7 +20,7 @@ class iso _TestResultResponseParser is UnitTest
         "ResultResponseParser.apply"
 
     fun tag apply(h: TestHelper) =>
-        None
+        h.fail()
 
 
 class iso _TestVoidResultResponseParser is UnitTest
@@ -43,6 +43,6 @@ class iso _TestRowsResultResponseParser is UnitTest
     
     fun tag apply(h: TestHelper) =>
         let data = [as U8:
-            
+            0
         ]
         h.fail()

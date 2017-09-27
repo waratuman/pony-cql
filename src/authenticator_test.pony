@@ -37,7 +37,7 @@ class iso _TestAuthenticatorToken is UnitTest
                 0x00; 0x75; 0x73; 0x65; 0x72; 0x6E; 0x61; 0x6D; 0x65
                 0x00; 0x70; 0x61; 0x73; 0x73; 0x77; 0x6F; 0x72; 0x64
             ]
-            for (a, b) in Zip2[U8, U8](data.values(), t.values()) do
+            for (a, b) in Iter[U8 val](data.values()).zip[U8 val](t.values()) do
                 h.assert_eq[U8](a, b)
             end
         else h.fail()

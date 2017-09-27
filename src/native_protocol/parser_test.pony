@@ -139,7 +139,7 @@ class iso UUIDParserTest is UnitTest
             0x00; 0x01; 0x02; 0x03; 0x04; 0x05; 0x06; 0x07
             0x08; 0x09; 0x0A; 0x0B; 0x0C; 0x0D; 0x0E; 0x0F
         ]
-        for (a, b) in Zip2[U8 val, U8 val](data.values(), UUIDParser(data)?.values()) do
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](UUIDParser(data)?.values()) do
             h.assert_eq[U8 val](a, b)
         end
         h.assert_eq[USize val](0, data.size())
@@ -159,7 +159,7 @@ class iso StringListParserTest is UnitTest
 
         let expected: Array[String val] val = recover ["cassandra"; "cassandra"] end
         let results: Array[String val] ref = StringListParser(data)?
-        for (a, b) in Zip2[String box, String box](expected.values(), results.values()) do
+        for (a, b) in Iter[String box](expected.values()).zip[String box](results.values()) do
             h.assert_eq[String box](a, b)
         end
         h.assert_eq[USize val](0, data.size())
@@ -174,7 +174,7 @@ class iso BytesParserTest is UnitTest
         var data = [as U8: 0x00; 0x00; 0x00; 0x01; 0x02; 0x03]
         match BytesParser(data)?
         | let v: Array[U8 val] ref =>
-            for (a, b) in Zip2[U8 val, U8 val]([as U8: 2; 3].values(), v.values()) do
+            for (a, b) in Iter[U8 val]([as U8: 2; 3].values()).zip[U8 val](v.values()) do
                 h.assert_eq[U8 val](a, b)
             end
         else
@@ -226,7 +226,7 @@ class iso ShortBytesParserTest is UnitTest
 
     fun tag apply(h: TestHelper) ? =>
         var data = [as U8: 0x00; 0x01; 0x02; 0x03]
-        for (a, b) in Zip2[U8 val, U8 val]([as U8: 2; 3].values(), ShortBytesParser(data)?.values()) do
+        for (a, b) in Iter[U8 val]([as U8: 2; 3].values()).zip[U8 val](ShortBytesParser(data)?.values()) do
             h.assert_eq[U8 val](a, b)
         end
         h.assert_eq[USize val](1, data.size())
@@ -411,12 +411,12 @@ class iso BytesMapParserTest is UnitTest
         else Array[U8 val]
         end
 
-        for (a, b) in Zip2[U8 val, U8 val](x.values(), y.values()) do
+        for (a, b) in Iter[U8 val](x.values()).zip[U8 val](y.values()) do
             h.assert_eq[U8 val](a, b)
         end
         
         x = [as U8: 0x33; 0x2E; 0x30; 0x2E; 0x30]
         y = (map("CQL_VERSION")? as Array[U8 val] ref)
-        for (a, b) in Zip2[U8 val, U8 val](x.values(), y.values()) do
+        for (a, b) in Iter[U8 val](x.values()).zip[U8 val](y.values()) do
             h.assert_eq[U8 val](a, b)
         end

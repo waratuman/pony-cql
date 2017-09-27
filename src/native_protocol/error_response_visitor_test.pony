@@ -23,6 +23,6 @@ class iso ErrorResponseVisitorTest is UnitTest
             0x00; 0x00; 0x00; 0x00; 0x00; 0x0C; 0x53; 0x65; 0x72; 0x76; 0x65
             0x72; 0x20; 0x65; 0x72; 0x72; 0x6F; 0x72
         ]
-        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
             h.assert_eq[U8](a, b)
         end

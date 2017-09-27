@@ -99,7 +99,7 @@ actor TestServerConnection is FrameNotifiee
             match (message.token, a.token())
             | (let t1: Array[U8 val] val, let t2: Array[U8 val] val) =>
                 var passed: Bool val = t1.size() == t2.size()
-                for (x, y) in Zip2[U8 val, U8 val](t1.values(), t2.values()) do
+                for (x, y) in Iter[U8 val](t1.values()).zip[U8 val](t2.values()) do
                     if (x == y) then
                         passed = true and passed
                     else

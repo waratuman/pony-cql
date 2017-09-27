@@ -20,6 +20,6 @@ class iso OptionsRequestVisitorTest is UnitTest
         let request: OptionsRequest val = OptionsRequest
         let result: Array[U8 val] val = recover OptionsRequestVisitor(request) end
         let data = Array[U8 val]
-        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
             h.assert_eq[U8](a, b)
         end

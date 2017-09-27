@@ -104,7 +104,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[USize val](16, params.size())
         h.assert_eq[None val](none, params(0)? as None val)
         h.assert_eq[String val](String.from_array(params(1)? as Array[U8 val] val), ascii)
-        for (a, b) in Zip2[U8 val, U8 val]((params(15)? as Array[U8 val] val).values(), (recover [i8.u8()] end).values()) do
+        for (a, b) in Iter[U8 val]((params(15)? as Array[U8 val] val).values()).zip[U8 val]((recover [i8.u8()] end).values()) do
             h.assert_eq[U8 val](a, b)
         end
         
@@ -152,7 +152,7 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Consistency val](request.consistency, Quorum)
         h.assert_eq[Bool val](true, request.metadata)
         h.assert_eq[Bool val](true, request.page_size is None)
-        for (a, b) in Zip2[U8 val, U8 val]((request.paging_state as Array[U8 val] val).values(), (recover [as U8: 1; 2; 3; 4] end).values()) do
+        for (a, b) in Iter[U8 val]((request.paging_state as Array[U8 val] val).values()).zip[U8 val]((recover [as U8: 1; 2; 3; 4] end).values()) do
             h.assert_eq[U8 val](a, b)
         end
         h.assert_eq[Bool val](true, request.serial_consistency is None)

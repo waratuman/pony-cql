@@ -9,6 +9,8 @@ type ResultResponse is
     )
 
 
+
+
 class iso VoidResultResponse is Stringable
 
     new iso create() =>

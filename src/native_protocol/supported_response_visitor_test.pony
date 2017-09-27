@@ -1,5 +1,6 @@
-use "ponytest"
 use "itertools"
+use "ponytest"
+
 
 actor SupportedResponseVisitorTestList is TestList
 
@@ -28,6 +29,7 @@ class iso SupportedResponseVisitorTest is UnitTest
             0x51; 0x4C; 0x5F; 0x56; 0x45; 0x52; 0x53; 0x49; 0x4F; 0x4E; 0x00
             0x01; 0x00; 0x05; 0x33; 0x2E; 0x30; 0x2E; 0x30
         ]
-        for (a, b) in Zip2[U8, U8](data.values(), result.values()) do
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
             h.assert_eq[U8](a, b)
         end
+        h.assert_eq[USize](data.size(), result.size())
