@@ -2,7 +2,7 @@
   "deps": [
     {
       "type": "github",
-      "repo": "waratuman/pony-cql"
+      "repo": "waratuman/pony-chrono"
     }
   ]
 }
