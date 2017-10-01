@@ -46,7 +46,7 @@ class RowsResultResponseParser is Parser[RowsResultResponse]
             true
         end
 
-        let column_types = Array[(String val, String val, String val, U16 val)]
+        let column_types = recover iso Array[(String val, String val, String val, U16 val)] end
         var i: USize val = 0
         if metadata then            
             while i < columns_count do
@@ -93,7 +93,7 @@ class RowsResultResponseParser is Parser[RowsResultResponse]
             i = i - 1
         end
 
-        RowsResultResponse(consume rows_content)
+        RowsResultResponse(consume column_types, consume rows_content)
 
 
 

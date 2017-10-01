@@ -37,7 +37,7 @@ actor VisitorTestList is TestList
         test(BytesVisitorTest)
         test(ValueVisitorTest)
         test(ShortBytesVisitorTest)
-        test(OptionVisitor)
+        test(OptionVisitorTest)
         test(OptionListVisitor)
         test(InetVisitorTest)
         test(InetAddrVisitorTest)
@@ -219,7 +219,7 @@ class iso ShortBytesVisitorTest is UnitTest
         end
 
 
-class iso OptionVisitor is UnitTest
+class iso OptionVisitorTest is UnitTest
 
     fun name(): String =>
         "OptionVisitor.apply"

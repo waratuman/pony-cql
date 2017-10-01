@@ -32,12 +32,18 @@ class iso _TestResultResponseVisitor is UnitTest
         end
         h.assert_eq[USize](expected.size(), actual.size())
 
+        let columns: Array[(String val, String val, String val, U16 val)] iso = recover
+            [("keyspace", "table", "column", 0x0009)]
+        end
         let rows: Array[Array[cql.Type val]] iso = recover
             [ [ as cql.Type: None ] ]
         end
-        r = RowsResultResponse(consume rows)
+        h.env.out.print(columns.size().string())
+        r = RowsResultResponse(consume columns, consume rows)
         actual = ResultResponseVisitor(r)
-        expected = [ as U8: 0 ]
+        expected = [ as U8: 0x00; 0x00; 0x00; 0x02; 0x00; 0x00; 0x00; 0x01; 0x00; 0x00; 0x00; 0x01 ]
+        h.env.out.print(Bytes.to_hex_string(actual))
+        
         for (a, b) in Iter[U8 val](expected.values()).zip[U8 val](actual.values()) do
             h.assert_eq[U8](a, b)
         end

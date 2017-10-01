@@ -23,9 +23,17 @@ class iso VoidResultResponse is Stringable
 class iso RowsResultResponse is Stringable
 
     let rows: Array[Array[cql.Type val]] iso
+    let columns: Array[(String val, String val, String val, U16 val)] iso
+    let paging_state: (Array[U8 val] iso | None)
 
-    new iso create(rows': Array[Array[cql.Type val]] iso) =>
+    new iso create(
+        columns': Array[(String val, String val, String val, U16 val)] iso,
+        rows': Array[Array[cql.Type val]] iso
+        )
+    =>
         rows = consume rows'
+        columns = consume columns'
+        paging_state = None
     
     fun box string(): String iso^ =>
         "ROW RESULTS".string()

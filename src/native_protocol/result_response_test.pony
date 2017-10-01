@@ -31,9 +31,12 @@ class iso _TestRowsResultResponseString is UnitTest
         "RowsResultResponse.string"
 
     fun tag apply(h: TestHelper) =>
+        let columns: Array[(String val, String val, String val, U16 val)] iso = recover iso
+            [("keyspace", "table", "column", 0x0009)]
+        end
         let rows = recover iso
             [[ as cql.Type: None]]
         end
-        let response = RowsResultResponse(consume rows)
+        let response = RowsResultResponse(consume columns, consume rows)
         h.assert_eq[String val]("ROW RESULTS", response.string())
 
