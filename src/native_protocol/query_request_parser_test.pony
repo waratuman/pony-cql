@@ -152,8 +152,8 @@ class iso QueryRequestParserTest is UnitTest
         h.assert_eq[Consistency val](request.consistency, Quorum)
         h.assert_eq[Bool val](true, request.metadata)
         h.assert_eq[Bool val](true, request.page_size is None)
-        for (a, b) in Iter[U8 val]((request.paging_state as Array[U8 val] val).values()).zip[U8 val]((recover [as U8: 1; 2; 3; 4] end).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val]((request.paging_state as Array[U8 val] val).values()).zip[U8 val]((recover [as U8: 1; 2; 3; 4] end).values()) do
+            h.assert_eq[U8 val](c, d)
         end
         h.assert_eq[Bool val](true, request.serial_consistency is None)
         h.assert_eq[Bool val](true, request.timestamp is None)

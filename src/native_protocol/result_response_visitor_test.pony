@@ -39,13 +39,17 @@ class iso _TestResultResponseVisitor is UnitTest
             [ [ as cql.Type: None ] ]
         end
         h.env.out.print(columns.size().string())
-        r = RowsResultResponse(consume columns, consume rows)
+        var r2 : RowsResultResponse val = RowsResultResponse(consume columns, consume rows)
+        r = r2
         actual = ResultResponseVisitor(r)
         expected = [ as U8: 0x00; 0x00; 0x00; 0x02; 0x00; 0x00; 0x00; 0x01; 0x00; 0x00; 0x00; 0x01 ]
+        h.env.out.print(r2.columns.size().string())
+        h.env.out.print(r2.rows.size().string())
+        h.env.out.print(Bytes.to_hex_string(expected))
         h.env.out.print(Bytes.to_hex_string(actual))
         
-        for (a, b) in Iter[U8 val](expected.values()).zip[U8 val](actual.values()) do
-            h.assert_eq[U8](a, b)
+        for (c, d) in Iter[U8 val](expected.values()).zip[U8 val](actual.values()) do
+            h.assert_eq[U8](c, d)
         end
         h.assert_eq[USize](expected.size(), actual.size())
         

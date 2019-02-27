@@ -39,6 +39,6 @@ class iso FrameVisitorTest is UnitTest
             0x04; 0x00; 0x00; 0x00; 0x0F; 0x00; 0x00; 0x00; 0x06; 0x00; 0x00
             0x00; 0x02; 0xAB; 0xCD
         ]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
-            h.assert_eq[U8](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
+            h.assert_eq[U8](c, d)
         end

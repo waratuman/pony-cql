@@ -92,6 +92,7 @@ primitive RowsResultResponseVisitor is Visitor[RowsResultResponse]
                 StringVisitor(col._2, c)
             end
             StringVisitor(col._3, c)
+            // ShortVisitor(col._4, c)
             // visit the option type
         end
 

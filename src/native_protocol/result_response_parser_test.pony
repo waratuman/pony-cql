@@ -32,7 +32,6 @@ class iso _TestVoidResultResponseParser is UnitTest
         let response = VoidResultResponseParser([as U8: 0])
         match response
         | let x: VoidResultResponse iso! => None
-        else h.fail()
         end
 
 
@@ -42,7 +41,5 @@ class iso _TestRowsResultResponseParser is UnitTest
         "RowResultResponseParser.apply"
     
     fun tag apply(h: TestHelper) =>
-        let data = [as U8:
-            0
-        ]
+        let data = [as U8: 0]
         h.fail()

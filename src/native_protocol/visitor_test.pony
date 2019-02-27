@@ -180,8 +180,8 @@ class iso BytesVisitorTest is UnitTest
         end
     
         data = [as U8: 0xFF; 0xFF; 0xFF; 0xFF]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](BytesVisitor(None).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](BytesVisitor(None).values()) do
+            h.assert_eq[U8 val](c, d)
         end
 
 
@@ -197,8 +197,8 @@ class iso ValueVisitorTest is UnitTest
         end
         
         data = [as U8: 0x00; 0x00; 0x00; 0x01; 0x01]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ValueVisitor([as U8: 1]).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](ValueVisitor([as U8: 1]).values()) do
+            h.assert_eq[U8 val](c, d)
         end
 
 
@@ -214,8 +214,8 @@ class iso ShortBytesVisitorTest is UnitTest
         end
 
         data = [as U8: 0x00; 0x00]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ShortBytesVisitor(Array[U8 val]).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](ShortBytesVisitor(Array[U8 val]).values()) do
+            h.assert_eq[U8 val](c, d)
         end
 
 
@@ -260,8 +260,8 @@ class iso InetVisitorTest is UnitTest
             0x00; 0x00; 0x15; 0x38
         ]
         let ipv6: U128 = 1
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](InetVisitor(Inet.create(ipv6, 5432)).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](InetVisitor(Inet.create(ipv6, 5432)).values()) do
+            h.assert_eq[U8 val](c, d)
         end
 
 
@@ -284,8 +284,8 @@ class iso InetAddrVisitorTest is UnitTest
             0x00; 0x00; 0x00; 0x01
         ]
         let ipv6: U128 = 1
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](InetAddrVisitor(ipv6).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](InetAddrVisitor(ipv6).values()) do
+            h.assert_eq[U8 val](c, d)
         end
 
 
@@ -296,58 +296,58 @@ class iso ConsistencyVisitorTest is UnitTest
     
     fun tag apply(h: TestHelper) =>
         var data = [as U8: 0x00; 0x00]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(AnyConsistency).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a1, b1) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(AnyConsistency).values()) do
+            h.assert_eq[U8 val](a1, b1)
         end
 
         data = [as U8: 0x00; 0x01]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(One).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a2, b2) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(One).values()) do
+            h.assert_eq[U8 val](a2, b2)
         end
 
         data = [as U8: 0x00; 0x02]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Two).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a3, b3) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Two).values()) do
+            h.assert_eq[U8 val](a3, b3)
         end
 
         data = [as U8: 0x00; 0x03]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Three).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a4, b4) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Three).values()) do
+            h.assert_eq[U8 val](a4, b4)
         end
 
         data = [as U8: 0x00; 0x04]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Quorum).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a5, b5) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Quorum).values()) do
+            h.assert_eq[U8 val](a5, b5)
         end
 
         data = [as U8: 0x00; 0x05]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(All).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a6, b6) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(All).values()) do
+            h.assert_eq[U8 val](a6, b6)
         end
 
         data = [as U8: 0x00; 0x06]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(LocalQuorum).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a7, b7) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(LocalQuorum).values()) do
+            h.assert_eq[U8 val](a7, b7)
         end
 
         data = [as U8: 0x00; 0x07]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(EachQuorum).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a8, b8) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(EachQuorum).values()) do
+            h.assert_eq[U8 val](a8, b8)
         end
 
         data = [as U8: 0x00; 0x08]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Serial).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a9, b9) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(Serial).values()) do
+            h.assert_eq[U8 val](a9, b9)
         end
 
         data = [as U8: 0x00; 0x09]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(LocalSerial).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a10, b10) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(LocalSerial).values()) do
+            h.assert_eq[U8 val](a10, b10)
         end
 
         data = [as U8: 0x00; 0x0A]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(LocalOne).values()) do
-            h.assert_eq[U8 val](a, b)
+        for (a11, b11) in Iter[U8 val](data.values()).zip[U8 val](ConsistencyVisitor(LocalOne).values()) do
+            h.assert_eq[U8 val](a11, b11)
         end
 
 

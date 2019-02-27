@@ -417,6 +417,6 @@ class iso BytesMapParserTest is UnitTest
         
         x = [as U8: 0x33; 0x2E; 0x30; 0x2E; 0x30]
         y = (map("CQL_VERSION")? as Array[U8 val] ref)
-        for (a, b) in Iter[U8 val](x.values()).zip[U8 val](y.values()) do
-            h.assert_eq[U8 val](a, b)
+        for (c, d) in Iter[U8 val](x.values()).zip[U8 val](y.values()) do
+            h.assert_eq[U8 val](c, d)
         end

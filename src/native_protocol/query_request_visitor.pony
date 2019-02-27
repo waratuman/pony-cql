@@ -64,237 +64,217 @@ primitive QueryRequestParameterVisitor is Visitor[QueryParameter]
         visit(param, c)
         c
     
-    fun visit(value: None val, c: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
-        IntVisitor(-1, c)
-        c
-
-    fun visit(value: String val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let v = value.array()
-        IntVisitor(value.size().i32(), c)
-        for byte in value.values() do
-            c.push(byte)
-        end
-        c
-    
-    fun visit(value: U64 val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(8, c)
-        c.push((value >> 56).u8())
-        c.push((value >> 48).u8())
-        c.push((value >> 40).u8())
-        c.push((value >> 32).u8())
-        c.push((value >> 24).u8())
-        c.push((value >> 16).u8())
-        c.push((value >> 8).u8())
-        c.push(value.u8())
-        c
-    
-    fun visit(value: F64 val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visit(value.bits(), c)
-        c
-    
-    fun visit(value: I64 val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visit(value.u64(), c)
-        c
-    
-    fun visit(value: Array[U8 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(value.size().i32(), c)
-        c.append(value)
-        c
-    
-    fun visit(value: Bool val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(1, c)
-        if value == true then
-            c.push(0x01)
-        else
-            c.push(0x00)
-        end
-        c
-    
-    fun visit(value: Date val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let result: U32 val = ((value.timestamp() / 86400) + 2147483648).u32()
-        IntVisitor(4, c)
-        UIntVisitor(result, c)
-        c
-    
-    fun visit(value: (I32 val | U32 val), c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(4, c)
-        UIntVisitor(value.u32(), c)
-        c
-    
-    fun visit(value: F32 val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(4, c)
-        UIntVisitor(value.bits(), c)
-        c
-    
-    fun visit(value: NetAddress, c: Array[U8 val] ref): Array[U8 val] ref =>
-        if value.ip6() then
-            IntVisitor(16, c)
-            UIntVisitor(value.addr1, c)
-            UIntVisitor(value.addr2, c)
-            UIntVisitor(value.addr3, c)
-            UIntVisitor(value.addr4, c)
-        else
+    fun visit
+        ( value: ( None val
+               | String val
+               | U64 val
+               | F64 val
+               | I64 val
+               | Array[U8 val] val
+               | Bool val
+               | Date val
+               | I32 val
+               | U32 val
+               | F32 val
+               | NetAddress val
+               | I16 val
+               | U16 val
+               | Time val
+               | U8 val
+               | I8 val
+               | Seq[cql.NativeType val] val
+               | collections.Set[String val] val
+               | collections.Set[I64 val] val
+               | collections.Set[F64 val] val
+               | collections.Set[I32 val] val
+               | collections.Set[F32 val] val
+               | collections.Set[I16 val] val
+               | collections.Set[I8 val] val
+               | collections.Map[String val, cql.NativeType val] val
+               | collections.Map[I64 val, cql.NativeType val] val
+               | collections.Map[F64 val, cql.NativeType val] val
+               | collections.Map[I32 val, cql.NativeType val] val
+               | collections.Map[F32 val, cql.NativeType val] val
+               | collections.Map[I16 val, cql.NativeType val] val
+               | collections.Map[I8 val, cql.NativeType val] val
+               )
+        , c: Array[U8 val] ref = Array[U8 val]
+        )
+        : Array[U8 val] ref =>
+        match value
+        | let v : None => IntVisitor(-1, c)
+        | let stringValue : String =>
+            let v = stringValue.array()
+            IntVisitor(v.size().i32(), c)
+            for byte in v.values() do
+                c.push(byte)
+            end
+        | let v : U64 val =>
+            IntVisitor(8, c)
+            c.push((v >> 56).u8())
+            c.push((v >> 48).u8())
+            c.push((v >> 40).u8())
+            c.push((v >> 32).u8())
+            c.push((v >> 24).u8())
+            c.push((v >> 16).u8())
+            c.push((v >> 8).u8())
+            c.push(v.u8())
+        | let v : F64 val =>
+            visit(v.bits(), c)
+        | let v : I64 val =>
+            visit(v.u64(), c)
+        | let v : Array[U8 val] val =>
+            IntVisitor(v.size().i32(), c)
+            c.append(v)
+        | let v : Bool val =>
+            IntVisitor(1, c)
+            if v == true then
+                c.push(0x01)
+            else
+                c.push(0x00)
+            end
+        | let v : Date val =>
+            let result: U32 val = ((v.timestamp() / 86400) + 2147483648).u32()
             IntVisitor(4, c)
-            c.push(value.addr.u8())
-            c.push((value.addr >> 8).u8())
-            c.push((value.addr >> 16).u8())
-            c.push((value.addr >> 24).u8())
-        end
-        c
-    
-    fun visit(value: (I16 val | U16 val), c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(2, c)
-        ShortVisitor(value.u16(), c)
-        c
-    
-    fun visit(value: Time val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        visit(value.u64(), c)
-        c
-    
-    fun visit(value: (U8 val | I8 val), c: Array[U8 val] ref): Array[U8 val] ref =>
-        IntVisitor(1, c)
-        c.push(value.u8())
-        c
-    
-    fun visit(value: Seq[cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-    
-    fun visit(value: collections.Set[String val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
+            UIntVisitor(result, c)
+        | let v : (I32 val | U32 val) =>
+            IntVisitor(4, c)
+            UIntVisitor(v.u32(), c)
+        | let v : F32 val =>
+            IntVisitor(4, c)
+            UIntVisitor(v.bits(), c)
+        | let v : NetAddress val =>
+            if v.ip6() then
+                IntVisitor(16, c)
+                var ip6 = v.ipv6_addr()
 
-    
-    fun visit(value: collections.Set[I64 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
+                UIntVisitor(ip6._1, c)
+                UIntVisitor(ip6._2, c)
+                UIntVisitor(ip6._3, c)
+                UIntVisitor(ip6._4, c)
+            else
+                IntVisitor(4, c)
+                UIntVisitor(v.ipv4_addr(), c)
+            end
+        | let v : (I16 val | U16 val) =>
+            IntVisitor(2, c)
+            ShortVisitor(v.u16(), c)
+        | let v : Time val =>
+            visit(v.u64(), c)
+        | let v : (U8 val | I8 val) =>
+            IntVisitor(1, c)
+            c.push(v.u8())
+        | let v :  Seq[cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[String val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[I64 val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[F64 val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[I32 val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[F32 val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[I16 val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Set[I8 val] val =>
+            let tail : Array[U8 val] ref = IntVisitor(v.size().i32())
+            for subvalue in v.values() do
+                QueryRequestParameterVisitor(subvalue, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[String val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[I64 val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[F64 val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[I32 val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[F32 val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[I16 val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
+        | let v : collections.Map[I8 val, cql.NativeType val] val =>
+            let tail = IntVisitor(v.size().i32())
+            for (k, va) in v.pairs() do
+                visit(k, tail)
+                visit(va, tail)
+            end
+            IntVisitor(tail.size().i32(), c)
+            c.append(tail)
         end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Set[F64 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Set[I32 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Set[F32 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Set[I16 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Set[I8 val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for subvalue in value.values() do
-            QueryRequestParameterVisitor(subvalue, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[String val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[I64 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[F64 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[F32 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[I32 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[I16 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
-        c
-
-    fun visit(value: collections.Map[I8 val, cql.NativeType val] val, c: Array[U8 val] ref): Array[U8 val] ref =>
-        let tail = IntVisitor(value.size().i32())
-        for (k, v) in value.pairs() do
-            visit(k, tail)
-            visit(v, tail)
-        end
-        IntVisitor(tail.size().i32(), c)
-        c.append(tail)
         c

@@ -187,7 +187,7 @@ class iso QueryRequestParameterVisitorTest is UnitTest
 
         net_address = DNS((h.env.root as AmbientAuth), "2001:0db8:85a3:0000:0000:8a2e:0370:7334", "80")(0)?
         result = recover QueryRequestParameterVisitor(net_address) end
-        h.assert_eq[String val]("00000010B80D01200000A3852E8A000034737003", Bytes.to_hex_string(result))
+        h.assert_eq[String val]("0000001020010DB885A3000000008A2E03707334", Bytes.to_hex_string(result))
 
         let int: I32 val = 32
         result = recover QueryRequestParameterVisitor(int) end

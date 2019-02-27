@@ -29,6 +29,6 @@ class iso AuthResponseRequestVisitorTest is UnitTest
         request = recover AuthResponseRequest(recover [as U8: 0xAB; 0xCD] end) end
         result = recover AuthResponseRequestVisitor(request) end
         data = [ as U8: 0x00; 0x00; 0x00; 0x02; 0xAB; 0xCD ]
-        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
-            h.assert_eq[U8](a, b)
+        for (c, d) in Iter[U8 val](data.values()).zip[U8 val](result.values()) do
+            h.assert_eq[U8](c, d)
         end

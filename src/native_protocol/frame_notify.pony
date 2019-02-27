@@ -78,7 +78,6 @@ class FrameNotify is TCPConnectionNotify
                 _log(Error, "Error parsing frame header.")
                 false
             end
-        else false
         end
 
     fun ref closed(conn: TCPConnection ref) =>
