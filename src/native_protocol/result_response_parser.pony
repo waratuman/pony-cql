@@ -69,14 +69,14 @@ class RowsResultResponseParser is Parser[RowsResultResponse]
 
         let rows_count = IntParser(data)?.usize()
 
-        let rows_content: Array[Array[cql.Type]] iso = recover
-            Array[Array[cql.Type]](rows_count)
+        let rows_content: Array[Array[cql.Type val] val] iso = recover
+            Array[Array[cql.Type val] val](rows_count)
         end
 
         i = 0
 
         while i < rows_count do
-            let content = recover Array[cql.Type](columns_count) end
+            let content = recover Array[cql.Type val](columns_count) end
             
             var j: USize val = 0
             while j < columns_count do

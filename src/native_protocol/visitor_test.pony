@@ -25,11 +25,14 @@ actor VisitorTestList is TestList
         StartupRequestVisitorTestList.make().tests(test)
         SupportedResponseVisitorTestList.make().tests(test)
         
+        test(BoolVisitorTest)
         test(ByteVisitorTest)
         test(UIntVisitorTest)
         test(IntVisitorTest)
         test(LongVisitorTest)
         test(ShortVisitorTest)
+        test(FloatVisitorTest)
+        test(DoubleVisitorTest)
         test(StringVisitorTest)
         test(LongStringVisitorTest)
         test(UUIDVisitorTest)
@@ -57,6 +60,22 @@ class iso ByteVisitorTest is UnitTest
         h.assert_eq[USize](1, collector.size())
         h.assert_eq[U8](3, collector(0)?)
 
+
+class iso BoolVisitorTest is UnitTest
+
+    fun name(): String =>
+        "BoolVisitor.apply"
+
+    fun tag apply(h: TestHelper) =>
+        var data = [ as U8: 0x00 ]
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](BoolVisitor(false).values()) do
+            h.assert_eq[U8](a, b)
+        end
+
+        data = [ as U8: 0x01 ]
+        for (a, b) in Iter[U8 val](data.values()).zip[U8 val](BoolVisitor(true).values()) do
+            h.assert_eq[U8](a, b)
+        end
 
 class iso UIntVisitorTest is UnitTest
 
@@ -92,7 +111,34 @@ class iso LongVisitorTest is UnitTest
         for (a, b) in Iter[U8 val](data.values()).zip[U8 val](LongVisitor(-1).values()) do
             h.assert_eq[U8](a, b)
         end
+
+
+class iso FloatVisitorTest is UnitTest
+
+    fun name(): String =>
+        "FloatVisitor.apply"
+    
+    fun tag apply(h: TestHelper) =>
+        let expected = [ as U8: 0x7F; 0x7F; 0xFF; 0xFF ]
+        let actual = FloatVisitor(F32.max_value())
         
+        for (a, b) in Iter[U8 val](expected.values()).zip[U8 val](actual.values()) do
+            h.assert_eq[U8](a, b)
+        end
+
+
+class iso DoubleVisitorTest is UnitTest
+
+    fun name(): String =>
+        "DoubleVisitor.apply"
+    
+    fun tag apply(h: TestHelper) =>
+        let expected = [ as U8: 0x7F; 0xEF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF ]
+        let actual = DoubleVisitor(F64.max_value())
+        
+        for (a, b) in Iter[U8 val](expected.values()).zip[U8 val](actual.values()) do
+            h.assert_eq[U8](a, b)
+        end
 
 class iso ShortVisitorTest is UnitTest
 

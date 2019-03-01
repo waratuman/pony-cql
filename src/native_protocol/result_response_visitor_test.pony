@@ -35,16 +35,17 @@ class iso _TestResultResponseVisitor is UnitTest
         let columns: Array[(String val, String val, String val, U16 val)] iso = recover
             [("keyspace", "table", "column", 0x0009)]
         end
-        let rows: Array[Array[cql.Type val]] iso = recover
+        let rows: Array[Array[cql.Type val] val] iso = recover
             [ [ as cql.Type: None ] ]
         end
-        h.env.out.print(columns.size().string())
+
         var r2 : RowsResultResponse val = RowsResultResponse(consume columns, consume rows)
         r = r2
         actual = ResultResponseVisitor(r)
         expected = [ as U8: 0x00; 0x00; 0x00; 0x02; 0x00; 0x00; 0x00; 0x01; 0x00; 0x00; 0x00; 0x01 ]
-        h.env.out.print(r2.columns.size().string())
-        h.env.out.print(r2.rows.size().string())
+
+        // h.env.out.print(r2.columns.size().string())
+        // h.env.out.print(r2.rows.size().string())
         h.env.out.print(Bytes.to_hex_string(expected))
         h.env.out.print(Bytes.to_hex_string(actual))
         

@@ -14,6 +14,19 @@ primitive ByteVisitor is Visitor[U8 val]
         collector
 
 
+primitive BoolVisitor is Visitor[Bool val]
+    """
+    A boolean value represented as 1 byte. 0 is False and 1 is True
+    """
+
+    fun box apply(value: Bool box, collector: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
+        if value == true then
+            collector.push(0x01)
+        else
+            collector.push(0x00)
+        end
+        collector
+
 primitive UIntVisitor is Visitor[U32 val]
     """
     A 4 byte unsigned integer.
@@ -65,6 +78,33 @@ primitive ShortVisitor is Visitor[U16 val]
     fun box apply(value: U16 val, collector: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
         collector.push((value >> 8).u8())
         collector.push(value.u8())
+        collector
+
+
+primitive FloatVisitor is Visitor[F32 val]
+    """
+    A 4 byte floating point number in the IEEE 754 binary32 format.
+    """
+
+    fun box apply(value: F32 val, collector: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
+        UIntVisitor(value.bits(), collector)
+
+
+primitive DoubleVisitor is Visitor[F64 val]
+    """
+    An 8 byte floating point number in the IEEE 754 binary64 format.
+    """
+
+    fun box apply(value: F64 val, collector: Array[U8 val] ref = Array[U8 val]): Array[U8 val] ref =>
+        let bits = value.bits()
+        collector.push((bits >> 56).u8())
+        collector.push((bits >> 48).u8())
+        collector.push((bits >> 40).u8())
+        collector.push((bits >> 32).u8())
+        collector.push((bits >> 24).u8())
+        collector.push((bits >> 16).u8())
+        collector.push((bits >> 08).u8())
+        collector.push(bits.u8())
         collector
 
 

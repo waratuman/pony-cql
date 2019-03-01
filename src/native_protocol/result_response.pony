@@ -22,13 +22,13 @@ class iso VoidResultResponse is Stringable
 
 class iso RowsResultResponse is Stringable
 
-    let rows: Array[Array[cql.Type val]] iso
-    let columns: Array[(String val, String val, String val, U16 val)] iso
+    let rows: Array[Array[cql.Type val] val] ref
+    let columns: Array[(String val, String val, String val, U16 val)] ref
     let paging_state: (Array[U8 val] iso | None)
 
     new iso create(
         columns': Array[(String val, String val, String val, U16 val)] iso,
-        rows': Array[Array[cql.Type val]] iso
+        rows': Array[Array[cql.Type val] val] iso
         )
     =>
         rows = consume rows'
@@ -36,20 +36,19 @@ class iso RowsResultResponse is Stringable
         paging_state = None
     
     fun box string(): String iso^ =>
-        "ROW RESULTS".string()
-        // let result = recover iso String end
-        // result.append("ROW RESULTS\n")
+        let result = recover iso String end
+        result.append("ROW RESULTS\n")
 
-        // for row in rows.values() do
-        //     for column in row.values() do
-        //         match column
-        //         | let x: Stringable => result.append(x.string())
-        //         else result.append("unsupported")
-        //         end
+        for row in rows.values() do
+            for column in row.values() do
+                match column
+                | let x: Stringable => result.append(x.string())
+                else result.append("unsupported")
+                end
 
-        //         result.append(" | ")
-        //     end
-        //     result.append("\n")
-        // end
+                result.append(" | ")
+            end
+            result.append("\n")
+        end
         
-        // result
+        result
